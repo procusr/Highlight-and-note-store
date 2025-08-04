@@ -22,6 +22,23 @@ This is a Go web application using:
 - Use interfaces for external dependencies
 - Write comprehensive tests for all business logic
 
+* **Concurrency Management**
+    - Implement safe goroutine practices with proper cancellation
+    - Use context propagation to prevent leaks and deadlocks
+    - Guard shared state with channels or sync primitives
+* **Architecture & Design**
+    - Follow interface-driven development with explicit dependency injection
+    - Prefer composition over inheritance
+    - Design with clear boundaries and dependency inversion
+    - Avoid global state; use constructor functions for dependencies
+* **Error Handling & Resources**
+    - Check and handle errors explicitly with wrapped errors for traceability
+    - Use defer for resource cleanup to prevent leaks
+    - Implement robust logging and observability
+* **Dependencies**
+    - Prefer standard library when feasible
+    - Use Go modules with version-locked dependencies
+
 ## Project Structure
 
 - `cmd/` - Application entry points
