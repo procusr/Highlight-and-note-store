@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"mh-go/internal/middleware"
@@ -41,19 +42,19 @@ func (h *AuthHandler) LoginPage(w http.ResponseWriter, r *http.Request) {
         <form class="mt-8 space-y-6" hx-post="/login" hx-target="#error" hx-swap="innerHTML">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <input name="email" type="email" required
+                    <input name="email" type="email" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Email address">
                 </div>
                 <div>
-                    <input name="password" type="password" required
+                    <input name="password" type="password" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Password">
                 </div>
             </div>
             <div id="error" class="text-red-600 text-sm"></div>
             <div>
-                <button type="submit"
+                <button type="submit" 
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Sign in
                 </button>
@@ -118,7 +119,7 @@ func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
         <form class="mt-8 space-y-6" hx-post="/register" hx-target="#error" hx-swap="innerHTML" hx-indicator="#loading">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <input name="email" type="email" required
+                    <input name="email" type="email" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Email address">
                 </div>
@@ -128,7 +129,7 @@ func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
                            placeholder="Password (min 6 characters)">
                 </div>
                 <div>
-                    <input name="confirm_password" type="password" required
+                    <input name="confirm_password" type="password" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Confirm Password">
                 </div>
@@ -136,7 +137,7 @@ func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
             <div id="error" class="text-red-600 text-sm"></div>
             <div id="loading" class="htmx-indicator text-blue-600 text-sm">Processing...</div>
             <div>
-                <button type="submit"
+                <button type="submit" 
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Sign up
                 </button>
@@ -218,13 +219,13 @@ func (h *AuthHandler) ForgotPasswordPage(w http.ResponseWriter, r *http.Request)
         </div>
         <form class="mt-8 space-y-6" hx-post="/forgot-password" hx-target="#message" hx-swap="innerHTML">
             <div>
-                <input name="email" type="email" required
+                <input name="email" type="email" required 
                        class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                        placeholder="Email address">
             </div>
             <div id="message" class="text-sm"></div>
             <div>
-                <button type="submit"
+                <button type="submit" 
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Send Reset Link
                 </button>
@@ -277,19 +278,19 @@ func (h *AuthHandler) ResetPasswordPage(w http.ResponseWriter, r *http.Request) 
             <input type="hidden" name="token" value="` + r.URL.Query().Get("token") + `">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <input name="password" type="password" required
+                    <input name="password" type="password" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="New Password">
                 </div>
                 <div>
-                    <input name="confirm_password" type="password" required
+                    <input name="confirm_password" type="password" required 
                            class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Confirm New Password">
                 </div>
             </div>
             <div id="message" class="text-sm"></div>
             <div>
-                <button type="submit"
+                <button type="submit" 
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Reset Password
                 </button>

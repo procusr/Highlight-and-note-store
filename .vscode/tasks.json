@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "command": "air",
+      "group": "build",
+      "isBackground": true,
+      "label": "Run MH-Go Development Server",
+      "problemMatcher": ["$go"],
+      "type": "shell"
+    }
+  ]
+}
