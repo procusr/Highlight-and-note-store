@@ -1,0 +1,97 @@
+package main
+
+import (
+	"database/sql"
+	"log"
+	"net/http"
+	"os"
+
+	"mh-go/internal/handlers"
+	"mh-go/internal/middleware"
+	"mh-go/internal/services"
+
+	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	_ "github.com/lib/pq"
+)
+
+func main() {
+	// Database connection
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		dbURL = "postgres://user:password@localhost:5433/mhgo?sslmode=disable"
+	}
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Println("Database is not reachable:", err)
+		return
+	}
+
+	log.Println("Connected to database successfully")
+
+	// JWT secret
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "your-super-secret-jwt-key-change-in-production"
+	}
+
+	// Initialize services
+	authService := services.NewAuthService(db, jwtSecret)
+	folderService := services.NewFolderService(db)
+	contentService := services.NewContentService(db)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(authService)
+	folderHandler := handlers.NewFolderHandler(folderService, contentService)
+
+	// Setup router
+	r := setupRouter(authService, authHandler, folderHandler)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Server starting on port %s", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
+}
+
+func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler) *chi.Mux {
+	r := chi.NewRouter()
+
+	// Global middleware
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
+	r.Use(middleware.CORS)
+	r.Use(middleware.ContentType)
+
+	// Static files
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+
+	// Auth routes (public)
+	r.Get("/login", authHandler.LoginPage)
+	r.Post("/login", authHandler.Login)
+	r.Get("/register", authHandler.RegisterPage)
+	r.Post("/register", authHandler.Register)
+	r.Post("/logout", authHandler.Logout)
+
+	// Protected routes
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.RequireAuth(authService))
+
+		// Dashboard
+		r.Get("/", folderHandler.DashboardPage)
+		r.Get("/dashboard", folderHandler.DashboardPage)
+
+		// Register folder routes
+		folderHandler.RegisterRoutes(r, authService)
+	})
+
+	return r
+}
