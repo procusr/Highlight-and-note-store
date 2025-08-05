@@ -67,7 +67,7 @@ templ CreateContentModal(folderID string) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
 				>
 					Create Content
 				</button>
@@ -110,7 +110,7 @@ templ EditFolderModal(folder models.Folder) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
 				>
 					Update Folder
 				</button>
@@ -181,7 +181,7 @@ templ EditContentModal(content models.Content) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
 				>
 					Update Content
 				</button>
@@ -223,7 +223,7 @@ templ DeleteConfirmationModal(itemType, itemID, itemName string) {
 				hx-delete={ "/api/" + itemType + "s/" + itemID }
 				hx-target="body"
 				hx-swap="outerHTML"
-				class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+				class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
 			>
 				Delete { itemType }
 			</button>

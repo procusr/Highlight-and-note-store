@@ -49,9 +49,10 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	folderHandler := handlers.NewFolderHandler(folderService, contentService)
+	pageHandler := handlers.NewPageHandler()
 
 	// Setup router
-	r := setupRouter(authService, authHandler, folderHandler)
+	r := setupRouter(authService, authHandler, folderHandler, pageHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -64,7 +65,7 @@ func main() {
 	}
 }
 
-func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler) *chi.Mux {
+func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, pageHandler *handlers.PageHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Global middleware
@@ -90,6 +91,10 @@ func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHa
 		// Dashboard
 		r.Get("/", folderHandler.DashboardPage)
 		r.Get("/dashboard", folderHandler.DashboardPage)
+
+		// Page routes
+		r.Get("/flashcards", pageHandler.FlashcardsPage)
+		r.Get("/settings", pageHandler.SettingsPage)
 
 		// Register folder routes
 		folderHandler.RegisterRoutes(r, authService)

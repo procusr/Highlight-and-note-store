@@ -51,38 +51,46 @@ func DashboardPage(user *models.User, folders []models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <div class=\"max-w-7xl mx-auto py-6 px-4\"><!-- Dashboard Header --><div class=\"flex justify-between items-center mb-6\"><div><h1 class=\"text-2xl font-bold text-gray-900\">Dashboard</h1><p class=\"text-gray-600 mt-2\">Welcome back, ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = Sidebar("dashboard").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " <!-- Main content with sidebar offset --> <main class=\"main-content md:ml-64 min-h-screen bg-gray-50 pt-16\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><!-- Dashboard Header --><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Dashboard</h1><p class=\"text-gray-600 text-sm md:text-base\">Welcome back, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/dashboard.templ`, Line: 17, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/dashboard.templ`, Line: 20, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p></div><button onclick=\"showCreateFolderModal()\" class=\"bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium\">Create New Folder</button></div><!-- Statistics Cards --><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-8\"><div class=\"bg-white overflow-hidden shadow rounded-lg\"><div class=\"p-5\"><div class=\"flex items-center\"><div class=\"flex-shrink-0\"><svg class=\"h-6 w-6 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z\"></path></svg></div><div class=\"ml-5 w-0 flex-1\"><dl><dt class=\"text-sm font-medium text-gray-500 truncate\">Total Folders</dt><dd class=\"text-lg font-medium text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Statistics Cards --><div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8\"><div class=\"bg-white rounded-lg border border-gray-200 p-4 md:p-6\"><div class=\"flex items-center\"><div class=\"p-2 bg-gray-100 rounded-lg\"><svg class=\"h-5 w-5 md:h-6 md:w-6 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z\"></path></svg></div><div class=\"ml-3 md:ml-4\"><p class=\"text-xs md:text-sm font-medium text-gray-600\">Total Folders</p><p class=\"text-lg md:text-2xl font-semibold text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.EscapeString(fmt.Sprintf("%d", len(folders))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/dashboard.templ`, Line: 41, Col: 108}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/dashboard.templ`, Line: 35, Col: 120}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</dd></dl></div></div></div></div><div class=\"bg-white overflow-hidden shadow rounded-lg\"><div class=\"p-5\"><div class=\"flex items-center\"><div class=\"flex-shrink-0\"><svg class=\"h-6 w-6 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><div class=\"ml-5 w-0 flex-1\"><dl><dt class=\"text-sm font-medium text-gray-500 truncate\">Total Content</dt><dd class=\"text-lg font-medium text-gray-900\">0</dd></dl></div></div></div></div><div class=\"bg-white overflow-hidden shadow rounded-lg\"><div class=\"p-5\"><div class=\"flex items-center\"><div class=\"flex-shrink-0\"><svg class=\"h-6 w-6 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><div class=\"ml-5 w-0 flex-1\"><dl><dt class=\"text-sm font-medium text-gray-500 truncate\">Last Activity</dt><dd class=\"text-lg font-medium text-gray-900\">Today</dd></dl></div></div></div></div></div><!-- Recent Folders -->")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p></div></div></div><div class=\"bg-white rounded-lg border border-gray-200 p-4 md:p-6\"><div class=\"flex items-center\"><div class=\"p-2 bg-gray-100 rounded-lg\"><svg class=\"h-5 w-5 md:h-6 md:w-6 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><div class=\"ml-3 md:ml-4\"><p class=\"text-xs md:text-sm font-medium text-gray-600\">Total Content</p><p class=\"text-lg md:text-2xl font-semibold text-gray-900\">0</p></div></div></div><div class=\"bg-white rounded-lg border border-gray-200 p-4 md:p-6 sm:col-span-2 lg:col-span-1\"><div class=\"flex items-center\"><div class=\"p-2 bg-gray-100 rounded-lg\"><svg class=\"h-5 w-5 md:h-6 md:w-6 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><div class=\"ml-3 md:ml-4\"><p class=\"text-xs md:text-sm font-medium text-gray-600\">Last Activity</p><p class=\"text-lg md:text-2xl font-semibold text-gray-900\">Today</p></div></div></div></div><!-- Recent Folders Section -->")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(folders) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div><h2 class=\"text-lg font-semibold text-gray-900 mb-4\">Your Folders</h2><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div><div class=\"flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-4\"><h2 class=\"text-base md:text-lg font-medium text-gray-900\">Recent Folders</h2><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors\"><svg class=\"w-3 h-3 md:w-4 md:h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Folder</button></div><div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4\" id=\"folders-container\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -92,17 +100,17 @@ func DashboardPage(user *models.User, folders []models.Folder) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"text-center py-12\"><svg class=\"mx-auto h-12 w-12 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z\"></path></svg><h3 class=\"mt-2 text-sm font-medium text-gray-900\">No folders</h3><p class=\"mt-1 text-sm text-gray-500\">Get started by creating your first folder.</p><div class=\"mt-6\"><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700\"><svg class=\"-ml-1 mr-2 h-5 w-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> Create Folder</button></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"text-center py-12 md:py-16\"><div class=\"mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4\"><svg class=\"h-6 w-6 md:h-8 md:w-8 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z\"></path></svg></div><h3 class=\"text-base md:text-lg font-medium text-gray-900 mb-2\">No folders yet</h3><p class=\"text-gray-600 mb-6 text-sm md:text-base px-4\">Get started by creating your first folder to organize your content.</p><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors\"><svg class=\"w-4 h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> Create Your First Folder</button></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><!-- Create Folder Modal --> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></main><!-- Create Folder Modal --> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -110,7 +118,7 @@ func DashboardPage(user *models.User, folders []models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " <!-- JavaScript for modal functionality --> <script>\n\t\t\t// Simple modal management without complex onclick handlers\n\t\t\tdocument.addEventListener('DOMContentLoaded', function() {\n\t\t\t\t// Show create folder modal\n\t\t\t\twindow.showCreateFolderModal = function() {\n\t\t\t\t\tdocument.getElementById('createFolderModal').classList.remove('hidden');\n\t\t\t\t}\n\n\t\t\t\t// Close modal by ID\n\t\t\t\twindow.closeModal = function(modalId) {\n\t\t\t\t\tdocument.getElementById(modalId).classList.add('hidden');\n\t\t\t\t}\n\n\t\t\t\t// Handle modal close buttons\n\t\t\t\tdocument.addEventListener('click', function(e) {\n\t\t\t\t\tif (e.target.hasAttribute('data-modal-close')) {\n\t\t\t\t\t\tconst modalId = e.target.getAttribute('data-modal-close');\n\t\t\t\t\t\tcloseModal(modalId);\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\t// Close modal when clicking outside\n\t\t\t\twindow.onclick = function(event) {\n\t\t\t\t\tconst modal = document.getElementById('createFolderModal');\n\t\t\t\t\tif (event.target === modal) {\n\t\t\t\t\t\tmodal.classList.add('hidden');\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " <!-- JavaScript for modal functionality --> <script>\n\t\t\t// Simple modal management\n\t\t\tdocument.addEventListener('DOMContentLoaded', function() {\n\t\t\t\t// Show create folder modal\n\t\t\t\twindow.showCreateFolderModal = function() {\n\t\t\t\t\tdocument.getElementById('createFolderModal').classList.remove('hidden');\n\t\t\t\t}\n\n\t\t\t\t// Close modal by ID\n\t\t\t\twindow.closeModal = function(modalId) {\n\t\t\t\t\tdocument.getElementById(modalId).classList.add('hidden');\n\t\t\t\t}\n\n\t\t\t\t// Handle modal close buttons\n\t\t\t\tdocument.addEventListener('click', function(e) {\n\t\t\t\t\tif (e.target.hasAttribute('data-modal-close')) {\n\t\t\t\t\t\tconst modalId = e.target.getAttribute('data-modal-close');\n\t\t\t\t\t\tcloseModal(modalId);\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\t// Close modal when clicking outside\n\t\t\t\twindow.onclick = function(event) {\n\t\t\t\t\tconst modal = document.getElementById('createFolderModal');\n\t\t\t\t\tif (event.target === modal) {\n\t\t\t\t\t\tmodal.classList.add('hidden');\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\t// Folder management functions\n\t\t\t\twindow.editFolder = function(folderId) {\n\t\t\t\t\tconsole.log('Edit folder:', folderId);\n\t\t\t\t\t// TODO: Implement edit functionality\n\t\t\t\t}\n\n\t\t\t\twindow.deleteFolder = function(folderId) {\n\t\t\t\t\tif (confirm('Are you sure you want to delete this folder?')) {\n\t\t\t\t\t\tconsole.log('Delete folder:', folderId);\n\t\t\t\t\t\t// TODO: Implement delete functionality\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -158,7 +166,7 @@ func CreateFolderModal() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<form hx-post=\"/api/folders\" hx-target=\"#folders-container\" hx-swap=\"afterbegin\"><div class=\"mb-4\"><label for=\"name\" class=\"block text-sm font-medium text-gray-700\">Folder Name</label> <input type=\"text\" id=\"name\" name=\"name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter folder name\"></div><div class=\"mb-4\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700\">Description</label> <textarea id=\"description\" name=\"description\" rows=\"3\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter folder description (optional)\"></textarea></div><div class=\"flex justify-end space-x-3\"><button type=\"button\" onclick=\"closeModal('createFolderModal')\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700\">Create Folder</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<form hx-post=\"/api/folders\" hx-target=\"#folders-container\" hx-swap=\"afterbegin\"><div class=\"mb-4\"><label for=\"name\" class=\"block text-sm font-medium text-gray-700\">Folder Name</label> <input type=\"text\" id=\"name\" name=\"name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500\" placeholder=\"Enter folder name\"></div><div class=\"mb-4\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700\">Description</label> <textarea id=\"description\" name=\"description\" rows=\"3\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500\" placeholder=\"Enter folder description (optional)\"></textarea></div><div class=\"flex justify-end space-x-3\"><button type=\"button\" onclick=\"closeModal('createFolderModal')\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800\">Create Folder</button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

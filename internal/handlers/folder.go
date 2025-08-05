@@ -49,6 +49,7 @@ func (h *FolderHandler) RegisterRoutes(r chi.Router, authService *services.AuthS
 
 	// Page routes
 	r.Get("/dashboard", h.DashboardPage)
+	r.Get("/folders", h.FoldersPage)
 	r.Get("/folders/{folderID}", h.FolderPage)
 }
 
@@ -73,6 +74,32 @@ func (h *FolderHandler) DashboardPage(w http.ResponseWriter, r *http.Request) {
 	// Render dashboard template
 	w.Header().Set("Content-Type", "text/html")
 	if err := templates.DashboardPage(user, folders).Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return
+	}
+}
+
+// FoldersPage renders the folders list page
+func (h *FolderHandler) FoldersPage(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	// Get user information (simplified for now)
+	user := &models.User{ID: userID, Email: "user@example.com"}
+
+	// Get all folders for the user
+	folders, err := h.folderService.GetRootFolders(userID)
+	if err != nil {
+		http.Error(w, "Failed to load folders", http.StatusInternalServerError)
+		return
+	}
+
+	// Render folders template
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.FoldersPage(user, folders).Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		return
 	}
@@ -114,9 +141,12 @@ func (h *FolderHandler) FolderPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get user information (simplified for now)
+	user := &models.User{ID: userID, Email: "user@example.com"}
+
 	// Render folder page template
 	w.Header().Set("Content-Type", "text/html")
-	if err := templates.FolderPage(*folder, contents, subfolders).Render(r.Context(), w); err != nil {
+	if err := templates.FolderPage(user, *folder, contents, subfolders).Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		return
 	}
