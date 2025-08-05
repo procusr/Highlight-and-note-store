@@ -3,12 +3,11 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net/http"
-	"os"
-
 	"mh-go/internal/handlers"
 	"mh-go/internal/middleware"
 	"mh-go/internal/services"
+	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -24,7 +23,8 @@ func main() {
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Printf("Failed to connect to database: %v", err)
+		return
 	}
 	defer db.Close()
 
@@ -59,7 +59,9 @@ func main() {
 	}
 
 	log.Printf("Server starting on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	if err := http.ListenAndServe(":"+port, r); err != nil {
+		log.Printf("Server error: %v", err)
+	}
 }
 
 func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler) *chi.Mux {
