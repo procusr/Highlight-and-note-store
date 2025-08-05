@@ -1,0 +1,53 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of build tools
+/bin/
+/build/
+/dist/
+
+# Go workspace file
+go.work
+
+# Go module files backup
+go.sum
+
+# Dependency directories (vendor)
+vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Air hot reload config
+.air.toml
+
+# Docker artifacts
+docker/*.env
+docker/*.local
+
+# Static assets build output
+/static/dist/
+
+# Templ generated files
+templates_gen/
+
+# Database
+*.db
+*.sqlite
+
+# Coverage reports
+coverage.out
+
+# OS generated files
+.DS_Store
+Thumbs.db

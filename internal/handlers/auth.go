@@ -6,6 +6,7 @@ import (
 
 	"mh-go/internal/middleware"
 	"mh-go/internal/services"
+	"mh-go/templates"
 
 	"github.com/google/uuid"
 )
@@ -19,55 +20,12 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) LoginPage(w http.ResponseWriter, r *http.Request) {
-	// Render login page template
+	// Render login page template using templ
 	w.Header().Set("Content-Type", "text/html")
-	html := `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - MH-Go</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Sign in to your account
-            </h2>
-        </div>
-        <form class="mt-8 space-y-6" hx-post="/login" hx-target="#error" hx-swap="innerHTML">
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div>
-                    <input name="email" type="email" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Email address">
-                </div>
-                <div>
-                    <input name="password" type="password" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Password">
-                </div>
-            </div>
-            <div id="error" class="text-red-600 text-sm"></div>
-            <div>
-                <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Sign in
-                </button>
-            </div>
-            <div class="text-center">
-                <a href="/register" class="text-indigo-600 hover:text-indigo-500">
-                    Don't have an account? Sign up
-                </a>
-            </div>
-        </form>
-    </div>
-</body>
-</html>`
-	w.Write([]byte(html))
+	if err := templates.LoginPage().Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -105,61 +63,12 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
-	// Render register page template
+	// Render register page template using templ
 	w.Header().Set("Content-Type", "text/html")
-	html := `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - MH-Go</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Create your account
-            </h2>
-        </div>
-        <form class="mt-8 space-y-6" hx-post="/register" hx-target="#error" hx-swap="innerHTML" hx-indicator="#loading">
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div>
-                    <input name="email" type="email" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Email address">
-                </div>
-                <div>
-                    <input name="password" type="password" required minlength="6"
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Password (min 6 characters)">
-                </div>
-                <div>
-                    <input name="confirm_password" type="password" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Confirm Password">
-                </div>
-            </div>
-            <div id="error" class="text-red-600 text-sm"></div>
-            <div id="loading" class="htmx-indicator text-blue-600 text-sm">Processing...</div>
-            <div>
-                <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Sign up
-                </button>
-            </div>
-            <div class="text-center">
-                <a href="/login" class="text-indigo-600 hover:text-indigo-500">
-                    Already have an account? Sign in
-                </a>
-            </div>
-        </form>
-    </div>
-</body>
-</html>`
-	w.Write([]byte(html))
+	if err := templates.RegisterPage().Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,200 @@
+package templates
+
+import "mh-go/internal/models"
+
+// Login page
+templ LoginPage() {
+	@Layout("Login") {
+		<div class="min-h-screen flex items-center justify-center">
+			<div class="max-w-md w-full space-y-8">
+				<div>
+					<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+						Sign in to your account
+					</h2>
+				</div>
+				<form class="mt-8 space-y-6" hx-post="/login" hx-target="#error" hx-swap="innerHTML">
+					<div class="rounded-md shadow-sm -space-y-px">
+						<div>
+							<input
+								name="email"
+								type="email"
+								required
+								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+								placeholder="Email address"
+							/>
+						</div>
+						<div>
+							<input
+								name="password"
+								type="password"
+								required
+								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+								placeholder="Password"
+							/>
+						</div>
+					</div>
+					<div id="error" class="text-red-600 text-sm"></div>
+					<div>
+						<button
+							type="submit"
+							class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+						>
+							Sign in
+						</button>
+					</div>
+					<div class="text-center">
+						<a href="/register" class="text-indigo-600 hover:text-indigo-500">
+							Don't have an account? Sign up
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+// Register page
+templ RegisterPage() {
+	@Layout("Register") {
+		<div class="min-h-screen flex items-center justify-center">
+			<div class="max-w-md w-full space-y-8">
+				<div>
+					<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+						Create your account
+					</h2>
+				</div>
+				<form class="mt-8 space-y-6" hx-post="/register" hx-target="#error" hx-swap="innerHTML">
+					<div class="rounded-md shadow-sm -space-y-px">
+						<div>
+							<input
+								name="email"
+								type="email"
+								required
+								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+								placeholder="Email address"
+							/>
+						</div>
+						<div>
+							<input
+								name="password"
+								type="password"
+								required
+								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+								placeholder="Password"
+							/>
+						</div>
+						<div>
+							<input
+								name="confirm_password"
+								type="password"
+								required
+								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+								placeholder="Confirm Password"
+							/>
+						</div>
+					</div>
+					<div id="error" class="text-red-600 text-sm"></div>
+					<div>
+						<button
+							type="submit"
+							class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+						>
+							Sign up
+						</button>
+					</div>
+					<div class="text-center">
+						<a href="/login" class="text-indigo-600 hover:text-indigo-500">
+							Already have an account? Sign in
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+// Folder view page
+templ FolderPage(folder models.Folder, contents []models.Content, subfolders []models.Folder) {
+	@Layout("Folder: " + folder.Name) {
+		@Navigation(nil)
+		<div class="max-w-7xl mx-auto py-6 px-4">
+			<!-- Breadcrumb -->
+			<nav class="flex mb-6" aria-label="Breadcrumb">
+				<ol class="inline-flex items-center space-x-1 md:space-x-3">
+					<li class="inline-flex items-center">
+						<a href="/dashboard" class="text-gray-700 hover:text-gray-900">
+							Dashboard
+						</a>
+					</li>
+					<li>
+						<div class="flex items-center">
+							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+							</svg>
+							<span class="text-gray-500 ml-1 md:ml-2">{ folder.Name }</span>
+						</div>
+					</li>
+				</ol>
+			</nav>
+
+			<!-- Folder Header -->
+			<div class="flex justify-between items-center mb-6">
+				<div>
+					<h1 class="text-2xl font-bold text-gray-900">{ folder.Name }</h1>
+					if folder.Description != "" {
+						<p class="text-gray-600 mt-2">{ folder.Description }</p>
+					}
+				</div>
+				<div class="flex space-x-3">
+					<button
+						onclick="showCreateFolderModal()"
+						class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+					>
+						New Folder
+					</button>
+					<button
+						onclick="showCreateContentModal()"
+						class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+					>
+						New Content
+					</button>
+				</div>
+			</div>
+
+			<!-- Subfolders -->
+			if len(subfolders) > 0 {
+				<div class="mb-8">
+					<h2 class="text-lg font-semibold text-gray-900 mb-4">Folders</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						for _, subfolder := range subfolders {
+							@FolderCard(subfolder)
+						}
+					</div>
+				</div>
+			}
+
+			<!-- Content -->
+			if len(contents) > 0 {
+				<div>
+					<h2 class="text-lg font-semibold text-gray-900 mb-4">Content</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						for _, content := range contents {
+							@ContentCard(content)
+						}
+					</div>
+				</div>
+			}
+
+			if len(subfolders) == 0 && len(contents) == 0 {
+				<div class="text-center py-12">
+					<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2a1 1 0 000 2h6a1 1 0 100-2H9z"></path>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+					</svg>
+					<h3 class="mt-2 text-sm font-medium text-gray-900">No items</h3>
+					<p class="mt-1 text-sm text-gray-500">Get started by creating a new folder or content.</p>
+				</div>
+			}
+		</div>
+	}
+}
