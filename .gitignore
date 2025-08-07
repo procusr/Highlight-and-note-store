@@ -33,3 +33,4 @@ tmp/
 *.tmplcache
 
 .env
+tmp/main
