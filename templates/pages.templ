@@ -193,6 +193,41 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 			}
 			</div>
 		</div>
+
+		<!-- Create Content Modal -->
+		@CreateContentModal(folder.ID.String())
+
+		<!-- JavaScript for modal functionality -->
+		<script>
+			// Simple modal management
+			document.addEventListener('DOMContentLoaded', function() {
+				// Show create content modal
+				window.showCreateContentModal = function() {
+					document.getElementById('createContentModal').classList.remove('hidden');
+				}
+
+				// Close modal by ID
+				window.closeModal = function(modalId) {
+					document.getElementById(modalId).classList.add('hidden');
+				}
+
+				// Handle modal close buttons
+				document.addEventListener('click', function(e) {
+					if (e.target.hasAttribute('data-modal-close')) {
+						const modalId = e.target.getAttribute('data-modal-close');
+						closeModal(modalId);
+					}
+				});
+
+				// Close modal when clicking outside
+				window.onclick = function(event) {
+					const modal = document.getElementById('createContentModal');
+					if (event.target === modal) {
+						modal.classList.add('hidden');
+					}
+				}
+			});
+		</script>
 	}
 }
 

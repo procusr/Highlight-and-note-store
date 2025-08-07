@@ -164,7 +164,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 // Create Folder Modal
 templ CreateFolderModal() {
 	@Modal("createFolderModal", "Create New Folder") {
-		<form hx-post="/api/folders" hx-target="#folders-container" hx-swap="afterbegin">
+		<form hx-post="/api/folders" hx-target="#folders-container" hx-swap="afterbegin" hx-on="htmx:afterRequest: if(event.detail.successful) closeModal('createFolderModal')">
 			<div class="mb-4">
 				<label for="name" class="block text-sm font-medium text-gray-700">Folder Name</label>
 				<input

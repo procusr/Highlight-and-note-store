@@ -44,20 +44,20 @@ func CreateContentModal(folderID string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-post=\"/api/content\" hx-target=\"#content-container\" hx-swap=\"afterbegin\"><input type=\"hidden\" name=\"folder_id\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(folderID)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/api/folders/" + folderID + "/content")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 9, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 8, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><div class=\"mb-4\"><label for=\"title\" class=\"block text-sm font-medium text-gray-700\">Title</label> <input type=\"text\" id=\"title\" name=\"title\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter content title\"></div><div class=\"mb-4\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700\">Description</label> <input type=\"text\" id=\"description\" name=\"description\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter content description (optional)\"></div><div class=\"mb-4\"><label for=\"content_type\" class=\"block text-sm font-medium text-gray-700\">Content Type</label> <select id=\"content_type\" name=\"content_type\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\"><option value=\"text\">Text</option> <option value=\"markdown\">Markdown</option> <option value=\"file\">File</option> <option value=\"link\">Link</option></select></div><div class=\"mb-4\"><label for=\"body\" class=\"block text-sm font-medium text-gray-700\">Content</label> <textarea id=\"body\" name=\"body\" rows=\"6\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter your content here...\"></textarea></div><div class=\"flex justify-end space-x-3\"><button type=\"button\" onclick=\"closeModal('createContentModal')\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors\">Create Content</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"body\" hx-swap=\"outerHTML\"><div class=\"mb-4\"><label for=\"title\" class=\"block text-sm font-medium text-gray-700\">Title</label> <input type=\"text\" id=\"title\" name=\"title\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter content title\"></div><div class=\"mb-4\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700\">Description</label> <input type=\"text\" id=\"description\" name=\"description\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter content description (optional)\"></div><div class=\"mb-4\"><label for=\"content_type\" class=\"block text-sm font-medium text-gray-700\">Content Type</label> <select id=\"content_type\" name=\"content_type\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\"><option value=\"text\">Text</option> <option value=\"markdown\">Markdown</option> <option value=\"file\">File</option> <option value=\"link\">Link</option></select></div><div class=\"mb-4\"><label for=\"body\" class=\"block text-sm font-medium text-gray-700\">Content</label> <textarea id=\"body\" name=\"body\" rows=\"6\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500\" placeholder=\"Enter your content here...\"></textarea></div><div class=\"flex justify-end space-x-3\"><button type=\"button\" onclick=\"closeModal('createContentModal')\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors\">Create Content</button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -112,7 +112,7 @@ func EditFolderModal(folder models.Folder) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs("/api/folders/" + folder.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 82, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 80, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func EditFolderModal(folder models.Folder) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 89, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 87, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -138,7 +138,7 @@ func EditFolderModal(folder models.Folder) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 101, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 99, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -199,7 +199,7 @@ func EditContentModal(content models.Content) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("/api/content/" + content.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 125, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 123, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -212,7 +212,7 @@ func EditContentModal(content models.Content) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(content.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 132, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 130, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -225,7 +225,7 @@ func EditContentModal(content models.Content) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(content.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 144, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 142, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -278,7 +278,7 @@ func EditContentModal(content models.Content) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(content.Body)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 171, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 169, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -339,7 +339,7 @@ func DeleteConfirmationModal(itemType, itemID, itemName string) templ.Component 
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(itemType)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 204, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 202, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -352,7 +352,7 @@ func DeleteConfirmationModal(itemType, itemID, itemName string) templ.Component 
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(itemName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 207, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 205, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -365,7 +365,7 @@ func DeleteConfirmationModal(itemType, itemID, itemName string) templ.Component 
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs("/api/" + itemType + "s/" + itemID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 223, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 221, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -378,7 +378,7 @@ func DeleteConfirmationModal(itemType, itemID, itemName string) templ.Component 
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(itemType)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 228, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/modals.templ`, Line: 226, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
