@@ -59,7 +59,7 @@ func DashboardPage(user *models.User, folders []models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " <!-- Main content with sidebar offset --> <main class=\"main-content md:ml-64 min-h-screen bg-gray-50 pt-16\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><!-- Dashboard Header --><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Dashboard</h1><p class=\"text-gray-600 text-sm md:text-base\">Welcome back, ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " <!-- Main content with sidebar offset --> <main class=\"main-content md:ml-16 min-h-screen bg-gray-50 pt-16 md:pt-16 transition-all duration-300\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><!-- Dashboard Header --><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Dashboard</h1><p class=\"text-gray-600 text-sm md:text-base\">Welcome back, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -90,7 +90,7 @@ func DashboardPage(user *models.User, folders []models.Folder) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(folders) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div><div class=\"flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-4\"><h2 class=\"text-base md:text-lg font-medium text-gray-900\">Recent Folders</h2><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors\"><svg class=\"w-3 h-3 md:w-4 md:h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Folder</button></div><div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4\" id=\"folders-container\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div><div class=\"flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-4\"><h2 class=\"text-base md:text-lg font-medium text-gray-900\">Recent Folders</h2><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors\"><svg class=\"w-3 h-3 md:w-4 md:h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Folder</button></div><div class=\"masonry-grid\" id=\"folders-container\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

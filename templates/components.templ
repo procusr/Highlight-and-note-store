@@ -12,6 +12,7 @@ templ Layout(title string) {
 		<title>{ title } - MH-Go</title>
 		<script src="https://cdn.tailwindcss.com"></script>
 		<script src="https://unpkg.com/htmx.org@1.9.6"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 		<link rel="stylesheet" href="/static/style.css"/>
 		<style>
 			.line-clamp-2 {
@@ -20,6 +21,61 @@ templ Layout(title string) {
 				-webkit-box-orient: vertical;
 				overflow: hidden;
 			}
+			/* Custom transition for sidebar width */
+			.sidebar-transition {
+				transition: width 0.3s ease-in-out;
+			}
+			/* Masonry Grid Layout */
+			.masonry-grid {
+				columns: 2;
+				column-gap: 0.75rem;
+			}
+			@media (min-width: 640px) {
+				.masonry-grid {
+					columns: 3;
+					column-gap: 0.75rem;
+				}
+			}
+			@media (min-width: 768px) {
+				.masonry-grid {
+					columns: 4;
+					column-gap: 0.75rem;
+				}
+			}
+			@media (min-width: 1024px) {
+				.masonry-grid {
+					columns: 5;
+					column-gap: 0.75rem;
+				}
+			}
+			@media (min-width: 1280px) {
+				.masonry-grid {
+					columns: 6;
+					column-gap: 0.75rem;
+				}
+			}
+			.masonry-item {
+				break-inside: avoid;
+				margin-bottom: 0.75rem;
+				display: inline-block;
+				width: 100%;
+			}
+			/* Pastel color classes */
+			.pastel-pink { background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%); }
+			.pastel-purple { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); }
+			.pastel-blue { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
+			.pastel-cyan { background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); }
+			.pastel-green { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); }
+			.pastel-yellow { background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%); }
+			.pastel-orange { background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); }
+			.pastel-red { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); }
+			.pastel-indigo { background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); }
+			.pastel-teal { background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); }
+			.pastel-lavender { background: linear-gradient(135deg, #f5f3ff 0%, #ddd6fe 100%); }
+			.pastel-mint { background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); }
+			.pastel-peach { background: linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%); }
+			.pastel-rose { background: linear-gradient(135deg, #fff1f2 0%, #fecaca 100%); }
+			.pastel-sky { background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); }
 		</style>
 	</head>
 	<body class="bg-gray-50 min-h-screen">
@@ -313,93 +369,202 @@ templ Navigation(user *models.User) {
 	</script>
 }
 
-// Sidebar Navigation Component - Mobile responsive
+// Sidebar Navigation Component - Expandable with Alpine.js
 templ Sidebar(currentPage string) {
-	<!-- Mobile overlay - Lower z-index and click should close menu -->
-	<div id="sidebar-overlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-20 hidden md:hidden" onclick="closeMobileMenu()"></div>
+	<div x-data="{
+		open: false,
+		expanded: false,
+		toggleSidebar() { this.open = !this.open },
+		closeSidebar() { this.open = false },
+		expandSidebar() { this.expanded = true },
+		collapseSidebar() { this.expanded = false }
+	}" class="relative">
+		<!-- Mobile Header Bar -->
+		<div class="h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full fixed top-16 left-0 right-0 z-40 border-b border-gray-200">
+			<div class="flex justify-end z-20 w-full">
+				<button @click="toggleSidebar()" class="text-neutral-800 dark:text-neutral-200 cursor-pointer p-2 hover:bg-gray-200 rounded-md">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+					</svg>
+				</button>
+			</div>
+		</div>
 
-	<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 pt-16 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-		<nav class="px-4 py-6">
-			<ul class="space-y-1">
-				<li>
-					<a href="/dashboard" class={ getSidebarLinkClass("dashboard", currentPage) } onclick="closeMobileMenu()">
-						<svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-						</svg>
-						<span>Dashboard</span>
-					</a>
-				</li>
-				<li>
-					<a href="/folders" class={ getSidebarLinkClass("folders", currentPage) } onclick="closeMobileMenu()">
-						<svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-						</svg>
-						<span>Folders</span>
-					</a>
-				</li>
-				<li>
-					<a href="/flashcards" class={ getSidebarLinkClass("flashcards", currentPage) } onclick="closeMobileMenu()">
-						<svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-						</svg>
-						<span>Flashcards</span>
-					</a>
-				</li>
-				<li>
-					<a href="/settings" class={ getSidebarLinkClass("settings", currentPage) } onclick="closeMobileMenu()">
-						<svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-						</svg>
-						<span>Settings</span>
-					</a>
-				</li>
-			</ul>
-		</nav>
-	</aside>
+		<!-- Mobile Sidebar Overlay -->
+		<div
+			x-show="open"
+			x-transition:enter="transition-opacity ease-linear duration-300"
+			x-transition:enter-start="opacity-0"
+			x-transition:enter-end="opacity-100"
+			x-transition:leave="transition-opacity ease-linear duration-300"
+			x-transition:leave-start="opacity-100"
+			x-transition:leave-end="opacity-0"
+			@click="closeSidebar()"
+			class="fixed inset-0 bg-gray-600 bg-opacity-50 z-40 md:hidden"
+			style="display: none;"
+		></div>
 
-	<!-- Mobile menu JavaScript -->
-	<script>
-		function toggleMobileMenu() {
-			const sidebar = document.getElementById('sidebar');
-			const overlay = document.getElementById('sidebar-overlay');
+		<!-- Mobile Sidebar -->
+		<div
+			x-show="open"
+			x-transition:enter="transition ease-in-out duration-300 transform"
+			x-transition:enter-start="-translate-x-full"
+			x-transition:enter-end="translate-x-0"
+			x-transition:leave="transition ease-in-out duration-300 transform"
+			x-transition:leave-start="translate-x-0"
+			x-transition:leave-end="-translate-x-full"
+			class="fixed inset-y-0 left-0 w-80 bg-white dark:bg-neutral-900 z-50 md:hidden flex flex-col pt-20"
+			style="display: none;"
+		>
+			<!-- Close Button -->
+			<div class="absolute right-4 top-4 z-50">
+				<button @click="closeSidebar()" class="text-neutral-800 dark:text-neutral-200 cursor-pointer p-2 hover:bg-gray-200 rounded-md">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
 
-			if (sidebar.classList.contains('translate-x-0')) {
-				// Close menu
-				sidebar.classList.remove('translate-x-0');
-				sidebar.classList.add('-translate-x-full');
-				overlay.classList.add('hidden');
-			} else {
-				// Open menu
-				sidebar.classList.remove('-translate-x-full');
-				sidebar.classList.add('translate-x-0');
-				overlay.classList.remove('hidden');
-			}
-		}
+			<!-- Mobile Navigation Links -->
+			<nav class="flex-1 px-6 py-6">
+				<ul class="space-y-2">
+					<li>
+						<a href="/dashboard" class={ getMobileSidebarLinkClass("dashboard", currentPage) } @click="closeSidebar()">
+							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+							</svg>
+							<span class="text-sm font-medium">Dashboard</span>
+						</a>
+					</li>
+					<li>
+						<a href="/folders" class={ getMobileSidebarLinkClass("folders", currentPage) } @click="closeSidebar()">
+							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+							</svg>
+							<span class="text-sm font-medium">Folders</span>
+						</a>
+					</li>
+					<li>
+						<a href="/flashcards" class={ getMobileSidebarLinkClass("flashcards", currentPage) } @click="closeSidebar()">
+							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+							</svg>
+							<span class="text-sm font-medium">Flashcards</span>
+						</a>
+					</li>
+					<li>
+						<a href="/settings" class={ getMobileSidebarLinkClass("settings", currentPage) } @click="closeSidebar()">
+							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+							</svg>
+							<span class="text-sm font-medium">Settings</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
 
-		function closeMobileMenu() {
-			const sidebar = document.getElementById('sidebar');
-			const overlay = document.getElementById('sidebar-overlay');
-			sidebar.classList.remove('translate-x-0');
-			sidebar.classList.add('-translate-x-full');
-			overlay.classList.add('hidden');
-		}
-
-		// Close mobile menu when window is resized to desktop
-		window.addEventListener('resize', function() {
-			if (window.innerWidth >= 768) {
-				closeMobileMenu();
-			}
-		});
-
-		// Close mobile menu on escape key
-		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape') {
-				closeMobileMenu();
-			}
-		});
-	</script>
+		<!-- Desktop Sidebar -->
+		<aside
+			@mouseenter="expandSidebar()"
+			@mouseleave="collapseSidebar()"
+			:class="expanded ? 'w-72' : 'w-16'"
+			class="hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 h-full flex-shrink-0 sidebar-transition fixed left-0 top-16 bottom-0 z-30 border-r border-gray-200"
+		>
+			<nav class="flex-1 px-3 py-6">
+				<ul class="space-y-2">
+					<li>
+						<a href="/dashboard" class={ getDesktopSidebarLinkClass("dashboard", currentPage) }>
+							<div class="flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-md transition-all duration-150 hover:bg-gray-200 dark:hover:bg-neutral-700">
+								<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+								</svg>
+								<span
+									x-show="expanded"
+									x-transition:enter="transition-opacity duration-300 delay-150"
+									x-transition:enter-start="opacity-0"
+									x-transition:enter-end="opacity-100"
+									x-transition:leave="transition-opacity duration-150"
+									x-transition:leave-start="opacity-100"
+									x-transition:leave-end="opacity-0"
+									class="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
+								>
+									Dashboard
+								</span>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="/folders" class={ getDesktopSidebarLinkClass("folders", currentPage) }>
+							<div class="flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-md transition-all duration-150 hover:bg-gray-200 dark:hover:bg-neutral-700">
+								<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+								</svg>
+								<span
+									x-show="expanded"
+									x-transition:enter="transition-opacity duration-300 delay-150"
+									x-transition:enter-start="opacity-0"
+									x-transition:enter-end="opacity-100"
+									x-transition:leave="transition-opacity duration-150"
+									x-transition:leave-start="opacity-100"
+									x-transition:leave-end="opacity-0"
+									class="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
+								>
+									Folders
+								</span>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="/flashcards" class={ getDesktopSidebarLinkClass("flashcards", currentPage) }>
+							<div class="flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-md transition-all duration-150 hover:bg-gray-200 dark:hover:bg-neutral-700">
+								<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+								</svg>
+								<span
+									x-show="expanded"
+									x-transition:enter="transition-opacity duration-300 delay-150"
+									x-transition:enter-start="opacity-0"
+									x-transition:enter-end="opacity-100"
+									x-transition:leave="transition-opacity duration-150"
+									x-transition:leave-start="opacity-100"
+									x-transition:leave-end="opacity-0"
+									class="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
+								>
+									Flashcards
+								</span>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="/settings" class={ getDesktopSidebarLinkClass("settings", currentPage) }>
+							<div class="flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-md transition-all duration-150 hover:bg-gray-200 dark:hover:bg-neutral-700">
+								<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+								</svg>
+								<span
+									x-show="expanded"
+									x-transition:enter="transition-opacity duration-300 delay-150"
+									x-transition:enter-start="opacity-0"
+									x-transition:enter-end="opacity-100"
+									x-transition:leave="transition-opacity duration-150"
+									x-transition:leave-start="opacity-100"
+									x-transition:leave-end="opacity-0"
+									class="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
+								>
+									Settings
+								</span>
+							</div>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+	</div>
 }// Alert component
 templ Alert(message, alertType string) {
 	<div class={ "alert", "p-4", "rounded-md", "mb-4", getAlertClasses(alertType) }>
@@ -435,44 +600,67 @@ templ Modal(id, title string) {
 	</div>
 }
 
-// Folder card component - Minimalistic and fully clickable
+// Folder card component - Masonry style with random pastel colors
 templ FolderCard(folder models.Folder) {
-	<a href={ templ.URL("/folders/" + folder.ID.String()) } class="block group">
-		<div class="bg-white rounded-lg border border-gray-200 p-6 hover:border-gray-300 hover:shadow-sm transition-all duration-200 cursor-pointer">
-			<div class="flex items-start justify-between mb-3">
-				<h3 class="text-lg font-medium text-gray-900 truncate pr-4">{ folder.Name }</h3>
-				<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-					<button
-						onclick="event.preventDefault(); event.stopPropagation(); editFolder('{ folder.ID.String() }')"
-						class="p-1 text-gray-400 hover:text-gray-600 rounded"
-						title="Edit folder"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-						</svg>
-					</button>
-					<button
-						onclick="event.preventDefault(); event.stopPropagation(); deleteFolder('{ folder.ID.String() }')"
-						class="p-1 text-gray-400 hover:text-red-600 rounded"
-						title="Delete folder"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-						</svg>
-					</button>
+	<div class="masonry-item">
+		<a href={ templ.URL("/folders/" + folder.ID.String()) } class="block group">
+			<div class={ "rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden", getPastelColor(folder.ID.String()) }>
+				<!-- Card Header with gradient overlay -->
+				<div class="relative p-3 md:p-4">
+					<div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+					<div class="relative">
+						<div class="flex items-start justify-between mb-2">
+							<h3 class="text-sm md:text-base font-medium text-gray-800 truncate pr-2 leading-tight">{ folder.Name }</h3>
+							<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+								<button
+									onclick="event.preventDefault(); event.stopPropagation(); editFolder('{ folder.ID.String() }')"
+									class="p-1 text-gray-600 hover:text-gray-800 hover:bg-white/50 rounded transition-colors"
+									title="Edit folder"
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+									</svg>
+								</button>
+								<button
+									onclick="event.preventDefault(); event.stopPropagation(); deleteFolder('{ folder.ID.String() }')"
+									class="p-1 text-gray-600 hover:text-red-600 hover:bg-white/50 rounded transition-colors"
+									title="Delete folder"
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						if folder.Description != "" {
+							<div class={ "mb-3", getContentHeight(folder.Description) }>
+								<p class="text-gray-700 text-xs md:text-sm leading-relaxed">{ folder.Description }</p>
+							</div>
+						}
+
+						<!-- Folder icon and date -->
+						<div class="flex items-center justify-between">
+							<div class="flex items-center space-x-1.5">
+								<div class="p-1.5 bg-white/30 rounded">
+									<svg class="w-3 h-3 md:w-4 md:h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+									</svg>
+								</div>
+								<span class="text-xs text-gray-600 font-medium">{ folder.CreatedAt.Format("Jan 2") }</span>
+							</div>
+							<div class="opacity-60 group-hover:opacity-100 transition-opacity">
+								<svg class="w-3 h-3 md:w-4 md:h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+								</svg>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			if folder.Description != "" {
-				<p class="text-gray-600 text-sm mb-4 line-clamp-2">{ folder.Description }</p>
-			}
-			<div class="flex items-center justify-between text-xs text-gray-500">
-				<span>{ folder.CreatedAt.Format("Jan 2, 2006") }</span>
-				<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-				</svg>
-			</div>
-		</div>
-	</a>
+		</a>
+	</div>
 }
 
 // Content card component
@@ -522,4 +710,61 @@ func getSidebarLinkClass(page, currentPage string) string {
 		return baseClasses + " bg-gray-100 text-gray-900"
 	}
 	return baseClasses + " text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+}
+
+// Helper function for mobile sidebar link classes
+func getMobileSidebarLinkClass(page, currentPage string) string {
+	baseClasses := "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors w-full"
+	if page == currentPage {
+		return baseClasses + " bg-gray-100 text-gray-900"
+	}
+	return baseClasses + " text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+}
+
+// Helper function for desktop sidebar link classes
+func getDesktopSidebarLinkClass(page, currentPage string) string {
+	baseClasses := "block w-full"
+	if page == currentPage {
+		return baseClasses + " text-gray-900"
+	}
+	return baseClasses + " text-gray-700"
+}
+
+// Helper function to get random pastel color based on folder ID
+func getPastelColor(folderID string) string {
+	colors := []string{
+		"pastel-pink", "pastel-purple", "pastel-blue", "pastel-cyan", "pastel-green",
+		"pastel-yellow", "pastel-orange", "pastel-red", "pastel-indigo", "pastel-teal",
+		"pastel-lavender", "pastel-mint", "pastel-peach", "pastel-rose", "pastel-sky",
+	}
+
+	// Use a simple hash of the folder ID to get consistent color per folder
+	hash := 0
+	for _, char := range folderID {
+		hash = int(char) + ((hash << 5) - hash)
+	}
+	if hash < 0 {
+		hash = -hash
+	}
+
+	return colors[hash%len(colors)]
+}
+
+// Helper function to determine content height based on description length
+func getContentHeight(description string) string {
+	if len(description) == 0 {
+		return ""
+	}
+
+	// Vary height based on content length to create masonry effect (smaller sizes)
+	switch {
+	case len(description) > 200:
+		return "min-h-[80px]"
+	case len(description) > 100:
+		return "min-h-[60px]"
+	case len(description) > 50:
+		return "min-h-[40px]"
+	default:
+		return "min-h-[30px]"
+	}
 }

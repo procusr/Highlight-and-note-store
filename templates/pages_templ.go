@@ -152,7 +152,7 @@ func FolderPage(user *models.User, folder models.Folder, contents []models.Conte
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <div class=\"main-content md:ml-64 pt-16\"><div class=\"max-w-7xl mx-auto py-6 px-4\"><!-- Breadcrumb --><nav class=\"flex mb-6\" aria-label=\"Breadcrumb\"><ol class=\"inline-flex items-center space-x-1 md:space-x-3\"><li class=\"inline-flex items-center\"><a href=\"/dashboard\" class=\"text-gray-700 hover:text-gray-900\">Dashboard</a></li><li><div class=\"flex items-center\"><svg class=\"w-6 h-6 text-gray-400\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z\" clip-rule=\"evenodd\"></path></svg> <span class=\"text-gray-500 ml-1 md:ml-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <div class=\"main-content md:ml-16 pt-16 transition-all duration-300\"><div class=\"max-w-7xl mx-auto py-6 px-4\"><!-- Breadcrumb --><nav class=\"flex mb-6\" aria-label=\"Breadcrumb\"><ol class=\"inline-flex items-center space-x-1 md:space-x-3\"><li class=\"inline-flex items-center\"><a href=\"/dashboard\" class=\"text-gray-700 hover:text-gray-900\">Dashboard</a></li><li><div class=\"flex items-center\"><svg class=\"w-6 h-6 text-gray-400\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z\" clip-rule=\"evenodd\"></path></svg> <span class=\"text-gray-500 ml-1 md:ml-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -206,7 +206,7 @@ func FolderPage(user *models.User, folder models.Folder, contents []models.Conte
 				return templ_7745c5c3_Err
 			}
 			if len(subfolders) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mb-8\"><h2 class=\"text-lg font-semibold text-gray-900 mb-4\">Folders</h2><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mb-8\"><h2 class=\"text-lg font-semibold text-gray-900 mb-4\">Folders</h2><div class=\"masonry-grid\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -315,12 +315,12 @@ func FoldersPage(user *models.User, folders []models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " <main class=\"main-content md:ml-64 min-h-screen bg-gray-50 pt-16\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-4\"><div><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">All Folders</h1><p class=\"text-gray-600 text-sm md:text-base\">Organize your content into folders for easy management.</p></div><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors\"><svg class=\"w-3 h-3 md:w-4 md:h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Folder</button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " <main class=\"main-content md:ml-16 min-h-screen bg-gray-50 pt-16 transition-all duration-300\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-4\"><div><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">All Folders</h1><p class=\"text-gray-600 text-sm md:text-base\">Organize your content into folders for easy management.</p></div><button onclick=\"showCreateFolderModal()\" class=\"inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors\"><svg class=\"w-3 h-3 md:w-4 md:h-4 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Folder</button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(folders) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4\" id=\"folders-container\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"masonry-grid\" id=\"folders-container\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -408,7 +408,7 @@ func FlashcardsPage(user *models.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " <main class=\"main-content md:ml-64 min-h-screen bg-gray-50 pt-16\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Flashcards</h1><p class=\"text-gray-600 text-sm md:text-base\">Study and memorize content with interactive flashcards.</p></div><div class=\"text-center py-12 md:py-16\"><div class=\"mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4\"><svg class=\"h-6 w-6 md:h-8 md:w-8 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10\"></path></svg></div><h3 class=\"text-base md:text-lg font-medium text-gray-900 mb-2\">Flashcards</h3><p class=\"text-gray-600 text-sm md:text-base px-4\">Create and study flashcards to enhance your learning experience.</p></div></div></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " <main class=\"main-content md:ml-16 min-h-screen bg-gray-50 pt-16 transition-all duration-300\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Flashcards</h1><p class=\"text-gray-600 text-sm md:text-base\">Study and memorize content with interactive flashcards.</p></div><div class=\"text-center py-12 md:py-16\"><div class=\"mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4\"><svg class=\"h-6 w-6 md:h-8 md:w-8 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10\"></path></svg></div><h3 class=\"text-base md:text-lg font-medium text-gray-900 mb-2\">Flashcards</h3><p class=\"text-gray-600 text-sm md:text-base px-4\">Create and study flashcards to enhance your learning experience.</p></div></div></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -468,7 +468,7 @@ func SettingsPage(user *models.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " <main class=\"main-content md:ml-64 min-h-screen bg-gray-50 pt-16\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Settings</h1><p class=\"text-gray-600 text-sm md:text-base\">Manage your account preferences and application settings.</p></div><div class=\"bg-white rounded-lg border border-gray-200 p-4 md:p-6\"><h3 class=\"text-base md:text-lg font-medium text-gray-900 mb-4\">Account Information</h3><div class=\"space-y-4\"><div><label class=\"block text-xs md:text-sm font-medium text-gray-700\">Email</label><p class=\"mt-1 text-sm md:text-base text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " <main class=\"main-content md:ml-16 min-h-screen bg-gray-50 pt-16 transition-all duration-300\"><div class=\"max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6\"><div class=\"mb-6 md:mb-8\"><h1 class=\"text-xl md:text-2xl font-semibold text-gray-900 mb-2\">Settings</h1><p class=\"text-gray-600 text-sm md:text-base\">Manage your account preferences and application settings.</p></div><div class=\"bg-white rounded-lg border border-gray-200 p-4 md:p-6\"><h3 class=\"text-base md:text-lg font-medium text-gray-900 mb-4\">Account Information</h3><div class=\"space-y-4\"><div><label class=\"block text-xs md:text-sm font-medium text-gray-700\">Email</label><p class=\"mt-1 text-sm md:text-base text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
