@@ -9,10 +9,10 @@ import (
 templ DashboardPage(user *models.User, folders []models.Folder) {
 	@Layout("Dashboard") {
 		@Navigation(user)
-		@Sidebar("dashboard")
+		@Sidebar("dashboard", user)
 
 		<!-- Main content with sidebar offset -->
-		<main class="main-content md:ml-28 min-h-screen bg-gray-50 pt-16">
+		<main class="main-content md:ml-28 min-h-screen bg-gray-50 pt-16 md:pt-0">
 			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
 				<!-- Dashboard Header -->
 				<div class="mb-6 md:mb-8">
