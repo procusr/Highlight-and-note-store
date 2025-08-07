@@ -16,18 +16,20 @@ import (
 type FolderHandler struct {
 	folderService  *services.FolderService
 	contentService *services.ContentService
+	userService    *services.UserService
 }
 
-func NewFolderHandler(folderService *services.FolderService, contentService *services.ContentService) *FolderHandler {
+func NewFolderHandler(folderService *services.FolderService, contentService *services.ContentService, userService *services.UserService) *FolderHandler {
 	return &FolderHandler{
 		folderService:  folderService,
 		contentService: contentService,
+		userService:    userService,
 	}
 }
 
 // RegisterRoutes registers all folder-related routes
 func (h *FolderHandler) RegisterRoutes(r chi.Router, authService *services.AuthService) {
-	r.Route("/api/folders", func(r chi.Router) {
+	r.Route("/folders", func(r chi.Router) {
 		r.Use(middleware.RequireAuth(authService))
 
 		// Folder routes
@@ -46,15 +48,10 @@ func (h *FolderHandler) RegisterRoutes(r chi.Router, authService *services.AuthS
 	})
 
 	// Search route
-	r.Route("/api/search", func(r chi.Router) {
+	r.Route("/search", func(r chi.Router) {
 		r.Use(middleware.RequireAuth(authService))
 		r.Get("/content", h.SearchContent)
 	})
-
-	// Page routes
-	r.Get("/dashboard", h.DashboardPage)
-	r.Get("/folders", h.FoldersPage)
-	r.Get("/folders/{folderID}", h.FolderPage)
 }
 
 // DashboardPage renders the main dashboard with folder interface
@@ -66,7 +63,11 @@ func (h *FolderHandler) DashboardPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user information
-	user := &models.User{ID: userID} // We should fetch this from user service, but for now we'll use the ID
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to load user", http.StatusInternalServerError)
+		return
+	}
 
 	// Get root folders for the user
 	folders, err := h.folderService.GetRootFolders(userID)
@@ -83,7 +84,7 @@ func (h *FolderHandler) DashboardPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// FoldersPage renders the folders list page
+// FoldersPage renders the folders listing page
 func (h *FolderHandler) FoldersPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
 	if userID == uuid.Nil {
@@ -92,16 +93,20 @@ func (h *FolderHandler) FoldersPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user information
-	user := &models.User{ID: userID} // We should fetch this from user service, but for now we'll use the ID
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to load user", http.StatusInternalServerError)
+		return
+	}
 
-	// Get all folders for the user
+	// Get all folders for the user (including subfolders)
 	folders, err := h.folderService.GetRootFolders(userID)
 	if err != nil {
 		http.Error(w, "Failed to load folders", http.StatusInternalServerError)
 		return
 	}
 
-	// Render folders template
+	// Render folders page template
 	w.Header().Set("Content-Type", "text/html")
 	if err := templates.FoldersPage(user, folders).Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
@@ -145,8 +150,12 @@ func (h *FolderHandler) FolderPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get user information
-	user := &models.User{ID: userID} // We should fetch this from user service, but for now we'll use the ID
+	// Get user details
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to load user", http.StatusInternalServerError)
+		return
+	}
 
 	// Render folder page template
 	w.Header().Set("Content-Type", "text/html")
@@ -187,6 +196,12 @@ func (h *FolderHandler) GetFolders(w http.ResponseWriter, r *http.Request) {
 // CreateFolder creates a new folder
 func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	fmt.Printf("CreateFolder: userID=%s, method=%s, content-type=%s\n", userID, r.Method, r.Header.Get("Content-Type"))
 
 	var req struct {
 		Name        string     `json:"name"`
@@ -194,24 +209,30 @@ func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 		ParentID    *uuid.UUID `json:"parent_id"`
 	}
 
-	// Check content type to determine how to parse the request
 	contentType := r.Header.Get("Content-Type")
+	fmt.Printf("Content-Type: %s\n", contentType)
 
 	if contentType == "application/json" {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+			fmt.Printf("JSON decode error: %v\n", err)
+			http.Error(w, "Invalid JSON data", http.StatusBadRequest)
 			return
 		}
 	} else {
-		// Parse as form data (default for HTMX forms)
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		// Parse form data first
+		if parseErr := r.ParseForm(); parseErr != nil {
+			fmt.Printf("Error parsing form: %v\n", parseErr)
+			http.Error(w, "Failed to parse form data", http.StatusBadRequest)
 			return
 		}
 
+		// Try form data
 		name := r.FormValue("name")
 		description := r.FormValue("description")
 		parentIDStr := r.FormValue("parent_id")
+
+		fmt.Printf("Form data: name='%s', description='%s', parent_id='%s'\n", name, description, parentIDStr)
+		fmt.Printf("All form values: %+v\n", r.Form)
 
 		if name == "" {
 			http.Error(w, "Name is required", http.StatusBadRequest)
@@ -244,13 +265,10 @@ func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If this is an HTMX request, return the folder card
+	// If this is an HTMX request, redirect to dashboard
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("Content-Type", "text/html")
-		if err := templates.FolderCard(*folder).Render(r.Context(), w); err != nil {
-			http.Error(w, "Error rendering folder card", http.StatusInternalServerError)
-			return
-		}
+		w.Header().Set("HX-Redirect", "/dashboard")
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -398,6 +416,11 @@ func (h *FolderHandler) GetContent(w http.ResponseWriter, r *http.Request) {
 // CreateContent creates new content in a folder
 func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	folderIDStr := chi.URLParam(r, "folderID")
 
 	folderID, err := uuid.Parse(folderIDStr)
@@ -413,25 +436,30 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		ContentType string `json:"content_type"`
 	}
 
-	// Check content type to determine how to parse the request
 	contentType := r.Header.Get("Content-Type")
+	fmt.Printf("Content creation - Content-Type: %s\n", contentType)
 
 	if contentType == "application/json" {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+			fmt.Printf("Content creation - JSON decode error: %v\n", err)
+			http.Error(w, "Invalid JSON data", http.StatusBadRequest)
 			return
 		}
 	} else {
-		// Parse as form data (default for HTMX forms)
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		// Parse form data first
+		if parseErr := r.ParseForm(); parseErr != nil {
+			fmt.Printf("Content creation - Error parsing form: %v\n", parseErr)
+			http.Error(w, "Failed to parse form data", http.StatusBadRequest)
 			return
 		}
 
+		// Try form data
 		title := r.FormValue("title")
 		description := r.FormValue("description")
 		body := r.FormValue("body")
-		contentTypeForm := r.FormValue("content_type")
+		contentTypeVal := r.FormValue("content_type")
+
+		fmt.Printf("Content form data: title='%s', description='%s', body='%s', content_type='%s'\n", title, description, body, contentTypeVal)
 
 		if title == "" || body == "" {
 			http.Error(w, "Title and body are required", http.StatusBadRequest)
@@ -441,7 +469,7 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		req.Title = title
 		req.Description = description
 		req.Body = body
-		req.ContentType = contentTypeForm
+		req.ContentType = contentTypeVal
 	}
 
 	if req.ContentType == "" {

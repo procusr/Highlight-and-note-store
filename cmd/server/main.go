@@ -39,12 +39,13 @@ func main() {
 
 	// Initialize services
 	authService := services.NewAuthService(db, cfg.JWTSecret)
+	userService := services.NewUserService(db)
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	folderHandler := handlers.NewFolderHandler(folderService, contentService)
+	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
 	contentHandler := handlers.NewContentHandler(contentService, folderService)
 
 	// Setup router
@@ -80,6 +81,10 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 		// Dashboard
 		r.Get("/dashboard", folderHandler.DashboardPage)
+
+		// Folder pages
+		r.Get("/folders", folderHandler.FoldersPage)
+		r.Get("/folders/{folderID}", folderHandler.FolderPage)
 
 		// API routes
 		r.Route("/api", func(r chi.Router) {

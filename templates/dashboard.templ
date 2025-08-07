@@ -12,7 +12,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 		@Sidebar("dashboard")
 
 		<!-- Main content with sidebar offset -->
-		<main class="main-content md:ml-16 min-h-screen bg-gray-50 pt-16 md:pt-16 transition-all duration-300">
+		<main class="main-content md:ml-28 min-h-screen bg-gray-50 pt-16">
 			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
 				<!-- Dashboard Header -->
 				<div class="mb-6 md:mb-8">
@@ -81,7 +81,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 								New Folder
 							</button>
 						</div>
-						<div class="masonry-grid" id="folders-container">
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" id="folders-container">
 							for _, folder := range folders {
 								@FolderCard(folder)
 							}
@@ -164,7 +164,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 // Create Folder Modal
 templ CreateFolderModal() {
 	@Modal("createFolderModal", "Create New Folder") {
-		<form hx-post="/api/folders" hx-target="#folders-container" hx-swap="afterbegin" hx-on="htmx:afterRequest: if(event.detail.successful) closeModal('createFolderModal')">
+		<form hx-post="/api/folders" hx-target="#folders-container" hx-swap="afterbegin">
 			<div class="mb-4">
 				<label for="name" class="block text-sm font-medium text-gray-700">Folder Name</label>
 				<input

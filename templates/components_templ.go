@@ -83,7 +83,7 @@ func TagsInput() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"w-full\"><div class=\"relative\"><div id=\"tags-container\" class=\"flex flex-wrap items-center gap-1 w-full px-2 py-1.5 md:px-3 md:py-2 border border-gray-300 rounded-md bg-white text-xs md:text-sm focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-gray-500 min-h-[32px] md:min-h-[40px]\" onclick=\"document.getElementById('tags-input').focus()\"><!-- Tags will be dynamically added here --><input id=\"tags-input\" type=\"text\" placeholder=\"Search...\" class=\"flex-1 min-w-[60px] md:min-w-[120px] outline-none border-none bg-transparent text-xs md:text-sm placeholder-gray-500\" onkeydown=\"handleTagInput(event)\" oninput=\"handleTagSearch(event)\"></div><!-- Search suggestions dropdown --><div id=\"search-suggestions\" class=\"absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto hidden z-50\"><!-- Suggestions will be populated here --></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"w-full\" x-data=\"{\n\t\ttags: [],\n\t\tsearchQuery: '',\n\t\tshowSuggestions: false,\n\t\tmockSuggestions: ['documents', 'images', 'notes', 'projects', 'work', 'personal'],\n\n\t\taddTag(tag) {\n\t\t\tif (tag && !this.tags.includes(tag)) {\n\t\t\t\tthis.tags.push(tag);\n\t\t\t\tthis.performSearch();\n\t\t\t}\n\t\t},\n\n\t\tremoveTag(tag) {\n\t\t\tthis.tags = this.tags.filter(t => t !== tag);\n\t\t\tthis.performSearch();\n\t\t},\n\n\t\thandleKeydown(event) {\n\t\t\tif (event.key === 'Enter' || event.key === ',') {\n\t\t\t\tevent.preventDefault();\n\t\t\t\tif (this.searchQuery.trim()) {\n\t\t\t\t\tthis.addTag(this.searchQuery.trim());\n\t\t\t\t\tthis.searchQuery = '';\n\t\t\t\t\tthis.showSuggestions = false;\n\t\t\t\t}\n\t\t\t} else if (event.key === 'Backspace' && this.searchQuery === '') {\n\t\t\t\tif (this.tags.length > 0) {\n\t\t\t\t\tthis.removeTag(this.tags[this.tags.length - 1]);\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\n\t\thandleInput() {\n\t\t\tif (this.searchQuery.length > 1) {\n\t\t\t\tthis.showSuggestions = true;\n\t\t\t} else {\n\t\t\t\tthis.showSuggestions = false;\n\t\t\t}\n\t\t},\n\n\t\tgetFilteredSuggestions() {\n\t\t\treturn this.mockSuggestions.filter(s =>\n\t\t\t\ts.toLowerCase().includes(this.searchQuery.toLowerCase()) &&\n\t\t\t\t!this.tags.includes(s)\n\t\t\t);\n\t\t},\n\n\t\tperformSearch() {\n\t\t\tconsole.log('Searching for tags:', this.tags);\n\t\t\t// Add HTMX call here to search content\n\t\t}\n\t}\"><div class=\"relative\"><div @click=\"$refs.tagInput.focus()\" class=\"flex flex-wrap items-center gap-1 w-full px-2 py-1.5 md:px-3 md:py-2 border border-gray-300 rounded-md bg-white text-xs md:text-sm focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-gray-500 min-h-[32px] md:min-h-[40px]\"><!-- Tags display --><template x-for=\"tag in tags\" :key=\"tag\"><span class=\"inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800\"><span x-text=\"tag\"></span> <button @click=\"removeTag(tag)\" class=\"ml-1 text-gray-500 hover:text-gray-700\"><svg class=\"w-3 h-3\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></span></template><!-- Input field --><input x-ref=\"tagInput\" x-model=\"searchQuery\" @keydown=\"handleKeydown($event)\" @input=\"handleInput()\" @focus=\"handleInput()\" @click.away=\"showSuggestions = false\" type=\"text\" placeholder=\"Search...\" class=\"flex-1 min-w-[60px] md:min-w-[120px] outline-none border-none bg-transparent text-xs md:text-sm placeholder-gray-500\"></div><!-- Search suggestions dropdown --><div x-show=\"showSuggestions && getFilteredSuggestions().length > 0\" x-transition:enter=\"transition ease-out duration-100\" x-transition:enter-start=\"transform opacity-0 scale-95\" x-transition:enter-end=\"transform opacity-100 scale-100\" x-transition:leave=\"transition ease-in duration-75\" x-transition:leave-start=\"transform opacity-100 scale-100\" x-transition:leave-end=\"transform opacity-0 scale-95\" class=\"absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto z-50\" style=\"display: none;\"><template x-for=\"suggestion in getFilteredSuggestions()\" :key=\"suggestion\"><div @click=\"addTag(suggestion); searchQuery = ''; showSuggestions = false\" class=\"px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer\" x-text=\"suggestion\"></div></template></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -113,7 +113,7 @@ func Navigation(user *models.User) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<header class=\"bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50\"><div class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\"><!-- Mobile Layout --><div class=\"flex items-center justify-between h-16 md:hidden\"><!-- Left: Mobile menu button --><button id=\"mobile-menu-button\" class=\"p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\" onclick=\"toggleMobileMenu()\"><svg class=\"h-6 w-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h16M4 18h16\"></path></svg></button><!-- Center: Mobile Logo and Search --><div class=\"flex items-center space-x-2 flex-1 justify-center max-w-xs\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<header class=\"bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50\" x-data=\"{ mobileMenuOpen: false, desktopMenuOpen: false }\"><div class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\"><!-- Mobile Layout --><div class=\"flex items-center justify-between h-16 md:hidden\"><!-- Left: Mobile menu button --><button @click=\"mobileMenuOpen = !mobileMenuOpen\" class=\"p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\"><svg class=\"h-6 w-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h16M4 18h16\"></path></svg></button><!-- Center: Mobile Logo and Search --><div class=\"flex items-center space-x-2 flex-1 justify-center max-w-xs\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,14 +136,14 @@ func Navigation(user *models.User) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if user != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"relative\"><button id=\"user-menu-button\" class=\"p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\" onclick=\"toggleUserMenu()\"><div class=\"w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center\"><svg class=\"w-5 h-5 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div></button><!-- User dropdown menu --><div id=\"user-menu\" class=\"absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 hidden\"><div class=\"py-1\"><div class=\"px-4 py-2 text-sm text-gray-700 border-b\"><span class=\"font-medium\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"relative\"><button @click=\"mobileMenuOpen = !mobileMenuOpen\" class=\"p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\"><div class=\"w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center\"><svg class=\"w-5 h-5 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div></button><!-- User dropdown menu --><div x-show=\"mobileMenuOpen\" @click.away=\"mobileMenuOpen = false\" x-transition:enter=\"transition ease-out duration-100\" x-transition:enter-start=\"transform opacity-0 scale-95\" x-transition:enter-end=\"transform opacity-100 scale-100\" x-transition:leave=\"transition ease-in duration-75\" x-transition:leave-start=\"transform opacity-100 scale-100\" x-transition:leave-end=\"transform opacity-0 scale-95\" class=\"absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200\" style=\"display: none;\"><div class=\"py-1\"><div class=\"px-4 py-2 text-sm text-gray-700 border-b\"><span class=\"font-medium\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 162, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 254, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -167,25 +167,25 @@ func Navigation(user *models.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><!-- User info --> <div class=\"relative\"><button id=\"user-menu-button-desktop\" class=\"flex items-center space-x-2 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\" onclick=\"toggleUserMenuDesktop()\"><div class=\"w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center\"><svg class=\"w-5 h-5 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><span class=\"text-sm font-medium\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><!-- User info --> <div class=\"relative\"><button @click=\"desktopMenuOpen = !desktopMenuOpen\" class=\"flex items-center space-x-2 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500\"><div class=\"w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center\"><svg class=\"w-5 h-5 text-gray-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><span class=\"text-sm font-medium\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 206, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 297, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span> <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 9l-7 7-7-7\"></path></svg></button><!-- User dropdown menu --><div id=\"user-menu-desktop\" class=\"absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 hidden\"><div class=\"py-1\"><a href=\"/settings\" class=\"block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100\">Settings</a><form hx-post=\"/logout\" hx-redirect=\"/\" class=\"block\"><button type=\"submit\" class=\"w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100\">Sign out</button></form></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span> <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 9l-7 7-7-7\"></path></svg></button><!-- User dropdown menu --><div x-show=\"desktopMenuOpen\" @click.away=\"desktopMenuOpen = false\" x-transition:enter=\"transition ease-out duration-100\" x-transition:enter-start=\"transform opacity-0 scale-95\" x-transition:enter-end=\"transform opacity-100 scale-100\" x-transition:leave=\"transition ease-in duration-75\" x-transition:leave-start=\"transform opacity-100 scale-100\" x-transition:leave-end=\"transform opacity-0 scale-95\" class=\"absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200\" style=\"display: none;\"><div class=\"py-1\"><a href=\"/settings\" class=\"block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100\">Settings</a><form hx-post=\"/logout\" hx-redirect=\"/\" class=\"block\"><button type=\"submit\" class=\"w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100\">Sign out</button></form></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div><!-- Right: Empty space for balance --><div class=\"w-20\"></div></div></div></header><!-- JavaScript for tags input and user menu --><script>\n\t\t// User menu toggle for mobile\n\t\tfunction toggleUserMenu() {\n\t\t\tconst menu = document.getElementById('user-menu');\n\t\t\tif (menu) {\n\t\t\t\tmenu.classList.toggle('hidden');\n\t\t\t}\n\t\t}\n\n\t\t// User menu toggle for desktop\n\t\tfunction toggleUserMenuDesktop() {\n\t\t\tconst menu = document.getElementById('user-menu-desktop');\n\t\t\tif (menu) {\n\t\t\t\tmenu.classList.toggle('hidden');\n\t\t\t}\n\t\t}\n\n\t\t// Close user menus when clicking outside\n\t\tdocument.addEventListener('click', function(e) {\n\t\t\t// Mobile menu\n\t\t\tconst mobileButton = document.getElementById('user-menu-button');\n\t\t\tconst mobileMenu = document.getElementById('user-menu');\n\t\t\tif (mobileButton && mobileMenu && !mobileButton.contains(e.target) && !mobileMenu.contains(e.target)) {\n\t\t\t\tmobileMenu.classList.add('hidden');\n\t\t\t}\n\n\t\t\t// Desktop menu\n\t\t\tconst desktopButton = document.getElementById('user-menu-button-desktop');\n\t\t\tconst desktopMenu = document.getElementById('user-menu-desktop');\n\t\t\tif (desktopButton && desktopMenu && !desktopButton.contains(e.target) && !desktopMenu.contains(e.target)) {\n\t\t\t\tdesktopMenu.classList.add('hidden');\n\t\t\t}\n\t\t});\n\n\t\t// Tags input functionality\n\t\tlet currentTags = [];\n\n\t\tfunction handleTagInput(event) {\n\t\t\tconst input = event.target;\n\t\t\tconst value = input.value.trim();\n\n\t\t\tif (event.key === 'Enter' || event.key === ',') {\n\t\t\t\tevent.preventDefault();\n\t\t\t\tif (value && !currentTags.includes(value)) {\n\t\t\t\t\taddTag(value);\n\t\t\t\t\tinput.value = '';\n\t\t\t\t\thideSearchSuggestions();\n\t\t\t\t}\n\t\t\t} else if (event.key === 'Backspace' && value === '') {\n\t\t\t\t// Remove last tag when backspace is pressed on empty input\n\t\t\t\tif (currentTags.length > 0) {\n\t\t\t\t\tremoveTag(currentTags[currentTags.length - 1]);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tfunction handleTagSearch(event) {\n\t\t\tconst value = event.target.value.trim();\n\t\t\tif (value.length > 1) {\n\t\t\t\tshowSearchSuggestions(value);\n\t\t\t} else {\n\t\t\t\thideSearchSuggestions();\n\t\t\t}\n\t\t}\n\n\t\tfunction addTag(tag) {\n\t\t\tcurrentTags.push(tag);\n\t\t\trenderTags();\n\t\t\tperformSearch();\n\t\t}\n\n\t\tfunction removeTag(tag) {\n\t\t\tcurrentTags = currentTags.filter(t => t !== tag);\n\t\t\trenderTags();\n\t\t\tperformSearch();\n\t\t}\n\n\t\tfunction renderTags() {\n\t\t\tconst container = document.getElementById('tags-container');\n\t\t\tconst input = document.getElementById('tags-input');\n\n\t\t\t// Remove existing tags\n\t\t\tconst existingTags = container.querySelectorAll('.tag');\n\t\t\texistingTags.forEach(tag => tag.remove());\n\n\t\t\t// Add current tags\n\t\t\tcurrentTags.forEach(tag => {\n\t\t\t\tconst tagElement = document.createElement('span');\n\t\t\t\ttagElement.className = 'tag inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800';\n\t\t\t\ttagElement.innerHTML = `\n\t\t\t\t\t${tag}\n\t\t\t\t\t<button onclick=\"removeTag('${tag}')\" class=\"ml-1 text-gray-500 hover:text-gray-700\">\n\t\t\t\t\t\t<svg class=\"w-3 h-3\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n\t\t\t\t\t\t\t<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path>\n\t\t\t\t\t\t</svg>\n\t\t\t\t\t</button>\n\t\t\t\t`;\n\t\t\t\tcontainer.insertBefore(tagElement, input);\n\t\t\t});\n\t\t}\n\n\t\tfunction showSearchSuggestions(query) {\n\t\t\t// Mock suggestions - in real app, this would be an API call\n\t\t\tconst mockSuggestions = ['documents', 'images', 'notes', 'projects', 'work', 'personal'];\n\t\t\tconst filteredSuggestions = mockSuggestions.filter(s =>\n\t\t\t\ts.toLowerCase().includes(query.toLowerCase()) && !currentTags.includes(s)\n\t\t\t);\n\n\t\t\tconst suggestionsContainer = document.getElementById('search-suggestions');\n\t\t\tsuggestionsContainer.innerHTML = '';\n\n\t\t\tfilteredSuggestions.forEach(suggestion => {\n\t\t\t\tconst item = document.createElement('div');\n\t\t\t\titem.className = 'px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer';\n\t\t\t\titem.textContent = suggestion;\n\t\t\t\titem.onclick = () => {\n\t\t\t\t\taddTag(suggestion);\n\t\t\t\t\tdocument.getElementById('tags-input').value = '';\n\t\t\t\t\thideSearchSuggestions();\n\t\t\t\t};\n\t\t\t\tsuggestionsContainer.appendChild(item);\n\t\t\t});\n\n\t\t\tsuggestionsContainer.classList.remove('hidden');\n\t\t}\n\n\t\tfunction hideSearchSuggestions() {\n\t\t\tdocument.getElementById('search-suggestions').classList.add('hidden');\n\t\t}\n\n\t\tfunction performSearch() {\n\t\t\t// Implement search functionality here\n\t\t\tconsole.log('Searching for tags:', currentTags);\n\t\t\t// You can add HTMX call here to search content\n\t\t}\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div><!-- Right: Empty space for balance --><div class=\"w-20\"></div></div></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -446,7 +446,7 @@ func Alert(message, alertType string) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 571, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 535, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -519,7 +519,7 @@ func Modal(id, title string) templ.Component {
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 584, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 548, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -532,7 +532,7 @@ func Modal(id, title string) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 588, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 552, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -545,7 +545,7 @@ func Modal(id, title string) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 589, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 553, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -596,7 +596,7 @@ func FolderCard(folder models.Folder) templ.Component {
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/folders/" + folder.ID.String()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 606, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 570, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -631,7 +631,7 @@ func FolderCard(folder models.Folder) templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 613, Col: 107}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 577, Col: 107}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -667,7 +667,7 @@ func FolderCard(folder models.Folder) templ.Component {
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 638, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 602, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
@@ -685,7 +685,7 @@ func FolderCard(folder models.Folder) templ.Component {
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(folder.CreatedAt.Format("Jan 2"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 651, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 615, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -728,7 +728,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(content.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 670, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 634, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -741,7 +741,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var44 string
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(content.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 672, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 636, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
@@ -754,7 +754,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(content.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 677, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 641, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
@@ -767,7 +767,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(content.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 684, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 648, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 		if templ_7745c5c3_Err != nil {
@@ -780,7 +780,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var47 string
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(content.ContentType)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 686, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 650, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
@@ -793,7 +793,7 @@ func ContentCard(content models.Content) templ.Component {
 		var templ_7745c5c3_Var48 string
 		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(content.CreatedAt.Format("Jan 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 687, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components.templ`, Line: 651, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 		if templ_7745c5c3_Err != nil {
