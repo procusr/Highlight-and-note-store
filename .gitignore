@@ -1,0 +1,35 @@
+
+
+# Build output directories
+/bin/
+build/
+
+# Go testing binaries and coverage output
+*.test
+coverage.out
+
+# Dependency directories (Go modules)
+vendor/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files
+.vscode/
+
+
+
+
+# Logs and temporary files
+*.log
+tmp/
+*.tmp
+
+# Air hot reloading configuration
+.air.toml
+
+# Templ generated files (if any temporary or derived artifacts)
+*.tmplcache
+
+.env
