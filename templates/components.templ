@@ -329,7 +329,9 @@ templ Sidebar(currentPage string, user *models.User) {
 			</nav>
 		</aside>
 	</div>
-}// Alert component
+}
+
+// Alert component
 templ Alert(message, alertType string) {
 	<div class={ "alert", "p-4", "rounded-md", "mb-4", getAlertClasses(alertType) }>
 		{ message }

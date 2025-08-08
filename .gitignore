@@ -5,7 +5,7 @@
 *.dylib
 *.test
 
-# Output of build tools  
+# Output of build tools
 /bin/
 /build/
 /dist/
