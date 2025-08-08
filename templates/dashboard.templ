@@ -8,7 +8,6 @@ import (
 // Dashboard page
 templ DashboardPage(user *models.User, folders []models.Folder) {
 	@Layout("Dashboard") {
-		@Navigation(user)
 		@Sidebar("dashboard", user)
 
 		<!-- Main content with sidebar offset -->

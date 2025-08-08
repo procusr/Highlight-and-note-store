@@ -85,12 +85,6 @@ templ Layout(title string) {
 }
 
 
-
-// Navigation component - Simplified without header
-templ Navigation(user *models.User) {
-	<!-- No navigation header - content will flow from top -->
-}
-
 // Sidebar Navigation Component - Expandable with Alpine.js
 templ Sidebar(currentPage string, user *models.User) {
 	<div x-data="{
@@ -208,7 +202,7 @@ templ Sidebar(currentPage string, user *models.User) {
 			:class="expanded ? 'w-72' : 'w-16'"
 			class="hidden md:flex md:flex-col bg-gray-50 h-full flex-shrink-0 sidebar-transition fixed left-0 top-0 bottom-0 z-30 border-r border-gray-200"
 		>
-			<nav class="flex-1 px-3 py-6">
+			<nav class="flex flex-1 flex-col px-3 py-6 bg-[#C5C4C4]">
 				<ul class="space-y-2">
 					<li>
 						<a href="/dashboard" class={ getDesktopSidebarLinkClass("dashboard", currentPage) }>
@@ -302,7 +296,6 @@ templ Sidebar(currentPage string, user *models.User) {
 				if user != nil {
 					<div class="mt-auto border-t border-gray-200 pt-4">
 						<!-- User info -->
-						<div class="px-3 mb-2">
 							<div class="flex items-center gap-3">
 								<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
 									<svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,16 +305,15 @@ templ Sidebar(currentPage string, user *models.User) {
 								<div x-show="expanded" x-transition class="min-w-0 flex-1">
 									<p class="text-sm font-medium text-gray-800 truncate">{ user.Email }</p>
 								</div>
-							</div>
 						</div>
 
 						<!-- Sign out button -->
-						<form hx-post="/logout" hx-redirect="/" class="px-3">
-							<button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors">
+						<form hx-post="/logout" hx-redirect="/" class="px-2">
+							<button type="submit" class="w-full flex items-center gap-3 py-2 text-sm rounded-md transition-colors mt-3">
 								<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
 								</svg>
-								<span x-show="expanded" x-transition class="whitespace-nowrap">Sign out</span>
+								<span x-show="expanded" x-transition class="whitespace-nowrap text-gray-700">Sign out</span>
 							</button>
 						</form>
 					</div>
