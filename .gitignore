@@ -5,7 +5,7 @@
 *.dylib
 *.test
 
-# Output of build tools
+# Output of build tools  
 /bin/
 /build/
 /dist/
@@ -24,7 +24,7 @@ vendor/
 .idea/
 *.swp
 *.swo
-go
+
 # Logs
 *.log
 
@@ -52,3 +52,7 @@ coverage.out
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Application binaries
+/mh-go
+/tmp/main

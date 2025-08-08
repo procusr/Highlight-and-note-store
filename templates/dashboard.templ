@@ -88,24 +88,28 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 						</div>
 					</div>
 				} else {
-					<div class="text-center py-12 md:py-16">
-						<div class="mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-							<svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-							</svg>
+					<div>
+						<div class="text-center py-12 md:py-16">
+							<div class="mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+								<svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+								</svg>
+							</div>
+							<h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
+							<p class="text-gray-600 mb-6 text-sm md:text-base px-4">Get started by creating your first folder to organize your content.</p>
+							<button
+								onclick="showCreateFolderModal()"
+								class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
+							>
+								<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+								</svg>
+								Create Your First Folder
+							</button>
 						</div>
-						<h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
-						<p class="text-gray-600 mb-6 text-sm md:text-base px-4">Get started by creating your first folder to organize your content.</p>
-						<button
-							onclick="showCreateFolderModal()"
-							class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
-						>
-							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-							</svg>
-							Create Your First Folder
-						</button>
+						<!-- Always include folders-container, even when empty -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" id="folders-container"></div>
 					</div>
 				}
 			</div>
@@ -156,6 +160,15 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 						// TODO: Implement delete functionality
 					}
 				}
+
+				// Listen for HTMX events to close modals after successful operations
+				document.addEventListener('folderCreated', function(e) {
+					console.log('Folder created successfully, closing modal');
+					closeModal('createFolderModal');
+					// Clear the form
+					const form = document.querySelector('#createFolderModal form');
+					if (form) form.reset();
+				});
 			});
 		</script>
 	}

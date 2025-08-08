@@ -7,6 +7,7 @@ import (
 
 	"mh-go/internal/models"
 	"mh-go/internal/services"
+	"mh-go/templates"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -75,6 +76,19 @@ func (h *ContentHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If this is an HTMX request, return the new content card HTML and trigger modal close
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("Content-Type", "text/html")
+		// Trigger custom event to close the modal
+		w.Header().Set("HX-Trigger", "contentCreated")
+		if err := templates.ContentCard(*content).Render(r.Context(), w); err != nil {
+			http.Error(w, "Error rendering content card", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
+	// For non-HTMX requests, return JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(content)
 }

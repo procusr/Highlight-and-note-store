@@ -201,8 +201,6 @@ func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("CreateFolder: userID=%s, method=%s, content-type=%s\n", userID, r.Method, r.Header.Get("Content-Type"))
-
 	var req struct {
 		Name        string     `json:"name"`
 		Description string     `json:"description"`
@@ -265,13 +263,19 @@ func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If this is an HTMX request, redirect to dashboard
+	// If this is an HTMX request, return the new folder card HTML
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/dashboard")
-		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "text/html")
+		// Trigger custom event to close the modal
+		w.Header().Set("HX-Trigger", "folderCreated")
+		if err := templates.FolderCard(*folder).Render(r.Context(), w); err != nil {
+			http.Error(w, "Error rendering folder card", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 
+	// For non-HTMX requests, return JSON
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(folder)

@@ -16,24 +16,41 @@ const UserIDKey contextKey = "user_id"
 func RequireAuth(authService *services.AuthService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// Get token from cookie
-cookie, err := r.Cookie("auth_token")
-if err != nil {
-http.Redirect(w, r, "/login", http.StatusSeeOther)
-return
-}
+			isHTMX := r.Header.Get("HX-Request") == "true"
+			
+			// Get token from cookie
+			cookie, err := r.Cookie("auth_token")
+			if err != nil {
+				// Check if this is an HTMX request
+				if isHTMX {
+					// For HTMX requests, return 401 with HX-Redirect header
+					w.Header().Set("HX-Redirect", "/login")
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
 
-// Validate token
-userID, err := authService.ValidateToken(cookie.Value)
-if err != nil {
-// Clear invalid cookie
-http.SetCookie(w, &http.Cookie{
+			// Validate token
+			userID, err := authService.ValidateToken(cookie.Value)
+			if err != nil {
+				// Clear invalid cookie
+				http.SetCookie(w, &http.Cookie{
 					Name:     "auth_token",
 					Value:    "",
 					Path:     "/",
 					HttpOnly: true,
 					MaxAge:   -1,
 				})
+				
+				// Check if this is an HTMX request
+				if isHTMX {
+					// For HTMX requests, return 401 with HX-Redirect header
+					w.Header().Set("HX-Redirect", "/login")
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
