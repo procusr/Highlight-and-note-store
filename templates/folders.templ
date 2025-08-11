@@ -2,117 +2,6 @@ package templates
 
 import "mh-go/internal/models"
 
-// Login page
-templ LoginPage() {
-	@Layout("Login") {
-		<div class="min-h-screen flex items-center justify-center">
-			<div class="max-w-md w-full space-y-8">
-				<div>
-					<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-						Sign in to your account
-					</h2>
-				</div>
-				<form class="mt-8 space-y-6" hx-post="/login" hx-target="#error" hx-swap="innerHTML">
-					<div class="rounded-md shadow-sm -space-y-px">
-						<div>
-							<input
-								name="email"
-								type="email"
-								required
-								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-								placeholder="Email address"
-							/>
-						</div>
-						<div>
-							<input
-								name="password"
-								type="password"
-								required
-								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-								placeholder="Password"
-							/>
-						</div>
-					</div>
-					<div id="error" class="text-red-600 text-sm"></div>
-					<div>
-						<button
-							type="submit"
-							class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-						>
-							Sign in
-						</button>
-					</div>
-					<div class="text-center">
-						<a href="/register" class="text-gray-600 hover:text-gray-800 font-medium">
-							Don't have an account? Sign up
-						</a>
-					</div>
-				</form>
-			</div>
-		</div>
-	}
-}
-
-// Register page
-templ RegisterPage() {
-	@Layout("Register") {
-		<div class="min-h-screen flex items-center justify-center">
-			<div class="max-w-md w-full space-y-8">
-				<div>
-					<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-						Create your account
-					</h2>
-				</div>
-				<form class="mt-8 space-y-6" hx-post="/register" hx-target="#error" hx-swap="innerHTML">
-					<div class="rounded-md shadow-sm -space-y-px">
-						<div>
-							<input
-								name="email"
-								type="email"
-								required
-								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-								placeholder="Email address"
-							/>
-						</div>
-						<div>
-							<input
-								name="password"
-								type="password"
-								required
-								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-								placeholder="Password"
-							/>
-						</div>
-						<div>
-							<input
-								name="confirm_password"
-								type="password"
-								required
-								class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-								placeholder="Confirm Password"
-							/>
-						</div>
-					</div>
-					<div id="error" class="text-red-600 text-sm"></div>
-					<div>
-						<button
-							type="submit"
-							class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-						>
-							Sign up
-						</button>
-					</div>
-					<div class="text-center">
-						<a href="/login" class="text-gray-600 hover:text-gray-800 font-medium">
-							Already have an account? Sign in
-						</a>
-					</div>
-				</form>
-			</div>
-		</div>
-	}
-}
-
 // Folder view page
 templ FolderPage(user *models.User, folder models.Folder, contents []models.Content, subfolders []models.Folder) {
 	@Layout("Folder: " + folder.Name) {
@@ -336,61 +225,28 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 						// TODO: Implement delete functionality
 					}
 				}
+
+				// Listen for HTMX events to close modals after successful operations
+				document.addEventListener('htmx:afterRequest', function(e) {
+					// Check if this was a successful folder creation request
+					if (e.detail.successful && e.detail.xhr.responseURL.includes('/api/folders')) {
+						console.log('Folder created successfully, closing modal');
+						closeModal('createFolderModal');
+						// Clear the form
+						const form = document.querySelector('#createFolderModal form');
+						if (form) form.reset();
+					}
+				});
+
+				// Listen for custom HTMX trigger events
+				document.addEventListener('folderCreated', function(e) {
+					console.log('Folder created event triggered, closing modal');
+					closeModal('createFolderModal');
+					// Clear the form
+					const form = document.querySelector('#createFolderModal form');
+					if (form) form.reset();
+				});
 			});
 		</script>
-	}
-}// Flashcards page
-templ FlashcardsPage(user *models.User) {
-	@Layout("Flashcards") {
-		@Sidebar("flashcards", user)
-
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
-				<div class="mb-6 md:mb-8">
-					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Flashcards</h1>
-					<p class="text-gray-600 text-sm md:text-base">Study and memorize content with interactive flashcards.</p>
-				</div>
-
-				<div class="text-center py-12 md:py-16">
-					<div class="mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-						<svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-						</svg>
-					</div>
-					<h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">Flashcards</h3>
-					<p class="text-gray-600 text-sm md:text-base px-4">Create and study flashcards to enhance your learning experience.</p>
-				</div>
-			</div>
-		</main>
-	}
-}
-
-// Settings page
-templ SettingsPage(user *models.User) {
-	@Layout("Settings") {
-		@Sidebar("settings", user)
-
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
-				<div class="mb-6 md:mb-8">
-					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Settings</h1>
-					<p class="text-gray-600 text-sm md:text-base">Manage your account preferences and application settings.</p>
-				</div>
-
-				<div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-					<h3 class="text-base md:text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-					<div class="space-y-4">
-						<div>
-							<label class="block text-xs md:text-sm font-medium text-gray-700">Email</label>
-							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.Email }</p>
-						</div>
-						<div>
-							<label class="block text-xs md:text-sm font-medium text-gray-700">Account created</label>
-							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.CreatedAt.Format("January 2, 2006") }</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</main>
 	}
 }

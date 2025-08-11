@@ -1,0 +1,131 @@
+package templates
+
+import "mh-go/internal/models"
+
+// Folder card component - Masonry style with random pastel colors
+templ FolderCard(folder models.Folder) {
+	<div class="masonry-item">
+		<a href={ templ.URL("/folders/" + folder.ID.String()) } class="block group">
+			<div class={ "rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden", getPastelColor(folder.ID.String()) }>
+				<!-- Card Header with gradient overlay -->
+				<div class="relative p-3 md:p-4">
+					<div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+					<div class="relative">
+						<div class="flex items-start justify-between mb-2">
+							<h3 class="text-sm md:text-base font-medium text-gray-800 truncate pr-2 leading-tight">{ folder.Name }</h3>
+							<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+								<button
+									onclick="event.preventDefault(); event.stopPropagation(); editFolder('{ folder.ID.String() }')"
+									class="p-1 text-gray-600 hover:text-gray-800 hover:bg-white/50 rounded transition-colors"
+									title="Edit folder"
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+									</svg>
+								</button>
+								<button
+									onclick="event.preventDefault(); event.stopPropagation(); deleteFolder('{ folder.ID.String() }')"
+									class="p-1 text-gray-600 hover:text-red-600 hover:bg-white/50 rounded transition-colors"
+									title="Delete folder"
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						if folder.Description != "" {
+							<div class={ "mb-3", getContentHeight(folder.Description) }>
+								<p class="text-gray-700 text-xs md:text-sm leading-relaxed">{ folder.Description }</p>
+							</div>
+						}
+
+						<!-- Folder icon and date -->
+						<div class="flex items-center justify-between">
+							<div class="flex items-center space-x-1.5">
+								<div class="p-1.5 bg-white/30 rounded">
+									<svg class="w-3 h-3 md:w-4 md:h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+									</svg>
+								</div>
+								<span class="text-xs text-gray-600 font-medium">{ folder.CreatedAt.Format("Jan 2") }</span>
+							</div>
+							<div class="opacity-60 group-hover:opacity-100 transition-opacity">
+								<svg class="w-3 h-3 md:w-4 md:h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+								</svg>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+}
+
+// Content card component
+templ ContentCard(content models.Content) {
+	<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-semibold text-gray-800">{ content.Title }</h3>
+			<div class="flex space-x-2">
+				<button data-edit-content={ content.ID.String() } class="text-blue-600 hover:text-blue-800">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+					</svg>
+				</button>
+				<button data-delete-content={ content.ID.String() } class="text-red-600 hover:text-red-800">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+					</svg>
+				</button>
+			</div>
+		</div>
+		<p class="text-gray-600 mb-4">{ content.Description }</p>
+		<div class="flex justify-between items-center text-sm text-gray-500">
+			<span>{ content.ContentType }</span>
+			<span>{ content.CreatedAt.Format("Jan 2, 2006") }</span>
+		</div>
+	</div>
+}
+
+// Helper function to get random pastel color based on folder ID
+func getPastelColor(folderID string) string {
+	colors := []string{
+		"pastel-pink", "pastel-purple", "pastel-blue", "pastel-cyan", "pastel-green",
+		"pastel-yellow", "pastel-orange", "pastel-red", "pastel-indigo", "pastel-teal",
+		"pastel-lavender", "pastel-mint", "pastel-peach", "pastel-rose", "pastel-sky",
+	}
+
+	// Use a simple hash of the folder ID to get consistent color per folder
+	hash := 0
+	for _, char := range folderID {
+		hash = int(char) + ((hash << 5) - hash)
+	}
+	if hash < 0 {
+		hash = -hash
+	}
+
+	return colors[hash%len(colors)]
+}
+
+// Helper function to determine content height based on description length
+func getContentHeight(description string) string {
+	if len(description) == 0 {
+		return ""
+	}
+
+	// Vary height based on content length to create masonry effect (smaller sizes)
+	switch {
+	case len(description) > 200:
+		return "min-h-[80px]"
+	case len(description) > 100:
+		return "min-h-[60px]"
+	case len(description) > 50:
+		return "min-h-[40px]"
+	default:
+		return "min-h-[30px]"
+	}
+}

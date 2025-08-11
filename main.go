@@ -45,10 +45,11 @@ func main() {
 	authService := services.NewAuthService(db, jwtSecret)
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
+	userService := services.NewUserService(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	folderHandler := handlers.NewFolderHandler(folderService, contentService)
+	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
 	pageHandler := handlers.NewPageHandler()
 
 	// Setup router

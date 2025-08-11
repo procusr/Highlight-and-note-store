@@ -1,0 +1,59 @@
+package templates
+
+// Alert component
+templ Alert(message, alertType string) {
+	<div class={ "alert", "p-4", "rounded-md", "mb-4", getAlertClasses(alertType) }>
+		{ message }
+	</div>
+}
+
+// Loading spinner component
+templ LoadingSpinner() {
+	<div class="flex justify-center items-center p-4">
+		<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+	</div>
+}
+
+// Simple Modal component (without complex scripts)
+templ Modal(id, title string) {
+	<div id={ id } class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+			<div class="mt-3">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-medium text-gray-900">{ title }</h3>
+					<button data-modal-close={ id } class="text-gray-400 hover:text-gray-600">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					{ children... }
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// Helper function for alert classes
+func getAlertClasses(alertType string) string {
+	switch alertType {
+	case "success":
+		return "bg-green-100 border border-green-400 text-green-700"
+	case "error":
+		return "bg-red-100 border border-red-400 text-red-700"
+	case "warning":
+		return "bg-yellow-100 border border-yellow-400 text-yellow-700"
+	default:
+		return "bg-blue-100 border border-blue-400 text-blue-700"
+	}
+}
+
+// Helper function for sidebar link classes
+func getSidebarLinkClass(page, currentPage string) string {
+	baseClasses := "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors"
+	if page == currentPage {
+		return baseClasses + " bg-gray-100 text-gray-900"
+	}
+	return baseClasses + " text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+}

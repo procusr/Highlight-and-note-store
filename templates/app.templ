@@ -161,8 +161,20 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 				}
 
 				// Listen for HTMX events to close modals after successful operations
+				document.addEventListener('htmx:afterRequest', function(e) {
+					// Check if this was a successful folder creation request
+					if (e.detail.successful && e.detail.xhr.responseURL.includes('/api/folders')) {
+						console.log('Folder created successfully, closing modal');
+						closeModal('createFolderModal');
+						// Clear the form
+						const form = document.querySelector('#createFolderModal form');
+						if (form) form.reset();
+					}
+				});
+
+				// Listen for custom HTMX trigger events
 				document.addEventListener('folderCreated', function(e) {
-					console.log('Folder created successfully, closing modal');
+					console.log('Folder created event triggered, closing modal');
 					closeModal('createFolderModal');
 					// Clear the form
 					const form = document.querySelector('#createFolderModal form');
@@ -173,46 +185,58 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 	}
 }
 
-// Create Folder Modal
-templ CreateFolderModal() {
-	@Modal("createFolderModal", "Create New Folder") {
-		<form hx-post="/api/folders" hx-target="#folders-container" hx-swap="afterbegin">
-			<div class="mb-4">
-				<label for="name" class="block text-sm font-medium text-gray-700">Folder Name</label>
-				<input
-					type="text"
-					id="name"
-					name="name"
-					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-					placeholder="Enter folder name"
-				/>
+// Flashcards page
+templ FlashcardsPage(user *models.User) {
+	@Layout("Flashcards") {
+		@Sidebar("flashcards", user)
+
+		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
+			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Flashcards</h1>
+					<p class="text-gray-600 text-sm md:text-base">Study and memorize content with interactive flashcards.</p>
+				</div>
+
+				<div class="text-center py-12 md:py-16">
+					<div class="mx-auto w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+						<svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+						</svg>
+					</div>
+					<h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">Flashcards</h3>
+					<p class="text-gray-600 text-sm md:text-base px-4">Create and study flashcards to enhance your learning experience.</p>
+				</div>
 			</div>
-			<div class="mb-4">
-				<label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-				<textarea
-					id="description"
-					name="description"
-					rows="3"
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-					placeholder="Enter folder description (optional)"
-				></textarea>
+		</main>
+	}
+}
+
+// Settings page
+templ SettingsPage(user *models.User) {
+	@Layout("Settings") {
+		@Sidebar("settings", user)
+
+		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
+			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Settings</h1>
+					<p class="text-gray-600 text-sm md:text-base">Manage your account preferences and application settings.</p>
+				</div>
+
+				<div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+					<h3 class="text-base md:text-lg font-medium text-gray-900 mb-4">Account Information</h3>
+					<div class="space-y-4">
+						<div>
+							<label class="block text-xs md:text-sm font-medium text-gray-700">Email</label>
+							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.Email }</p>
+						</div>
+						<div>
+							<label class="block text-xs md:text-sm font-medium text-gray-700">Account created</label>
+							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.CreatedAt.Format("January 2, 2006") }</p>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="flex justify-end space-x-3">
-				<button
-					type="button"
-					onclick="closeModal('createFolderModal')"
-					class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-				>
-					Cancel
-				</button>
-				<button
-					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800"
-				>
-					Create Folder
-				</button>
-			</div>
-		</form>
+		</main>
 	}
 }
