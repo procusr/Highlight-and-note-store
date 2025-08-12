@@ -38,7 +38,7 @@ type Content struct {
 	Title       string    `json:"title" db:"title"`
 	Description string    `json:"description" db:"description"`
 	Body        string    `json:"body" db:"body"`
-	ContentType string    `json:"content_type" db:"content_type"` // text, image, file, etc.
+	ContentType string    `json:"content_type" db:"content_type"`
 	FolderID    uuid.UUID `json:"folder_id" db:"folder_id"`
 	UserID      uuid.UUID `json:"user_id" db:"user_id"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
