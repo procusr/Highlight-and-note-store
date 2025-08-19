@@ -6,8 +6,8 @@ import "mh-go/internal/models"
 templ FolderPage(user *models.User, folder models.Folder, contents []models.Content, subfolders []models.Folder) {
 	@Layout("Folder: " + folder.Name) {
 		@Sidebar("folder", user)
-		<div class="main-content md:ml-64 pt-16 md:pt-0">
-			<div class="max-w-7xl mx-auto py-6 px-4">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 			<!-- Breadcrumb -->
 			<nav class="flex mb-6" aria-label="Breadcrumb">
 				<ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -87,7 +87,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 				</div>
 			}
 			</div>
-		</div>
+		</main>
 
 		<!-- Create Content Modal -->
 		@CreateContentModal(folder.ID.String())
@@ -130,7 +130,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 	@Layout("Folders") {
 		@Sidebar("folders", user)
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
+		<main class="main-content md:ml-28 min-h-screen bg-gray-50 pt-16 md:pt-0">
 			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
 				<div class="mb-6 md:mb-8">
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

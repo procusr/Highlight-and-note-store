@@ -1,11 +1,43 @@
 /* Custom styles for MH-Go application */
 
+/* Consistent layout system */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Account for collapsed sidebar on desktop */
+@media (min-width: 768px) {
+  .main-container {
+    margin-left: 4rem; /* 64px for collapsed sidebar */
+    margin-right: auto;
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .main-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main-container {
+    padding: 0 3rem;
+  }
+}
+
 /* Mobile-first responsive design */
 @media (max-width: 767px) {
-  .main-content {
-    margin-left: 0 !important;
-  }
-
   .mobile-menu-button {
     display: block;
   }

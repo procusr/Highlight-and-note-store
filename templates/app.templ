@@ -10,9 +10,9 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 	@Layout("Dashboard") {
 		@Sidebar("dashboard", user)
 
-		<!-- Main content with sidebar offset -->
-		<main class="main-content md:ml-28 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<!-- Main content with consistent centered layout -->
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<!-- Dashboard Header -->
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Dashboard</h1>
@@ -216,8 +216,8 @@ templ SettingsPage(user *models.User) {
 	@Layout("Settings") {
 		@Sidebar("settings", user)
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Settings</h1>
 					<p class="text-gray-600 text-sm md:text-base">Manage your account preferences and application settings.</p>
