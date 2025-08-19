@@ -49,7 +49,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 			if len(subfolders) > 0 {
 				<div class="mb-8">
 					<h2 class="text-lg font-semibold text-gray-900 mb-4">Folders</h2>
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<div class="masonry-grid">
 						for _, subfolder := range subfolders {
 							@FolderCard(subfolder)
 						}

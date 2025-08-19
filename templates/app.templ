@@ -80,7 +80,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 								New Folder
 							</button>
 						</div>
-						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" id="folders-container">
+						<div class="masonry-grid" id="folders-container">
 							for _, folder := range folders {
 								@FolderCard(folder)
 							}
@@ -108,7 +108,7 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 							</button>
 						</div>
 						<!-- Always include folders-container, even when empty -->
-						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" id="folders-container"></div>
+						<div class="masonry-grid" id="folders-container"></div>
 					</div>
 				}
 			</div>

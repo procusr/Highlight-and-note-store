@@ -27,6 +27,7 @@ templ Layout(title string) {
 			.masonry-grid {
 				columns: 2;
 				column-gap: 0.75rem;
+				column-fill: balance;
 			}
 			@media (min-width: 640px) {
 				.masonry-grid {
@@ -54,6 +55,7 @@ templ Layout(title string) {
 			}
 			.masonry-item {
 				break-inside: avoid;
+				page-break-inside: avoid;
 				margin-bottom: 0.75rem;
 				display: inline-block;
 				width: 100%;
