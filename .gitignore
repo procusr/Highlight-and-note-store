@@ -56,3 +56,4 @@ Thumbs.db
 # Application binaries
 /mh-go
 /tmp/main
+.env
