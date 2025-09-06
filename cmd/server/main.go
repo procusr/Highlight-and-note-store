@@ -42,20 +42,28 @@ func main() {
 	userService := services.NewUserService(db)
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
+	
+	// Learning platform services
+	topicService := services.NewTopicService(db)
+	methodService := services.NewLearningMethodService(db)
+	progressService := services.NewProgressService(db)
+	learningService := services.NewLearningService(db, topicService, methodService, progressService)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
 	contentHandler := handlers.NewContentHandler(contentService, folderService)
+	learningHandler := handlers.NewLearningHandler(topicService, methodService, progressService, learningService, userService)
+	pageHandler := handlers.NewPageHandler(userService)
 
 	// Setup router
-	r := setupRouter(cfg, authService, authHandler, folderHandler, contentHandler)
+	r := setupRouter(cfg, authService, authHandler, folderHandler, contentHandler, learningHandler, pageHandler)
 
 	log.Printf("Server starting on port %s", cfg.Port)
 	log.Printf("Server failed to start: %v", http.ListenAndServe(":"+cfg.Port, r))
 }
 
-func setupRouter(cfg *config.Config, authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, contentHandler *handlers.ContentHandler) *chi.Mux {
+func setupRouter(cfg *config.Config, authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, contentHandler *handlers.ContentHandler, learningHandler *handlers.LearningHandler, pageHandler *handlers.PageHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Global middleware
@@ -82,9 +90,21 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		// Dashboard
 		r.Get("/dashboard", folderHandler.DashboardPage)
 
-		// Folder pages
+		// Learning Platform
+		r.Get("/learning", learningHandler.LearningPlatformPage)
+		r.Post("/learning/start", learningHandler.StartLearning)
+
+		// New learning-focused routes matching architect template
+		r.Get("/remember", pageHandler.RememberPage)
+		r.Get("/analyze", pageHandler.AnalyzePage)
+		r.Get("/optimize", pageHandler.OptimizePage)
+		
+		// Keep existing folder functionality
 		r.Get("/folders", folderHandler.FoldersPage)
 		r.Get("/folders/{folderID}", folderHandler.FolderPage)
+		
+		// Other pages
+		r.Get("/settings", pageHandler.SettingsPage)
 
 		// API routes
 		r.Route("/api", func(r chi.Router) {
@@ -93,6 +113,21 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 			// Content routes
 			contentHandler.RegisterRoutes(r, authService)
+			
+			// Learning platform API routes
+			r.Route("/learning", func(r chi.Router) {
+				r.Get("/topics", learningHandler.GetTopics)
+				r.Get("/topics/search", learningHandler.SearchTopics)
+				r.Get("/pathways", learningHandler.GetLearningPathways)
+				r.Get("/stats", learningHandler.GetDashboardStats)
+				r.Get("/prompts", learningHandler.GetUserPrompts)
+				r.Get("/preferences", learningHandler.GetUserPreferences)
+				r.Post("/preferences", learningHandler.UpdateUserPreferences)
+				r.Post("/prompts", learningHandler.CreateLearningPrompt)
+				r.Post("/progress", learningHandler.UpdateProgress)
+				r.Post("/sessions", learningHandler.StartLearningSession)
+				r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
+			})
 		})
 	})
 

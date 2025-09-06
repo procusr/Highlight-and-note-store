@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Architect - AI-Enhanced Learning Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Learning Architect</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-item active" data-section="overview">
+                    <span class="nav-icon">📊</span>
+                    <span>Overview</span>
+                </button>
+                <button class="nav-item" data-section="learn">
+                    <span class="nav-icon">🧠</span>
+                    <span>Learn</span>
+                </button>
+                <button class="nav-item" data-section="remember">
+                    <span class="nav-icon">💭</span>
+                    <span>Remember</span>
+                </button>
+                <button class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-item" data-section="optimize">
+                    <span class="nav-icon">⚡</span>
+                    <span>Optimize</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Overview Section -->
+        <section id="overview" class="section active">
+            <div class="section-header">
+                <h2>Good morning! Ready to learn?</h2>
+                <p class="section-subtitle">Here's your learning overview for today</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h3>Your Progress</h3>
+                    <div class="progress-cards">
+                        <div class="progress-card">
+                            <div class="progress-circle" data-progress="88">
+                                <span class="progress-value">88%</span>
+                            </div>
+                            <p>Overall Progress</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-circle" data-progress="85">
+                                <span class="progress-value">85%</span>
+                            </div>
+                            <p>Weekly Progress</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="streak-display">
+                                <span class="streak-number">12</span>
+                                <span class="streak-unit">days</span>
+                            </div>
+                            <p>Daily Streak</p>
+                        </div>
+                    </div>
+
+                    <div class="additional-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">1,247</span>
+                            <span class="stat-label">Study Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">89</span>
+                            <span class="stat-label">Concepts Mastered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Plan Section -->
+                <div class="study-plan">
+                    <h3>Today's Study Plan</h3>
+                    <div id="study-cards" class="study-cards">
+                        <!-- Dynamically populated -->
+                    </div>
+
+                    <div class="current-path">
+                        <h4>Current Learning Path</h4>
+                        <div class="path-card">
+                            <span class="path-name">Foundation Through Discovery</span>
+                            <span class="path-type">First principles exploration</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-preview">
+                        <h4>Learning Analytics</h4>
+                        <div class="chart-container">
+                            <canvas id="weeklyChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-section">
+                        <h4>Review Queue</h4>
+                        <div id="review-queue">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h4>Weak Areas</h4>
+                        <div id="weak-areas">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Learn Section -->
+        <section id="learn" class="section">
+            <div class="section-header">
+                <h2>Learning Pathways & Practice</h2>
+                <p class="section-subtitle">Choose your learning adventure</p>
+            </div>
+
+            <div class="learning-content">
+                <div class="pathways-section">
+                    <h3>Learning Pathways</h3>
+                    <div id="pathways-grid" class="pathways-grid">
+                        <!-- Dynamically populated with AI prompt integration -->
+                    </div>
+                </div>
+
+                <div class="practice-tools">
+                    <h3>Practice Generation Tools</h3>
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-icon">🎯</div>
+                            <h4>Adaptive Problem Generator</h4>
+                            <p>Automatically generates problems matched to your current level</p>
+                            <button class="btn btn--primary">Generate Problems</button>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">📊</div>
+                            <h4>Difficulty Adjustment</h4>
+                            <p>Real-time difficulty calibration based on performance</p>
+                            <button class="btn btn--primary">Adjust Settings</button>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">✏️</div>
+                            <h4>Custom Exercise Creator</h4>
+                            <p>Create your own practice exercises and assessments</p>
+                            <button class="btn btn--primary">Create Exercise</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Remember Section -->
+        <section id="remember" class="section">
+            <div class="section-header">
+                <h2>Memory Techniques & Active Recall</h2>
+                <p class="section-subtitle">Enhance your retention and recall</p>
+            </div>
+
+            <div class="memory-tabs">
+                <button class="tab-button active" data-tab="techniques">Memory Techniques</button>
+                <button class="tab-button" data-tab="spaced-repetition">Spaced Repetition</button>
+                <button class="tab-button" data-tab="active-recall">Active Recall</button>
+            </div>
+
+            <div id="techniques" class="tab-panel active">
+                <div id="techniques-grid" class="techniques-grid">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <div id="spaced-repetition" class="tab-panel">
+                <div class="spaced-repetition">
+                    <div class="scheduling-info">
+                        <h3>Intelligent Scheduling</h3>
+                        <p>Optimized intervals: 1hr → 1day → 3days → 1week → 2weeks → 1month → 3months</p>
+                    </div>
+
+                    <h4>Review Queue Management</h4>
+                    <div id="spaced-cards" class="spaced-cards">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="active-recall" class="tab-panel">
+                <div class="recall-tools">
+                    <div class="tool-card">
+                        <div class="tool-icon">🃏</div>
+                        <h4>Smart Flashcard System</h4>
+                        <p>Spaced repetition algorithm with immediate feedback</p>
+                        <button class="btn btn--primary">Start Flashcards</button>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-icon">❓</div>
+                        <h4>Quiz Generator</h4>
+                        <p>Multiple question types with adaptive difficulty</p>
+                        <button class="btn btn--primary">Generate Quiz</button>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-icon">🧩</div>
+                        <h4>Retrieval Practice</h4>
+                        <p>Self-testing exercises with performance tracking</p>
+                        <button class="btn btn--primary">Start Practice</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section">
+            <div class="section-header">
+                <h2>Learning Analytics & Insights</h2>
+                <p class="section-subtitle">Insights into your learning patterns</p>
+            </div>
+
+            <div class="analytics-content">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-icon">📊</div>
+                        <h3>Learning Analytics</h3>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span class="metric-label">Efficiency Score</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-icon">📈</div>
+                        <h3>Retention Curve</h3>
+                        <div class="metric">
+                            <span class="metric-value">82%</span>
+                            <span class="metric-label">Retention Rate</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-icon">🎯</div>
+                        <h3>Metacognitive Dashboard</h3>
+                        <div class="metric">
+                            <span class="metric-value">76%</span>
+                            <span class="metric-label">Accuracy Rate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-analysis">
+                    <h3>Error Patterns</h3>
+                    <div id="error-patterns" class="error-patterns">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <h4>Error Pattern Analysis</h4>
+                    <p>Track and analyze your common mistakes to improve learning efficiency.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Optimize Section -->
+        <section id="optimize" class="section">
+            <div class="section-header">
+                <h2>Adaptive Optimization</h2>
+                <p class="section-subtitle">Fine-tune your learning experience</p>
+            </div>
+
+            <div class="optimization-content">
+                <div class="optimization-section">
+                    <h3>🤖 Adaptive Learning Engine</h3>
+                    <div class="engine-controls">
+                        <div class="control-group">
+                            <label>Learning Intensity</label>
+                            <input type="range" class="slider" min="1" max="10" value="7">
+                            <span class="slider-value">7/10</span>
+                        </div>
+                        <div class="control-group">
+                            <label>Session Duration</label>
+                            <input type="range" class="slider" min="15" max="90" value="45">
+                            <span class="slider-value">45 min</span>
+                        </div>
+                        <div class="control-group">
+                            <label>Difficulty Level</label>
+                            <input type="range" class="slider" min="1" max="10" value="6">
+                            <span class="slider-value">6/10</span>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h4>Learning Path Recommendations</h4>
+                        <ul class="recommendation-list">
+                            <li>More spaced repetition for Physics concepts</li>
+                            <li>Memory palace training for Historical dates</li>
+                            <li>Error pattern analysis for Math problems</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="optimization-section">
+                    <h3>🎯 Learning Strategies</h3>
+                    <div id="strategies-grid" class="strategies-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <div class="optimization-section">
+                    <h3>🔀 Interleaving System</h3>
+                    <div class="interleaving-card">
+                        <h4>Smart Topic Mixing</h4>
+                        <p>Optimal interleaving schedule based on your learning patterns</p>
+                        <div class="interleaving-visual">
+                            <div class="topic-block" style="background-color: var(--color-bg-1);">Math</div>
+                            <div class="topic-block" style="background-color: var(--color-bg-2);">Science</div>
+                            <div class="topic-block" style="background-color: var(--color-bg-3);">History</div>
+                            <div class="topic-block" style="background-color: var(--color-bg-1);">Math</div>
+                        </div>
+                        <button class="btn btn--primary">Customize Mixing</button>
+                    </div>
+                </div>
+
+                <div class="optimization-section">
+                    <h3>⚡ Performance Optimization</h3>
+                    <div class="performance-metrics">
+                        <div class="metric-card">
+                            <h4>Learning Efficiency</h4>
+                            <p>Time investment vs knowledge gained</p>
+                            <div class="efficiency-score">85%</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Retention Optimization</h4>
+                            <p>Long-term knowledge retention rate</p>
+                            <div class="efficiency-score">82%</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Transfer Learning</h4>
+                            <p>Application to new domains</p>
+                            <div class="efficiency-score">78%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- AI Prompt Modal -->
+    <div id="ai-prompt-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px; width: 95%;">
+            <div class="modal-header">
+                <h3 id="ai-prompt-title">AI Learning Coach</h3>
+                <button class="modal-close" onclick="closeAllModals()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="topic-input">Customize for Your Topic:</label>
+                    <input type="text" id="topic-input" class="form-control" placeholder="Enter your learning topic (e.g., Machine Learning, Spanish Grammar)">
+                    <button class="btn btn--secondary btn--sm" onclick="customizePromptForTopic()" style="margin-top: 8px;">Customize</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="ai-prompt-content">AI Prompt (Copy and paste into ChatGPT, Claude, or any AI assistant):</label>
+                    <textarea id="ai-prompt-content" class="form-control" rows="20" readonly style="font-family: var(--font-family-mono); font-size: 12px; line-height: 1.4;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="copy-prompt-btn" class="btn btn--primary" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="btn btn--secondary" onclick="closeAllModals()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Palace Modal -->
+    <div id="memory-palace-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Memory Palace Builder</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="palace-selector">
+                    <h4>Choose Your Palace</h4>
+                    <div class="palace-options">
+                        <button class="palace-option active" data-palace="house">My House</button>
+                        <button class="palace-option" data-palace="school">School Campus</button>
+                    </div>
+                </div>
+
+                <div id="palace-rooms" class="palace-rooms">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="palace-items">
+                    <h4>Items to Remember</h4>
+                    <div class="item-list">
+                        <div class="memory-item">Shopping List: Milk, Bread, Eggs</div>
+                        <div class="memory-item">Historical Dates: 1776, 1969, 2001</div>
+                        <div class="memory-item">Formulas: E=mc², F=ma, a²+b²=c²</div>
+                    </div>
+                    <button class="btn btn--primary">Save Palace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+package templates
+
+import (
+	"fmt"
+	"mh-go/internal/models"
+)
+
+// Learning Platform Page - Simple version focused on learning paths
+templ LearningPlatformPage(
+	user *models.User, 
+	stats *models.DashboardStats, 
+	pathwayCards []models.LearningPathwayCard, 
+	topics []models.Topic, 
+	sessions []models.LearningSession, 
+	preferences *models.UserPreferences,
+) {
+	@Layout("Learn") {
+		@Sidebar("learning", user)
+		
+		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
+			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Learning Paths</h1>
+					<p class="text-gray-600 text-sm md:text-base">Choose your learning adventure and start your journey.</p>
+				</div>
+
+				<!-- Learning Paths Grid -->
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-8" x-data="{ showModal: false, selectedMethod: null }">
+					for _, card := range pathwayCards {
+						<div class="bg-white rounded-lg border border-gray-200 p-3 cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+							data-method-id={ card.ID.String() }
+							data-method-name={ card.Name }
+							data-method-key={ card.MethodKey }
+							data-has-started={ templ.EscapeString(fmt.Sprintf("%t", card.HasStarted)) }
+							@click="selectedMethod = { id: $el.dataset.methodId, name: $el.dataset.methodName, key: $el.dataset.methodKey, hasStarted: $el.dataset.hasStarted === 'true' }; showModal = true">
+							
+							<div class="text-xl mb-2">{ getMethodIcon(card.MethodKey) }</div>
+							<h4 class="text-sm font-semibold text-gray-900 mb-1">{ card.Name }</h4>
+							<p class="text-xs text-gray-600 mb-2 line-clamp-2">{ card.Description }</p>
+							
+							if card.HasStarted {
+								<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+									Continue
+								</span>
+							} else {
+								<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+									Start
+								</span>
+							}
+						</div>
+					}
+
+					<!-- Learning Prompt Modal -->
+					<div x-show="showModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+						<div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+							<div x-show="showModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity" @click="showModal = false">
+								<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+							</div>
+							<span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+							<div x-show="showModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+								<form hx-post="/learning/start" hx-target="#learning-result" @submit.prevent="$el.querySelector('button[type=submit]').disabled = true; htmx.process($el); setTimeout(() => showModal = false, 500)">
+									<div class="mb-4">
+										<div class="flex items-center mb-3">
+											<span class="text-2xl mr-3" x-text="selectedMethod && selectedMethod.key ? (selectedMethod.key === 'applied_laboratory' ? '🧪' : selectedMethod.key === 'foundation_discovery' ? '🔍' : selectedMethod.key === 'integration_transfer' ? '🔗' : selectedMethod.key === 'mistake_learning_lab' ? '🔧' : selectedMethod.key === 'problem_gymnasium' ? '💪' : '📚') : '📚'"></span>
+											<div>
+												<h3 class="text-lg font-medium text-gray-900" x-text="selectedMethod ? selectedMethod.name : 'Start Learning'"></h3>
+												<p class="text-sm text-gray-600">Begin your learning journey</p>
+											</div>
+										</div>
+									</div>
+									
+									<input type="hidden" name="method_id" x-model="selectedMethod ? selectedMethod.id : ''"/>
+									<input type="hidden" name="method_key" x-model="selectedMethod ? selectedMethod.key : ''"/>
+									
+									<div class="mb-4">
+										<label class="block text-sm font-medium text-gray-700 mb-2">What do you want to learn?</label>
+										<input type="text" name="topic" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Machine Learning, Spanish Grammar, Mathematics"/>
+									</div>
+									
+									<div class="mb-6">
+										<label class="block text-sm font-medium text-gray-700 mb-2">Learning Goal</label>
+										<textarea name="user_prompt" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="What would you like to achieve?"></textarea>
+									</div>
+									
+									<div class="flex justify-end space-x-3">
+										<button type="button" @click="showModal = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+											Cancel
+										</button>
+										<button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+											Start Learning
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div id="learning-result"></div>
+				</div>
+
+				<!-- Current Learning Progress Section -->
+				if len(sessions) > 0 {
+					<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">Current Learning</h3>
+						<div class="space-y-4">
+							for _, session := range sessions {
+								if session.LearningMethod != nil && len(sessions) > 0 {
+									<div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+										<div class="flex-1">
+											<h4 class="font-semibold text-gray-900">{ session.Topic.Name }</h4>
+											<p class="text-sm text-gray-600">{ session.LearningMethod.Name }</p>
+											<div class="mt-2">
+												<div class="flex justify-between text-xs text-gray-600 mb-1">
+													<span>Progress</span>
+													<span>50%</span>
+												</div>
+												<div class="w-full bg-gray-200 rounded-full h-2">
+													<div class="bg-blue-600 h-2 rounded-full" style="width: 50%"></div>
+												</div>
+											</div>
+										</div>
+										<div class="ml-4">
+											<button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
+												Continue Learning
+											</button>
+										</div>
+									</div>
+								}
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</main>
+	}
+}
+
+// AI Prompt Display Template - shows clean learning progress interface
+templ AIPromptDisplay(prompt *models.LearningPrompt, topic string, methodKey string) {
+	<div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+		<div class="mb-4">
+			<div class="flex items-center mb-3">
+				<span class="text-2xl mr-3">{ getMethodIcon(methodKey) }</span>
+				<div>
+					<h3 class="text-lg font-semibold text-gray-900">Learning Session Active</h3>
+					<p class="text-sm text-gray-600">{ getMethodName(methodKey) }</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+			<div class="flex justify-between items-center mb-2">
+				<h4 class="font-semibold text-blue-900">{ topic }</h4>
+				<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Active</span>
+			</div>
+			<p class="text-blue-800 text-sm">{ prompt.UserPrompt }</p>
+		</div>
+		
+		<div class="mb-4">
+			<div class="flex justify-between text-xs text-gray-600 mb-2">
+				<span>Progress</span>
+				<span>Just Started</span>
+			</div>
+			<div class="w-full bg-gray-200 rounded-full h-2">
+				<div class="bg-blue-600 h-2 rounded-full" style="width: 5%"></div>
+			</div>
+		</div>
+		
+		<div class="flex justify-between items-center">
+			<div class="text-sm text-gray-600">
+				Started: { prompt.CreatedAt.Format("Jan 2, 3:04 PM") }
+			</div>
+			<button class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+				Continue Learning
+			</button>
+		</div>
+	</div>
+}
+
+// Helper function to get method icons
+func getMethodIcon(key string) string {
+	switch key {
+	case "applied_laboratory":
+		return "🧪"
+	case "foundation_discovery":
+		return "🔍"
+	case "integration_transfer":
+		return "🔗"
+	case "mistake_learning_lab":
+		return "🔧"
+	case "problem_gymnasium":
+		return "💪"
+	default:
+		return "📚"
+	}
+}
+
+// Helper function to get method names
+func getMethodName(key string) string {
+	switch key {
+	case "applied_laboratory":
+		return "Applied Mastery Laboratory"
+	case "foundation_discovery":
+		return "Foundation Through Discovery"
+	case "integration_transfer":
+		return "Integration & Transfer System"
+	case "mistake_learning_lab":
+		return "Mistake-Based Learning Lab"
+	case "problem_gymnasium":
+		return "Problem-Solving Gymnasium"
+	default:
+		return "Learning Method"
+	}
+}
+
+// LearningPathwaysGrid - compact grid for HTMX responses
+templ LearningPathwaysGrid(pathwayCards []models.LearningPathwayCard) {
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" x-data="{ showModal: false, selectedMethod: null }">
+		for _, card := range pathwayCards {
+			<div class="bg-white rounded-lg border border-gray-200 p-3 cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+				data-method-id={ card.ID.String() }
+				data-method-name={ card.Name }
+				data-method-key={ card.MethodKey }
+				data-has-started={ templ.EscapeString(fmt.Sprintf("%t", card.HasStarted)) }
+				@click="selectedMethod = { id: $el.dataset.methodId, name: $el.dataset.methodName, key: $el.dataset.methodKey, hasStarted: $el.dataset.hasStarted === 'true' }; showModal = true">
+				
+				<div class="text-xl mb-2">{ getMethodIcon(card.MethodKey) }</div>
+				<h4 class="text-sm font-semibold text-gray-900 mb-1">{ card.Name }</h4>
+				<p class="text-xs text-gray-600 mb-2">{ card.Description }</p>
+				
+				if card.HasStarted {
+					<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+						Continue
+					</span>
+				} else {
+					<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+						Start
+					</span>
+				}
+			</div>
+		}
+	</div>
+}
