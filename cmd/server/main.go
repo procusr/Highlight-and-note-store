@@ -42,7 +42,7 @@ func main() {
 	userService := services.NewUserService(db)
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
-	
+
 	// Learning platform services
 	topicService := services.NewTopicService(db)
 	methodService := services.NewLearningMethodService(db)
@@ -87,8 +87,9 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.RequireAuth(authService))
 
-		// Dashboard
-		r.Get("/dashboard", folderHandler.DashboardPage)
+		// Overview (replaces dashboard)
+		r.Get("/", folderHandler.OverviewPage)
+		r.Get("/overview", folderHandler.OverviewPage)
 
 		// Learning Platform
 		r.Get("/learning", learningHandler.LearningPlatformPage)
@@ -98,11 +99,11 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		r.Get("/remember", pageHandler.RememberPage)
 		r.Get("/analyze", pageHandler.AnalyzePage)
 		r.Get("/optimize", pageHandler.OptimizePage)
-		
+
 		// Keep existing folder functionality
 		r.Get("/folders", folderHandler.FoldersPage)
 		r.Get("/folders/{folderID}", folderHandler.FolderPage)
-		
+
 		// Other pages
 		r.Get("/settings", pageHandler.SettingsPage)
 
@@ -113,7 +114,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 			// Content routes
 			contentHandler.RegisterRoutes(r, authService)
-			
+
 			// Learning platform API routes
 			r.Route("/learning", func(r chi.Router) {
 				r.Get("/topics", learningHandler.GetTopics)

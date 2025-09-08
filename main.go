@@ -89,9 +89,9 @@ func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHa
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.RequireAuth(authService))
 
-		// Dashboard
-		r.Get("/", folderHandler.DashboardPage)
-		r.Get("/dashboard", folderHandler.DashboardPage)
+		// Overview (replaces dashboard)
+		r.Get("/", folderHandler.OverviewPage)
+		r.Get("/overview", folderHandler.OverviewPage)
 
 		// Page routes
 		r.Get("/flashcards", pageHandler.FlashcardsPage)

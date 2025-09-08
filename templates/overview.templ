@@ -1,0 +1,316 @@
+package templates
+
+import (
+	"mh-go/internal/models"
+)
+
+// Overview page
+templ OverviewPage(user *models.User) {
+	@Layout("Overview") {
+		@Sidebar("overview", user)
+
+		<!-- Main content with consistent centered layout -->
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
+				<!-- Overview Header -->
+				<div class="section-header mb-6 md:mb-8">
+					<h2>Good morning! Ready to learn?</h2>
+					<p class="section-subtitle">Here's your learning overview for today</p>
+				</div>
+
+				<div class="dashboard-grid">
+					<!-- Left Column: Stats Section with Chart -->
+					<div class="stats-section">
+						<h3>Your Progress</h3>
+						<div class="progress-cards">
+							<div class="progress-card">
+								<div class="progress-circle" id="overall-progress" data-progress="88">
+									<span class="progress-value">88%</span>
+								</div>
+								<p>Overall Progress</p>
+							</div>
+							<div class="progress-card">
+								<div class="progress-circle" id="weekly-progress" data-progress="85">
+									<span class="progress-value">85%</span>
+								</div>
+								<p>Weekly Progress</p>
+							</div>
+							<div class="progress-card">
+								<div class="streak-display">
+									<span class="streak-number">12</span>
+									<span class="streak-unit">days</span>
+								</div>
+								<p>Daily Streak</p>
+							</div>
+						</div>
+
+						<div class="additional-stats">
+							<div class="stat-item">
+								<span class="stat-value">1,247</span>
+								<span class="stat-label">Study Minutes</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-value">89</span>
+								<span class="stat-label">Concepts Mastered</span>
+							</div>
+						</div>
+
+						<!-- Learning Analytics Chart -->
+						<div class="analytics-section">
+							<h4>Learning Analytics</h4>
+							<div class="chart-container">
+								<canvas id="learningChart" width="400" height="200"></canvas>
+							</div>
+						</div>
+					</div>
+
+					<!-- Middle Column: Study Plan -->
+					<div class="study-plan">
+						<h3>Today's Study Plan</h3>
+						<div class="study-cards">
+							<div class="study-card">
+								<div class="study-card-content">
+									<h4>Calculus Integration</h4>
+									<div class="study-card-meta">15 min</div>
+								</div>
+								<button class="btn btn-primary">Start</button>
+							</div>
+							<div class="study-card">
+								<div class="study-card-content">
+									<h4>Physics Formulas</h4>
+									<div class="study-card-meta">23 cards due</div>
+								</div>
+								<button class="btn btn-secondary">Review</button>
+							</div>
+							<div class="study-card">
+								<div class="study-card-content">
+									<h4>Advanced challenges</h4>
+									<div class="study-card-meta">3 remaining</div>
+								</div>
+								<button class="btn btn-secondary">Practice</button>
+							</div>
+						</div>
+
+						<!-- Current Learning Path -->
+						<div class="current-path">
+							<h4>Current Learning Path</h4>
+							<div class="path-card">
+								<span class="path-name">Foundation Through Discovery</span>
+								<span class="path-type">First principles exploration</span>
+								<div class="progress-bar">
+									<div class="progress-fill" style="width: 65%;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right Column: Sidebar -->
+					<aside class="overview-sidebar">
+						<div class="sidebar-section">
+							<h4>Review Queue</h4>
+							<div class="review-items">
+								<div class="review-item">
+									<div class="review-content">
+										<h5>Physics Formulas</h5>
+										<div class="review-meta">15 cards • Medium • Due Today</div>
+									</div>
+								</div>
+								<div class="review-item">
+									<div class="review-content">
+										<h5>French Verbs</h5>
+										<div class="review-meta">8 cards • Easy • Due Today</div>
+									</div>
+								</div>
+								<div class="review-item">
+									<div class="review-content">
+										<h5>Programming Concepts</h5>
+										<div class="review-meta">12 cards • Hard • Tomorrow</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="sidebar-section">
+							<h4>Weak Areas</h4>
+							<div class="weak-areas">
+								<div class="weak-area-item">
+									<div class="weak-area-title">Calculus Integration</div>
+									<div class="weak-area-stats">Confidence: 45% | Accuracy: 52% | Priority: High</div>
+									<div class="confidence-bar">
+										<div class="confidence-fill low" style="width: 45%;"></div>
+									</div>
+								</div>
+								<div class="weak-area-item">
+									<div class="weak-area-title">Historical Dates</div>
+									<div class="weak-area-stats">Confidence: 38% | Accuracy: 41% | Priority: High</div>
+									<div class="confidence-bar">
+										<div class="confidence-fill low" style="width: 38%;"></div>
+									</div>
+								</div>
+								<div class="weak-area-item">
+									<div class="weak-area-title">Spanish Vocabulary</div>
+									<div class="weak-area-stats">Confidence: 62% | Accuracy: 58% | Priority: Medium</div>
+									<div class="confidence-bar">
+										<div class="confidence-fill medium" style="width: 62%;"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</aside>
+				</div>
+			</div>
+		</main>
+
+		<!-- Chart.js CDN -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				// Initialize progress circles with CSS conic gradients
+				function initProgressCircles() {
+					document.querySelectorAll('.progress-circle').forEach(circle => {
+						const progress = circle.dataset.progress;
+						if (progress) {
+							const percentage = parseInt(progress);
+							const angle = (percentage / 100) * 360;
+							circle.style.background = `conic-gradient(var(--accent-color) 0deg ${angle}deg, var(--progress-bg) ${angle}deg 360deg)`;
+						}
+					});
+				}
+
+				// Initialize Learning Analytics Chart
+				function initLearningChart() {
+					const ctx = document.getElementById('learningChart');
+					if (!ctx) return;
+
+					new Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+							datasets: [
+								{
+									label: 'Learning Minutes',
+									data: [20, 45, 28, 35, 55, 40, 52],
+									borderColor: 'rgba(33, 128, 141, 1)',
+									backgroundColor: 'rgba(33, 128, 141, 0.1)',
+									borderWidth: 2,
+									fill: true,
+									tension: 0.4,
+									pointBackgroundColor: 'rgba(33, 128, 141, 1)',
+									pointBorderColor: '#fff',
+									pointBorderWidth: 2,
+									pointRadius: 4,
+									pointHoverRadius: 6
+								},
+								{
+									label: 'Retention Score',
+									data: [4, 6, 5, 7, 8, 6, 7],
+									borderColor: 'rgba(245, 158, 11, 1)',
+									backgroundColor: 'rgba(245, 158, 11, 0.1)',
+									borderWidth: 2,
+									fill: false,
+									tension: 0.4,
+									pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+									pointBorderColor: '#fff',
+									pointBorderWidth: 2,
+									pointRadius: 4,
+									pointHoverRadius: 6,
+									yAxisID: 'y1'
+								}
+							]
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							interaction: {
+								mode: 'index',
+								intersect: false,
+							},
+							scales: {
+								y: {
+									type: 'linear',
+									display: true,
+									position: 'left',
+									max: 60,
+									grid: {
+										color: 'rgba(94, 82, 64, 0.1)'
+									},
+									ticks: {
+										color: 'rgba(98, 108, 113, 1)'
+									}
+								},
+								y1: {
+									type: 'linear',
+									display: true,
+									position: 'right',
+									max: 10,
+									grid: {
+										drawOnChartArea: false,
+									},
+									ticks: {
+										color: 'rgba(98, 108, 113, 1)'
+									}
+								},
+								x: {
+									grid: {
+										color: 'rgba(94, 82, 64, 0.1)'
+									},
+									ticks: {
+										color: 'rgba(98, 108, 113, 1)'
+									}
+								}
+							},
+							plugins: {
+								legend: {
+									display: true,
+									position: 'bottom',
+									labels: {
+										usePointStyle: true,
+										color: 'rgba(19, 52, 59, 1)',
+										font: {
+											size: 12,
+											family: 'var(--font-family-base)'
+										}
+									}
+								},
+								tooltip: {
+									backgroundColor: 'rgba(255, 255, 253, 0.95)',
+									titleColor: 'rgba(19, 52, 59, 1)',
+									bodyColor: 'rgba(98, 108, 113, 1)',
+									borderColor: 'rgba(94, 82, 64, 0.2)',
+									borderWidth: 1
+								}
+							}
+						}
+					});
+				}
+
+				// Initialize all components
+				initProgressCircles();
+				initLearningChart();
+
+				// Add click handlers for interactive elements
+				document.querySelectorAll('.study-card').forEach(card => {
+					card.addEventListener('click', function() {
+						const title = this.querySelector('h4').textContent;
+						console.log('Study card clicked:', title);
+					});
+				});
+
+				document.querySelectorAll('.review-item').forEach(item => {
+					item.addEventListener('click', function() {
+						const topic = this.querySelector('h5').textContent;
+						console.log('Review item clicked:', topic);
+					});
+				});
+
+				document.querySelectorAll('.weak-area-item').forEach(item => {
+					item.addEventListener('click', function() {
+						const topic = this.querySelector('.weak-area-title').textContent;
+						console.log('Weak area clicked:', topic);
+					});
+				});
+			});
+		</script>
+	}
+}

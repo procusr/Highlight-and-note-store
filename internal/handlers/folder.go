@@ -54,8 +54,8 @@ func (h *FolderHandler) RegisterRoutes(r chi.Router, authService *services.AuthS
 	})
 }
 
-// DashboardPage renders the main dashboard with folder interface
-func (h *FolderHandler) DashboardPage(w http.ResponseWriter, r *http.Request) {
+// OverviewPage renders the main overview with learning progress interface
+func (h *FolderHandler) OverviewPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
 	if userID == uuid.Nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -69,16 +69,9 @@ func (h *FolderHandler) DashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get root folders for the user
-	folders, err := h.folderService.GetRootFolders(userID)
-	if err != nil {
-		http.Error(w, "Failed to load folders", http.StatusInternalServerError)
-		return
-	}
-
-	// Render dashboard template
+	// Render overview template
 	w.Header().Set("Content-Type", "text/html")
-	if err := templates.DashboardPage(user, folders).Render(r.Context(), w); err != nil {
+	if err := templates.OverviewPage(user).Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		return
 	}
