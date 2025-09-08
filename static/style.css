@@ -614,7 +614,7 @@ p {
   padding: 0 1rem;
 }
 
-/* Desktop layout - clean sidebar compensation */
+/* Desktop layout with sidebar compensation */
 @media (min-width: 768px) {
   .main-container {
     /* Account for sidebar and center content perfectly */
@@ -639,14 +639,33 @@ p {
   }
 }
 
+/* Alternative layout for pages that use different sidebar widths */
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    margin-left: 4rem;
+    padding: 0 2rem;
+  }
+}
+
+/* Consistent responsive padding */
 @media (min-width: 640px) and (max-width: 767px) {
-  .main-container {
+  .main-container,
+  .main-content {
     padding: 0 2rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .main-container {
+  .main-container,
+  .main-content {
     padding: 0 3rem;
   }
 }
@@ -775,124 +794,8 @@ p {
   }
 }
 
-/* Form enhancements */
-.form-group {
-  margin-bottom: 1rem;
-}
 
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #374151;
-}
 
-.form-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  transition:
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-/* Button styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border: 1px solid transparent;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary {
-  background-color: #6366f1;
-  border-color: #6366f1;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #5b5cf6;
-  border-color: #5b5cf6;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  border-color: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #5f6470;
-  border-color: #5f6470;
-}
-
-.btn-success {
-  background-color: #10b981;
-  border-color: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #0f9c6c;
-  border-color: #0f9c6c;
-}
-
-.btn-danger {
-  background-color: #ef4444;
-  border-color: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
-}
-
-/* Alert styles */
-.alert {
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  border: 1px solid transparent;
-  border-radius: 0.375rem;
-}
-
-.alert-success {
-  color: #065f46;
-  background-color: #d1fae5;
-  border-color: #a7f3d0;
-}
-
-.alert-error {
-  color: #991b1b;
-  background-color: #fee2e2;
-  border-color: #fecaca;
-}
-
-.alert-warning {
-  color: #92400e;
-  background-color: #fef3c7;
-  border-color: #fde68a;
-}
-
-.alert-info {
-  color: #1e40af;
-  background-color: #dbeafe;
-  border-color: #93c5fd;
-}
 
 /* Responsive utilities */
 @media (max-width: 768px) {
@@ -928,15 +831,6 @@ p {
   transform: scale(1.1);
 }
 
-/* HTMX loading indicators */
-.htmx-indicator {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.htmx-request .htmx-indicator {
-  opacity: 1;
-}
 
 /* Search results styling */
 #search-results {
@@ -976,83 +870,7 @@ p {
   }
 }
 
-/* Overview Dashboard Styles - Complete Architect Implementation */
-
-/* CSS Variables for the architect design system */
-:root {
-  /* Color palette from architect */
-  --color-white: rgba(255, 255, 255, 1);
-  --color-black: rgba(0, 0, 0, 1);
-  --color-cream-50: rgba(252, 252, 249, 1);
-  --color-cream-100: rgba(255, 255, 253, 1);
-  --color-gray-200: rgba(245, 245, 245, 1);
-  --color-gray-300: rgba(167, 169, 169, 1);
-  --color-gray-400: rgba(119, 124, 124, 1);
-  --color-slate-500: rgba(98, 108, 113, 1);
-  --color-brown-600: rgba(94, 82, 64, 1);
-  --color-charcoal-700: rgba(31, 33, 33, 1);
-  --color-charcoal-800: rgba(38, 40, 40, 1);
-  --color-slate-900: rgba(19, 52, 59, 1);
-  --color-teal-300: rgba(50, 184, 198, 1);
-  --color-teal-400: rgba(45, 166, 178, 1);
-  --color-teal-500: rgba(33, 128, 141, 1);
-  --color-teal-600: rgba(29, 116, 128, 1);
-  --color-teal-700: rgba(26, 104, 115, 1);
-  --color-teal-800: rgba(41, 150, 161, 1);
-
-  /* Architect-specific variables */
-  --accent-color: #3b82f6;
-  --accent-color-hover: #2563eb;
-  --accent-color-light: rgba(59, 130, 246, 0.1);
-  --progress-bg: #e5e7eb;
-  --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Semantic colors */
-  --color-background: var(--color-cream-50);
-  --color-surface: var(--color-cream-100);
-  --color-text: var(--color-slate-900);
-  --color-text-secondary: var(--color-slate-500);
-  --color-primary: var(--color-teal-500);
-  --color-primary-hover: var(--color-teal-600);
-  --color-border: rgba(94, 82, 64, 0.2);
-  --color-card-border: rgba(94, 82, 64, 0.12);
-
-  /* Typography */
-  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 20px;
-  --font-size-3xl: 24px;
-  --font-size-4xl: 30px;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 550;
-  --font-weight-bold: 600;
-
-  /* Spacing */
-  --space-4: 4px;
-  --space-8: 8px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-32: 32px;
-
-  /* Border Radius */
-  --radius-sm: 6px;
-  --radius-base: 8px;
-  --radius-lg: 12px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
-    0 2px 4px -1px rgba(0, 0, 0, 0.02);
-}
+/* Overview Dashboard Styles - Clean Implementation */
 
 /* Enhanced section styling */
 .section-header h2 {
@@ -1069,12 +887,8 @@ p {
   margin: 0;
 }
 
-/* Dashboard Grid */
+/* Dashboard Grid Enhancement */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 300px;
-  gap: var(--space-32);
-  align-items: start;
   margin-top: var(--space-32);
 }
 
@@ -1354,54 +1168,15 @@ p {
   margin-top: var(--space-8);
 }
 
-.progress-bar {
-  width: 100%;
-  height: 4px;
-  background-color: var(--progress-bg);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
+/* Enhanced Progress Bar */
 .progress-fill {
-  height: 100%;
-  background-color: var(--accent-color);
-  border-radius: 2px;
   transition: width 0.3s ease;
 }
 
-/* Enhanced Button Styling to match architect */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-8) var(--space-16);
-  border-radius: var(--radius-base);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
-  cursor: pointer;
-  transition: all var(--transition-smooth);
-  border: none;
-  text-decoration: none;
-  position: relative;
-  font-family: var(--font-family-base);
-}
-
-.btn--primary {
-  background: var(--accent-color);
-  color: white;
-}
-
+/* Enhanced Button Styling */
 .btn--primary:hover {
-  background: var(--accent-color-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-.btn--secondary {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-card-border);
 }
 
 .btn--secondary:hover {

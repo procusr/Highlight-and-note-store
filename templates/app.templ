@@ -10,8 +10,8 @@ templ FlashcardsPage(user *models.User) {
 	@Layout("Flashcards") {
 		@Sidebar("flashcards", user)
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Flashcards</h1>
 					<p class="text-gray-600 text-sm md:text-base">Study and memorize content with interactive flashcards.</p>
@@ -66,8 +66,8 @@ templ RememberPage(userID uuid.UUID) {
 	@Layout("Remember") {
 		@Sidebar("remember", &models.User{ID: userID})
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Remember</h1>
 					<p class="text-gray-600 text-sm md:text-base">Reinforce your learning with spaced repetition and flashcards.</p>
@@ -138,8 +138,8 @@ templ AnalyzePage(userID uuid.UUID) {
 	@Layout("Analyze") {
 		@Sidebar("analyze", &models.User{ID: userID})
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Analyze</h1>
 					<p class="text-gray-600 text-sm md:text-base">Track your progress and analyze learning patterns.</p>
@@ -196,8 +196,8 @@ templ OptimizePage(userID uuid.UUID) {
 	@Layout("Optimize") {
 		@Sidebar("optimize", &models.User{ID: userID})
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Optimize</h1>
 					<p class="text-gray-600 text-sm md:text-base">Enhance your learning efficiency with AI-powered recommendations.</p>
