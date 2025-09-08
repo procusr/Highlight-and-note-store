@@ -184,7 +184,129 @@ This is a Go web application using:
 - `static/` - Static assets (CSS, JS, images)
 - `docker/` - Docker configuration files
 
-/architect folder is for templating purpose its a plain frontend which is planned to be converted to a go application
+./architect folder is for templating purpose its a plain frontend which is planned to be converted to a go application
+
+---
+
+When designing UX
+
+- Organize content logically to facilitate easy access.
+  - Use clear labeling and categorization for navigation.
+  - Implement effective search functionality.
+  - Create a sitemap to visualize overall structure.
+    Establish a clear visual hierarchy to guide user attention.
+  - Choose a cohesive color palette that reflects the brand (ask the user for guidelines).
+  - Use typography effectively for readability and emphasis.
+  - Maintain sufficient contrast for legibility (WCAG 2.1 AA standard).
+  - Design with a consistent style across the application.
+- Interaction Design
+
+  - Create intuitive navigation patterns.
+  - Use familiar UI components to reduce cognitive load.
+  - Provide clear calls-to-action to guide user behavior.
+  - Implement responsive design for cross-device compatibility.
+  - Use animations judiciously to enhance user experience.
+
+  AI Design Prompt: Mobile-First Learning Platform for Focused Study
+
+1. Task Overview
+   You are to design a minimalistic, clear, and mobile-friendly website for a learning platform. The platform's primary goal is to guide users through focused, uninterrupted learning sessions. The design must be intuitive, calming, and free of distractions to help users concentrate on their tasks.
+
+2. Core Design Philosophy
+   Minimalism & Clarity: The design must be clean and uncluttered. Every element on the screen should have a purpose. Avoid unnecessary decorations, borders, or visual noise.
+
+Mobile-First Approach: Design for a mobile viewport first (e.g., 400px width). The layout should be fluid and adaptable to larger screens, but the core experience must be optimized for mobile users.
+
+Focus on Hierarchy: The visual hierarchy should be the primary tool for guiding the user. Use size, weight, and color to differentiate between primary, secondary, and tertiary information. The most important information in any given view should be the most prominent.
+
+3. Personality & Tone
+   The website's personality should be calm, encouraging, and professional. It needs to feel like a supportive tool, not a demanding app.
+
+Typography: Use a clean, neutral sans-serif font that is highly legible on small screens. A good choice would be a system font or a popular, well-regarded font with at least five weights.
+
+Language: The copy should be clear, concise, and friendly.
+
+4. Layout & Spacing
+   Embrace Whitespace: Start with generous whitespace to ensure the layout feels breathable and calm. This is crucial for reducing cognitive load and helping users focus.
+
+Single-Column Layout (Mobile): For mobile screens, use a single-column layout to present information and tasks linearly.
+
+## Core Design Principles
+
+### 1. **Simplicity & Clarity**
+
+- **Don't make users think**: Every interface element should be self-explanatory, obvious, and self-evident [3].
+- **Minimize cognitive load**: Use familiar patterns and clear visual hierarchy to make choices mindless and unambiguous [3].
+- **Progressive disclosure**: Show only essential information initially, allowing users to drill down for details as needed [2].
+- **Consistent navigation**: Maintain persistent navigation across all screens to help users understand where they are and what the site contains [3].
+- **Clear affordances and signifiers**: Make clickable/tappable elements obviously interactive through clear signals [1].
+
+### 2. **Mobile-First Responsive Design**
+
+- **Touch-friendly targets**: Ensure interactive elements are large enough for touch, with a minimum size of 44x44 pixels, and provide adequate spacing between them [3].
+- **Thumb-zone optimization**: Place primary actions within comfortable thumb reach on mobile devices.
+- **Fluid layouts**: Use relative units (%, em, rem) instead of fixed pixels for flexible layouts that adapt to different screen sizes [2].
+- **Content prioritization**: Prioritize the most important content for mobile views, ensuring it's visible without excessive scrolling [2][3].
+- **Progressive enhancement**: Design the core experience for mobile, then enhance it for desktop with additional features or a more expansive layout [2].
+
+### 3. **Visual Hierarchy & Typography**
+
+- **Establish clear hierarchy**: Use size, font weight, and color to guide the user's attention to the most important elements on the page [2].
+- **Limit font sizes**: Define a restrictive type scale with 6-8 font sizes to ensure consistency and speed up design decisions [2].
+- **Optimize line length**: Aim for 45 to 75 characters per line to provide the best reading experience [2].
+- **Sufficient contrast**: Meet WCAG 2.1 AA standards (a contrast ratio of at least 4.5:1 for normal text) to ensure legibility [2].
+- **White space**: Use generous spacing to give elements room to breathe, which cleans up the design and improves focus [2].
+  .
+
+### **Responsive Breakpoints**
+
+- **Mobile**: 320px - 768px (primary design target)
+- **Tablet**: 768px - 1024px
+- **Desktop**: 1024px+ (enhanced experience)
+
+### **Accessibility Standards**
+
+- WCAG 2.1 AA compliance.
+- Keyboard navigation support.
+- Screen reader compatibility.
+- High contrast mode option.
+- Scalable text (up to 200% zoom without loss of content or functionality).
+
+## User Experience Considerations
+
+### **Habit Formation** (Hooked Model)
+
+- **Trigger**: Use external triggers like push notifications for learning reminders and achievement updates. Aim to connect these to internal triggers like the desire for career growth or fear of falling behind [4].
+- **Action**: Design for one-tap lesson access and frictionless content consumption to make the core action as simple as possible [4].
+- **Variable Reward**: Provide variable rewards through progress achievements, discovery of new content, and peer recognition (rewards of the self and tribe) [4].
+- **Investment**: Encourage users to invest in the platform by taking notes, customizing learning paths, or participating in the community. This stored value increases the likelihood of return [4].
+
+### **Cognitive Load Management**
+
+- Chunk content into digestible sections to avoid overwhelming users.
+- Use progressive disclosure for complex topics.
+- Provide clear visual breaks between concepts.
+- Offer summary sections and key takeaways.
+
+### **Error Prevention & Recovery**
+
+- Design for error; assume users will make mistakes and make it easy to recover [1].
+- Auto-save progress and notes to prevent data loss.
+- Use clear confirmation dialogues for destructive actions.
+- Provide helpful, human-readable error messages with recovery options [1].
+- Implement undo functionality where appropriate.
+
+## Final Design Guidelines
+
+1.  **Solve the right problem**: Ensure every design decision solves a real learner problem [1].
+2.  **Test early and often**: Validate designs with target users throughout the process to gather feedback and iterate [3].
+3.  **Design for focus**: Minimize distractions to support deep learning.
+4.  **Make progress visible**: Learners should always know where they are and where they're going.
+5.  **Optimize for return visits**: Design for habit formation and long-term engagement [4].
+6.  **Embrace constraints**: Mobile-first limitations often lead to better, more focused overall experiences [2].
+7.  **Plan for scale**: Design systems that can grow to accommodate thousands of lessons and users.
+
+---
 
 consider this
 
