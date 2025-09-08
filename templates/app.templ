@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"mh-go/internal/models"
+	"github.com/google/uuid"
 )
 
 // Dashboard page
@@ -185,13 +186,72 @@ templ DashboardPage(user *models.User, folders []models.Folder) {
 	}
 }
 
+// Folders page
+templ FoldersPage(user *models.User, folders []models.Folder) {
+	@Layout("Folders") {
+		@Sidebar("folders", user)
+
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Folders</h1>
+					<p class="text-gray-600 text-sm md:text-base">Manage your content folders and organization.</p>
+				</div>
+
+				<div class="flex justify-between items-center mb-6">
+					<button
+						onclick="showCreateFolderModal()"
+						class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
+					>
+						<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+						</svg>
+						New Folder
+					</button>
+				</div>
+
+				if len(folders) > 0 {
+					<div class="masonry-grid" id="folders-container">
+						for _, folder := range folders {
+							@FolderCard(folder)
+						}
+					</div>
+				} else {
+					<div class="text-center py-12">
+						<div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+							<svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+							</svg>
+						</div>
+						<h3 class="text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
+						<p class="text-gray-600 mb-4">Create your first folder to start organizing your content.</p>
+						<button
+							onclick="showCreateFolderModal()"
+							class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
+						>
+							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							</svg>
+							Create Folder
+						</button>
+					</div>
+					<div class="masonry-grid" id="folders-container"></div>
+				}
+			</div>
+		</main>
+
+		@CreateFolderModal()
+	}
+}
+
 // Flashcards page
 templ FlashcardsPage(user *models.User) {
 	@Layout("Flashcards") {
 		@Sidebar("flashcards", user)
 
-		<main class="main-content md:ml-64 min-h-screen bg-gray-50 pt-16 md:pt-0">
-			<div class="max-w-6xl mx-auto py-6 md:py-8 px-4 md:px-6">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Flashcards</h1>
 					<p class="text-gray-600 text-sm md:text-base">Study and memorize content with interactive flashcards.</p>
@@ -234,6 +294,221 @@ templ SettingsPage(user *models.User) {
 							<label class="block text-xs md:text-sm font-medium text-gray-700">Account created</label>
 							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.CreatedAt.Format("January 2, 2006") }</p>
 						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	}
+}
+
+// Remember page (spaced repetition/flashcards)
+templ RememberPage(userID uuid.UUID) {
+	@Layout("Remember") {
+		@Sidebar("remember", &models.User{ID: userID})
+
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Remember</h1>
+					<p class="text-gray-600 text-sm md:text-base">Reinforce your learning with spaced repetition and flashcards.</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Flashcards</h3>
+								<p class="text-sm text-gray-600">0 active sets</p>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">Review flashcards created from your learning sessions.</p>
+						<button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+							Start Review
+						</button>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Spaced Repetition</h3>
+								<p class="text-sm text-gray-600">0 due today</p>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">Optimize retention with scientifically-timed reviews.</p>
+						<button class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+							Review Due Items
+						</button>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Quick Quiz</h3>
+								<p class="text-sm text-gray-600">Test retention</p>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">Quick knowledge checks on recent topics.</p>
+						<button class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+							Take Quiz
+						</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	}
+}
+
+// Analyze page (analytics and progress tracking)
+templ AnalyzePage(userID uuid.UUID) {
+	@Layout("Analyze") {
+		@Sidebar("analyze", &models.User{ID: userID})
+
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Analyze</h1>
+					<p class="text-gray-600 text-sm md:text-base">Track your progress and analyze learning patterns.</p>
+				</div>
+
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">Learning Progress</h3>
+						<div class="space-y-4">
+							<div class="flex justify-between items-center">
+								<span class="text-sm text-gray-600">Weekly Progress</span>
+								<span class="text-sm font-semibold text-gray-900">85%</span>
+							</div>
+							<div class="w-full bg-gray-200 rounded-full h-2">
+								<div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">Study Statistics</h3>
+						<div class="grid grid-cols-2 gap-4">
+							<div class="text-center">
+								<div class="text-2xl font-bold text-blue-600">0</div>
+								<div class="text-sm text-gray-600">Hours This Week</div>
+							</div>
+							<div class="text-center">
+								<div class="text-2xl font-bold text-green-600">0</div>
+								<div class="text-sm text-gray-600">Topics Mastered</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="bg-white rounded-lg border border-gray-200 p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4">Learning Analytics</h3>
+					<div class="text-center py-12">
+						<div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+							<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+							</svg>
+						</div>
+						<h4 class="text-lg font-medium text-gray-900 mb-2">Analytics Coming Soon</h4>
+						<p class="text-gray-600">Start learning to see detailed analytics and insights about your progress.</p>
+					</div>
+				</div>
+			</div>
+		</main>
+	}
+}
+
+// Optimize page (learning optimization)
+templ OptimizePage(userID uuid.UUID) {
+	@Layout("Optimize") {
+		@Sidebar("optimize", &models.User{ID: userID})
+
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
+				<div class="mb-6 md:mb-8">
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Optimize</h1>
+					<p class="text-gray-600 text-sm md:text-base">Enhance your learning efficiency with AI-powered recommendations.</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Study Schedule</h3>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">AI-optimized learning schedule based on your patterns.</p>
+						<button class="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+							Generate Schedule
+						</button>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Weak Areas</h3>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">Identify and focus on topics that need more attention.</p>
+						<button class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+							Analyze Gaps
+						</button>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-4">
+							<div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Learning Style</h3>
+							</div>
+						</div>
+						<p class="text-gray-600 mb-4">Personalized recommendations based on your learning style.</p>
+						<button class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+							Assess Style
+						</button>
+					</div>
+				</div>
+
+				<div class="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4">AI Recommendations</h3>
+					<div class="text-center py-12">
+						<div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+							<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+							</svg>
+						</div>
+						<h4 class="text-lg font-medium text-gray-900 mb-2">Start Learning to Get Recommendations</h4>
+						<p class="text-gray-600 mb-4">Complete a few learning sessions to receive personalized optimization suggestions.</p>
+						<a href="/learning" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+							Go to Learn Section
+						</a>
 					</div>
 				</div>
 			</div>
