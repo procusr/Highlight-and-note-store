@@ -43,19 +43,26 @@ func main() {
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
 
+	// Initialize services for learning
+	topicService := services.NewTopicService(db)
+	methodService := services.NewLearningMethodService(db)
+	progressService := services.NewProgressService(db)
+	learningService := services.NewLearningService(db, topicService, methodService, progressService)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
 	contentHandler := handlers.NewContentHandler(contentService, folderService)
+	learningHandler := handlers.NewLearningHandler(topicService, methodService, progressService, learningService, userService)
 
 	// Setup router
-	r := setupRouter(cfg, authService, authHandler, folderHandler, contentHandler)
+	r := setupRouter(cfg, authService, authHandler, folderHandler, contentHandler, learningHandler)
 
 	log.Printf("Server starting on port %s", cfg.Port)
 	log.Printf("Server failed to start: %v", http.ListenAndServe(":"+cfg.Port, r))
 }
 
-func setupRouter(cfg *config.Config, authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, contentHandler *handlers.ContentHandler) *chi.Mux {
+func setupRouter(cfg *config.Config, authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, contentHandler *handlers.ContentHandler, learningHandler *handlers.LearningHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Global middleware
@@ -82,6 +89,9 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		// Dashboard
 		r.Get("/dashboard", folderHandler.DashboardPage)
 
+		// Learning page
+		r.Get("/learning", learningHandler.LearningPlatformPage)
+
 		// Folder pages
 		r.Get("/folders", folderHandler.FoldersPage)
 		r.Get("/folders/{folderID}", folderHandler.FolderPage)
@@ -93,6 +103,22 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 			// Content routes
 			contentHandler.RegisterRoutes(r, authService)
+
+			// Learning routes
+			r.Route("/learning", func(r chi.Router) {
+				r.Get("/pathways", learningHandler.GetLearningPathways)
+				r.Get("/topics", learningHandler.GetTopics)
+				r.Get("/topics/search", learningHandler.SearchTopics)
+				r.Post("/start", learningHandler.StartLearning)
+				r.Post("/prompts", learningHandler.CreateLearningPrompt)
+				r.Get("/prompts", learningHandler.GetUserPrompts)
+				r.Get("/stats", learningHandler.GetDashboardStats)
+				r.Post("/progress", learningHandler.UpdateProgress)
+				r.Post("/sessions", learningHandler.StartLearningSession)
+				r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
+				r.Get("/preferences", learningHandler.GetUserPreferences)
+				r.Put("/preferences", learningHandler.UpdateUserPreferences)
+			})
 		})
 	})
 

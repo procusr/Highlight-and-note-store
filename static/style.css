@@ -279,14 +279,24 @@
   border-color: #93c5fd;
 }
 
-/* Responsive utilities */
-@media (max-width: 768px) {
+/* Mobile sidebar left alignment fix */
+@media (max-width: 767px) {
   .mobile-hidden {
     display: none !important;
   }
 
   .mobile-full {
     width: 100% !important;
+  }
+  
+  /* Force left alignment for mobile sidebar navigation */
+  .fixed.inset-y-0.left-0 nav ul li a {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+  
+  .fixed.inset-y-0.left-0 nav ul li a span {
+    text-align: left !important;
   }
 }
 
