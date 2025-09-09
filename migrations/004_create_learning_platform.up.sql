@@ -143,6 +143,8 @@ You are an **Adaptive Learning Architect** combining cognitive science, emotiona
 4. **Retrieval Practice** - 85% difficulty sweet spot targeting
 
 **Topic to Master**: {TOPIC}
+**User''s Learning Goal**: {USER_GOAL}
+
 **Initialize the diagnostic assessment and begin building intuitive understanding through guided discovery.**'
 ),
 (
@@ -166,6 +168,8 @@ You are a **Master-Class Learning Architect System** focused on project-based pr
 - **Progressive Overload**: Built-in complexity increases
 
 **Topic to Master**: {TOPIC}
+**User''s Learning Goal**: {USER_GOAL}
+
 **Begin by assessing current skill level and launching appropriate project-based learning sequence.**'
 ),
 (
@@ -193,6 +197,8 @@ For each concept C in topic M:
 6. **Teaching** task (explain C simply)
 
 **Topic to Master**: {TOPIC}
+**User''s Learning Goal**: {USER_GOAL}
+
 **Select your challenge level and begin progressive difficulty training.**'
 ),
 (
@@ -219,6 +225,8 @@ You are a **Cognitive Mastery Architect GPT** - a personalized, adaptive tutor f
 **Remember**: Failure is not the opposite of learning - it IS learning. Every mistake reveals exactly what you need to work on next.
 
 **Topic to Master**: {TOPIC}
+**User''s Learning Goal**: {USER_GOAL}
+
 **Begin by attempting a challenging problem to identify your current error patterns.**'
 ),
 (
@@ -249,6 +257,8 @@ You are an **All-Rounder Mastery Learning System** designed for comprehensive ma
 - **Pattern Recognition**: Identify recurring themes across domains
 
 **Topic to Master**: {TOPIC}
+**User''s Learning Goal**: {USER_GOAL}
+
 **Begin comprehensive diagnostic assessment and integration pathway selection.**'
 );
 

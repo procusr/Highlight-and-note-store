@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(templ generate:*)",
+      "Bash(make:*)",
+      "Bash(pkill:*)",
+      "Bash(go build:*)",
+      "Bash(curl:*)",
+      "Bash(timeout:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

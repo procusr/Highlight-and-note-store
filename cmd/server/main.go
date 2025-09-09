@@ -94,6 +94,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		// Learning Platform
 		r.Get("/learning", learningHandler.LearningPlatformPage)
 		r.Post("/learning/start", learningHandler.StartLearning)
+		r.Get("/learning/session/{sessionID}", learningHandler.LearningSessionPage)
 
 		// New learning-focused routes matching architect template
 		r.Get("/remember", pageHandler.RememberPage)
@@ -121,6 +122,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 				r.Get("/topics/search", learningHandler.SearchTopics)
 				r.Get("/pathways", learningHandler.GetLearningPathways)
 				r.Get("/stats", learningHandler.GetDashboardStats)
+				r.Get("/sessions/active", learningHandler.GetActiveLearningSessions)
 				r.Get("/prompts", learningHandler.GetUserPrompts)
 				r.Get("/preferences", learningHandler.GetUserPreferences)
 				r.Post("/preferences", learningHandler.UpdateUserPreferences)

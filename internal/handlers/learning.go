@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"mh-go/internal/middleware"
 	"mh-go/internal/services"
 	"mh-go/templates"
@@ -39,7 +40,7 @@ func NewLearningHandler(
 // LearningPlatformPage renders the main learning platform page
 func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
-	
+
 	// Get user model
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
@@ -68,8 +69,8 @@ func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Get recent learning sessions
-	sessions, err := h.learningService.GetUserSessions(userID, 5)
+	// Get active learning sessions
+	sessions, err := h.learningService.GetActiveLearningSessions(userID)
 	if err != nil {
 		http.Error(w, "Failed to get learning sessions", http.StatusInternalServerError)
 		return
@@ -358,6 +359,24 @@ func (h *LearningHandler) GetUserPreferences(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(preferences)
 }
 
+// GetActiveLearningSessions returns active learning sessions for the current user
+func (h *LearningHandler) GetActiveLearningSessions(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+
+	sessions, err := h.learningService.GetActiveLearningSessions(userID)
+	if err != nil {
+		http.Error(w, "Failed to get active learning sessions", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":   true,
+		"sessions":  sessions,
+		"message":   "Active learning sessions retrieved successfully",
+	})
+}
+
 // UpdateUserPreferences updates user preferences
 func (h *LearningHandler) UpdateUserPreferences(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
@@ -416,4 +435,47 @@ func (h *LearningHandler) UpdateUserPreferences(w http.ResponseWriter, r *http.R
 		"preferences": preferences,
 		"message":     "Preferences updated successfully",
 	})
+}
+
+// LearningSessionPage renders the immersive learning session page
+func (h *LearningHandler) LearningSessionPage(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	sessionID := chi.URLParam(r, "sessionID")
+	
+	// Get user model
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to get user", http.StatusInternalServerError)
+		return
+	}
+
+	// Parse session ID
+	parsedSessionID, err := uuid.Parse(sessionID)
+	if err != nil {
+		http.Error(w, "Invalid session ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get learning session
+	session, err := h.learningService.GetLearningSessionByID(parsedSessionID)
+	if err != nil {
+		http.Error(w, "Failed to get learning session", http.StatusInternalServerError)
+		return
+	}
+
+	// Verify that the session belongs to the user
+	if session.UserID != userID {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	
+	// Get the learning prompt for this session
+	prompt, err := h.learningService.GetPromptForSession(parsedSessionID)
+	if err != nil {
+		// Log the error but continue - we'll display the session without the prompt
+		fmt.Printf("Warning: failed to get prompt for session: %v\n", err)
+	}
+
+	component := templates.LearningSessionPage(user, session, prompt)
+	component.Render(r.Context(), w)
 }

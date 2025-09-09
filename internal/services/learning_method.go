@@ -110,7 +110,7 @@ func (s *LearningMethodService) CreateLearningMethod(method *models.LearningMeth
 	`
 
 	err := s.db.QueryRow(
-		query, method.ID, method.Name, method.Description, 
+		query, method.ID, method.Name, method.Description,
 		method.Icon, method.MethodKey, method.AiPromptTemplate,
 	).Scan(&method.CreatedAt, &method.UpdatedAt)
 
@@ -125,14 +125,14 @@ func (s *LearningMethodService) CreateLearningMethod(method *models.LearningMeth
 func (s *LearningMethodService) UpdateLearningMethod(method *models.LearningMethod) error {
 	query := `
 		UPDATE learning_methods
-		SET name = $2, description = $3, icon = $4, method_key = $5, 
+		SET name = $2, description = $3, icon = $4, method_key = $5,
 		    ai_prompt_template = $6, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 		RETURNING updated_at
 	`
 
 	err := s.db.QueryRow(
-		query, method.ID, method.Name, method.Description, 
+		query, method.ID, method.Name, method.Description,
 		method.Icon, method.MethodKey, method.AiPromptTemplate,
 	).Scan(&method.UpdatedAt)
 
@@ -168,27 +168,29 @@ func (s *LearningMethodService) DeleteLearningMethod(methodID uuid.UUID) error {
 }
 
 // GenerateAIPrompt generates the AI prompt by replacing placeholders
-func (s *LearningMethodService) GenerateAIPrompt(methodID uuid.UUID, topic string) (string, error) {
+func (s *LearningMethodService) GenerateAIPrompt(methodID uuid.UUID, topic string, userGoal string) (string, error) {
 	method, err := s.GetLearningMethodByID(methodID)
 	if err != nil {
 		return "", fmt.Errorf("failed to get learning method: %w", err)
 	}
 
-	// Replace {TOPIC} placeholder with the actual topic
-	prompt := strings.ReplaceAll(method.AiPromptTemplate, "{TOPIC}", topic)
-	
-	return prompt, nil
+	// Substitute placeholders for {TOPIC} and {USER_GOAL}
+	aiPrompt := strings.ReplaceAll(method.AiPromptTemplate, "{TOPIC}", topic)
+	aiPrompt = strings.ReplaceAll(aiPrompt, "{USER_GOAL}", userGoal)
+
+	return aiPrompt, nil
 }
 
 // GenerateAIPromptByKey generates the AI prompt by method key
-func (s *LearningMethodService) GenerateAIPromptByKey(methodKey string, topic string) (string, error) {
+func (s *LearningMethodService) GenerateAIPromptByKey(methodKey string, topic string, userGoal string) (string, error) {
 	method, err := s.GetLearningMethodByKey(methodKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to get learning method: %w", err)
+		return "", fmt.Errorf("failed to get learning method by key: %w", err)
 	}
 
-	// Replace {TOPIC} placeholder with the actual topic
-	prompt := strings.ReplaceAll(method.AiPromptTemplate, "{TOPIC}", topic)
-	
-	return prompt, nil
+	// Substitute placeholders for {TOPIC} and {USER_GOAL}
+	aiPrompt := strings.ReplaceAll(method.AiPromptTemplate, "{TOPIC}", topic)
+	aiPrompt = strings.ReplaceAll(aiPrompt, "{USER_GOAL}", userGoal)
+
+	return aiPrompt, nil
 }

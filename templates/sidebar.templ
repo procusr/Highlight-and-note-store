@@ -79,7 +79,7 @@ templ Sidebar(currentPage string, user *models.User) {
 
 			<!-- Mobile Navigation Links -->
 			<nav class="flex-1 px-6 py-6">
-				<ul class="space-y-2">
+				<ul class="space-y-2 text-left">
 					<li>
 						<a href="/dashboard" class={ getMobileSidebarLinkClass("overview", currentPage) } @click="closeSidebar()">
 							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -44,7 +44,7 @@ case "$1" in
             docker exec -it "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -c "
                 DROP SCHEMA public CASCADE;
                 CREATE SCHEMA public;
-                GRANT ALL ON SCHEMA public TO $DB_USER;
+                GRANT ALL ON SCHEMA public TO \"$DB_USER\";
                 GRANT ALL ON SCHEMA public TO public;
             "
             echo "Database reset. Run migrations to recreate tables."

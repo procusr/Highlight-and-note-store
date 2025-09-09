@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"mh-go/internal/models"
-	"strings"
+
 	"time"
 
 	"github.com/google/uuid"
@@ -35,13 +35,10 @@ func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UU
 	}
 
 	// Generate the AI prompt using the method template
-	aiPrompt, err := s.methodService.GenerateAIPrompt(methodID, topic.Name)
+	aiPrompt, err := s.methodService.GenerateAIPrompt(methodID, topic.Name, userPrompt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate AI prompt: %w", err)
 	}
-
-	// Append the user's specific prompt to the AI prompt
-	fullAIPrompt := aiPrompt + "\n\n" + "User's specific learning goal: " + userPrompt
 
 	prompt := &models.LearningPrompt{
 		ID:               uuid.New(),
@@ -49,12 +46,12 @@ func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UU
 		TopicID:          topicID,
 		LearningMethodID: methodID,
 		UserPrompt:       userPrompt,
-		AiPrompt:         fullAIPrompt,
+		AiPrompt:         aiPrompt,
 		ResponseStatus:   "pending",
 	}
 
 	query := `
-		INSERT INTO learning_prompts 
+		INSERT INTO learning_prompts
 		(id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt, response_status)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING created_at, updated_at
@@ -133,7 +130,7 @@ func (s *LearningService) UpdatePromptError(promptID uuid.UUID, errorMessage str
 // GetUserPrompts returns all prompts for a user
 func (s *LearningService) GetUserPrompts(userID uuid.UUID, limit int) ([]models.LearningPrompt, error) {
 	query := `
-		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt, 
+		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt,
 		       ai_response, response_status, error_message, created_at, updated_at
 		FROM learning_prompts
 		WHERE user_id = $1
@@ -184,7 +181,7 @@ func (s *LearningService) GetPromptByID(promptID uuid.UUID) (*models.LearningPro
 	var aiResponse, errorMessage sql.NullString
 
 	query := `
-		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt, 
+		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt,
 		       ai_response, response_status, error_message, created_at, updated_at
 		FROM learning_prompts
 		WHERE id = $1
@@ -224,7 +221,7 @@ func (s *LearningService) StartLearningSession(userID, topicID, methodID uuid.UU
 	}
 
 	query := `
-		INSERT INTO learning_sessions 
+		INSERT INTO learning_sessions
 		(id, user_id, topic_id, learning_method_id, started_at)
 		VALUES ($1, $2, $3, $4, $5)
 		RETURNING created_at
@@ -248,7 +245,7 @@ func (s *LearningService) EndLearningSession(sessionID uuid.UUID, activitiesComp
 
 	query := `
 		UPDATE learning_sessions
-		SET ended_at = $2, 
+		SET ended_at = $2,
 		    session_duration_minutes = EXTRACT(EPOCH FROM ($2 - started_at)) / 60,
 		    activities_completed = $3,
 		    session_notes = $4
@@ -321,47 +318,7 @@ func (s *LearningService) GetUserSessions(userID uuid.UUID, limit int) ([]models
 	return sessions, nil
 }
 
-// SearchTopics searches for topics by name or category
-func (s *LearningService) SearchTopics(query string, limit int) ([]models.Topic, error) {
-	searchQuery := `
-		SELECT id, name, description, category, difficulty_level, created_at, updated_at
-		FROM topics
-		WHERE name ILIKE '%' || $1 || '%' 
-		   OR description ILIKE '%' || $1 || '%'
-		   OR category ILIKE '%' || $1 || '%'
-		ORDER BY 
-			CASE WHEN name ILIKE $1 || '%' THEN 1
-			     WHEN name ILIKE '%' || $1 || '%' THEN 2
-			     ELSE 3 END,
-			name
-		LIMIT $2
-	`
 
-	rows, err := s.db.Query(searchQuery, strings.ToLower(query), limit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to search topics: %w", err)
-	}
-	defer rows.Close()
-
-	var topics []models.Topic
-	for rows.Next() {
-		var topic models.Topic
-		err := rows.Scan(
-			&topic.ID, &topic.Name, &topic.Description, &topic.Category,
-			&topic.DifficultyLevel, &topic.CreatedAt, &topic.UpdatedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan topic: %w", err)
-		}
-		topics = append(topics, topic)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("failed to iterate topics: %w", err)
-	}
-
-	return topics, nil
-}
 
 // GetOrCreateUserPreferences gets user preferences or creates default ones
 func (s *LearningService) GetOrCreateUserPreferences(userID uuid.UUID) (*models.UserPreferences, error) {
@@ -403,7 +360,7 @@ func (s *LearningService) createDefaultUserPreferences(userID uuid.UUID) (*model
 	}
 
 	query := `
-		INSERT INTO user_preferences 
+		INSERT INTO user_preferences
 		(id, user_id, learning_intensity, session_duration_minutes, difficulty_preference, theme_preference)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING created_at, updated_at
@@ -419,6 +376,93 @@ func (s *LearningService) createDefaultUserPreferences(userID uuid.UUID) (*model
 	}
 
 	return prefs, nil
+}
+
+// GetActiveLearningSessions returns sessions that are currently in progress
+func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.LearningSession, error) {
+	query := `
+		SELECT ls.id, ls.user_id, ls.topic_id, ls.learning_method_id, ls.session_duration_minutes,
+		       ls.activities_completed, ls.session_notes, ls.started_at, ls.ended_at, ls.created_at,
+		       t.name as topic_name, t.description as topic_description, t.category as topic_category,
+		       lm.name as method_name, lm.description as method_description, lm.icon as method_icon, lm.method_key as method_key,
+		       ulp.progress_percentage, ulp.status as progress_status
+		FROM learning_sessions ls
+		LEFT JOIN topics t ON ls.topic_id = t.id
+		LEFT JOIN learning_methods lm ON ls.learning_method_id = lm.id
+		LEFT JOIN user_learning_progress ulp ON ls.topic_id = ulp.topic_id
+			AND ls.learning_method_id = ulp.learning_method_id
+			AND ls.user_id = ulp.user_id
+		WHERE ls.user_id = $1
+			AND (ls.ended_at IS NULL OR ulp.status = 'in_progress')
+		ORDER BY ls.started_at DESC
+		LIMIT 5
+	`
+
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query active learning sessions: %w", err)
+	}
+	defer rows.Close()
+
+	var sessions []models.LearningSession
+	for rows.Next() {
+		var session models.LearningSession
+		var endedAt sql.NullTime
+		var sessionNotes sql.NullString
+		var topicName, topicDescription, topicCategory, methodName, methodDescription, methodIcon, methodKey sql.NullString
+		var progressPercent sql.NullInt32
+		var progressStatus sql.NullString
+
+		err := rows.Scan(
+			&session.ID, &session.UserID, &session.TopicID, &session.LearningMethodID,
+			&session.SessionDurationMins, &session.ActivitiesCompleted, &sessionNotes,
+			&session.StartedAt, &endedAt, &session.CreatedAt,
+			&topicName, &topicDescription, &topicCategory,
+			&methodName, &methodDescription, &methodIcon, &methodKey,
+			&progressPercent, &progressStatus,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan active session: %w", err)
+		}
+
+		if endedAt.Valid {
+			session.EndedAt = &endedAt.Time
+		}
+		if sessionNotes.Valid {
+			session.SessionNotes = &sessionNotes.String
+		}
+
+		// Create topic relationship
+		if topicName.Valid {
+			session.Topic = &models.Topic{
+				ID:              session.TopicID,
+				Name:            topicName.String,
+				Description:     topicDescription.String,
+				Category:        topicCategory.String,
+				DifficultyLevel: "intermediate", // Default value
+			}
+		}
+
+		// Create learning method relationship
+		if methodName.Valid {
+			session.LearningMethod = &models.LearningMethod{
+				ID:               session.LearningMethodID,
+				Name:             methodName.String,
+				Description:      methodDescription.String,
+				Icon:             methodIcon.String,
+				MethodKey:        methodKey.String,
+				AiPromptTemplate: "", // Will be populated if needed
+			}
+		}
+
+		sessions = append(sessions, session)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate active sessions: %w", err)
+	}
+
+	return sessions, nil
 }
 
 // UpdateUserPreferences updates user preferences
@@ -446,4 +490,107 @@ func (s *LearningService) UpdateUserPreferences(prefs *models.UserPreferences) e
 	}
 
 	return nil
+}
+
+// GetLearningSessionByID retrieves a learning session by its ID
+func (s *LearningService) GetLearningSessionByID(sessionID uuid.UUID) (*models.LearningSession, error) {
+	query := `
+		SELECT ls.id, ls.user_id, ls.topic_id, ls.learning_method_id, ls.session_duration_minutes,
+		       ls.activities_completed, ls.session_notes, ls.started_at, ls.ended_at, ls.created_at,
+		       t.name as topic_name, t.description as topic_description, t.category as topic_category,
+		       lm.name as method_name, lm.description as method_description, lm.icon as method_icon, lm.method_key as method_key
+		FROM learning_sessions ls
+		LEFT JOIN topics t ON ls.topic_id = t.id
+		LEFT JOIN learning_methods lm ON ls.learning_method_id = lm.id
+		WHERE ls.id = $1
+	`
+
+	var session models.LearningSession
+	var endedAt sql.NullTime
+	var sessionNotes sql.NullString
+	var topicName, topicDescription, topicCategory, methodName, methodDescription, methodIcon, methodKey sql.NullString
+
+	err := s.db.QueryRow(query, sessionID).Scan(
+		&session.ID, &session.UserID, &session.TopicID, &session.LearningMethodID,
+		&session.SessionDurationMins, &session.ActivitiesCompleted, &sessionNotes,
+		&session.StartedAt, &endedAt, &session.CreatedAt,
+		&topicName, &topicDescription, &topicCategory,
+		&methodName, &methodDescription, &methodIcon, &methodKey,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get learning session: %w", err)
+	}
+
+	if endedAt.Valid {
+		session.EndedAt = &endedAt.Time
+	}
+	if sessionNotes.Valid {
+		session.SessionNotes = &sessionNotes.String
+	}
+
+	// Create topic relationship
+	if topicName.Valid {
+		session.Topic = &models.Topic{
+			ID:              session.TopicID,
+			Name:            topicName.String,
+			Description:     topicDescription.String,
+			Category:        topicCategory.String,
+			DifficultyLevel: "intermediate", // Default value
+		}
+	}
+
+	// Create learning method relationship
+	if methodName.Valid {
+		session.LearningMethod = &models.LearningMethod{
+			ID:               session.LearningMethodID,
+			Name:             methodName.String,
+			Description:      methodDescription.String,
+			Icon:             methodIcon.String,
+			MethodKey:        methodKey.String,
+			AiPromptTemplate: "", // Will be populated if needed
+		}
+	}
+
+	return &session, nil
+}
+
+// GetPromptForSession retrieves the most recent learning prompt for a session
+func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.LearningPrompt, error) {
+	query := `
+		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.user_prompt, lp.ai_prompt, 
+		       lp.ai_response, lp.response_status, lp.error_message, lp.created_at, lp.updated_at
+		FROM learning_prompts lp
+		JOIN learning_sessions ls ON lp.topic_id = ls.topic_id 
+			AND lp.learning_method_id = ls.learning_method_id 
+			AND lp.user_id = ls.user_id
+		WHERE ls.id = $1
+		ORDER BY lp.created_at DESC
+		LIMIT 1
+	`
+
+	var prompt models.LearningPrompt
+	var aiResponse, errorMessage sql.NullString
+
+	err := s.db.QueryRow(query, sessionID).Scan(
+		&prompt.ID, &prompt.UserID, &prompt.TopicID, &prompt.LearningMethodID,
+		&prompt.UserPrompt, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
+		&errorMessage, &prompt.CreatedAt, &prompt.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no prompt found for session")
+		}
+		return nil, fmt.Errorf("failed to get prompt for session: %w", err)
+	}
+
+	if aiResponse.Valid {
+		prompt.AiResponse = &aiResponse.String
+	}
+	if errorMessage.Valid {
+		prompt.ErrorMessage = &errorMessage.String
+	}
+
+	return &prompt, nil
 }

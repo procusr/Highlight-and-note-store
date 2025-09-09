@@ -94,6 +94,13 @@ func (h *LearningHandler) StartLearning(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Create learning session to track the user's learning activity
+	_, err = h.learningService.StartLearningSession(userID, topicModel.ID, parsedMethodID)
+	if err != nil {
+		// Log the error but don't fail the entire operation
+		fmt.Printf("Warning: failed to create learning session: %v\n", err)
+	}
+
 	// Generate AI prompt display
 	component := templates.AIPromptDisplay(prompt, topic, methodKey)
 	component.Render(r.Context(), w)
