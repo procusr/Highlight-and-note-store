@@ -20,7 +20,6 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) LoginPage(w http.ResponseWriter, r *http.Request) {
-	// Render login page template using templ
 	w.Header().Set("Content-Type", "text/html")
 	if err := templates.LoginPage().Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
@@ -63,7 +62,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
-	// Render register page template using templ
 	w.Header().Set("Content-Type", "text/html")
 	if err := templates.RegisterPage().Render(r.Context(), w); err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
@@ -117,105 +115,92 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 func (h *AuthHandler) ForgotPasswordPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	html := `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password - MH-Go</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Reset your password
-            </h2>
-        </div>
-        <form class="mt-8 space-y-6" hx-post="/forgot-password" hx-target="#message" hx-swap="innerHTML">
-            <div>
-                <input name="email" type="email" required
-                       class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                       placeholder="Email address">
-            </div>
-            <div id="message" class="text-sm"></div>
-            <div>
-                <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Send Reset Link
-                </button>
-            </div>
-            <div class="text-center">
-                <a href="/login" class="text-indigo-600 hover:text-indigo-500">
-                    Back to sign in
-                </a>
-            </div>
-        </form>
-    </div>
-</body>
-</html>`
-	w.Write([]byte(html))
+	templates.ForgotPasswordPage().Render(r.Context(), w)
 }
 
 func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement password reset functionality
-	w.WriteHeader(http.StatusNotImplemented)
-	w.Write([]byte("<div class='text-red-600'>Password reset functionality not yet implemented</div>"))
+	if err := r.ParseForm(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Failed to parse form data</div>"))
+		return
+	}
+
+	email := r.FormValue("email")
+	if email == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Email is required</div>"))
+		return
+	}
+
+	// Get user by email
+	user, err := h.authService.GetUserByEmail(email)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>No account found with this email</div>"))
+		return
+	}
+
+	// Generate reset token
+	token, err := h.authService.GenerateToken(user.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("<div class='text-red-600'>Failed to generate reset token</div>"))
+		return
+	}
+
+	// TODO: Send reset email with token
+	// For now, just redirect to reset password page with token
+	w.Header().Set("HX-Redirect", "/reset-password?token="+token)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *AuthHandler) ResetPasswordPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	html := `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - MH-Go</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Reset your password
-            </h2>
-        </div>
-        <form class="mt-8 space-y-6" hx-post="/reset-password" hx-target="#message" hx-swap="innerHTML">
-            <input type="hidden" name="token" value="` + r.URL.Query().Get("token") + `">
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div>
-                    <input name="password" type="password" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="New Password">
-                </div>
-                <div>
-                    <input name="confirm_password" type="password" required
-                           class="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Confirm New Password">
-                </div>
-            </div>
-            <div id="message" class="text-sm"></div>
-            <div>
-                <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Reset Password
-                </button>
-            </div>
-        </form>
-    </div>
-</body>
-</html>`
-	w.Write([]byte(html))
+	token := r.URL.Query().Get("token")
+	templates.ResetPasswordPage(token).Render(r.Context(), w)
 }
 
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement password reset functionality
-	w.WriteHeader(http.StatusNotImplemented)
-	w.Write([]byte("<div class='text-red-600'>Password reset functionality not yet implemented</div>"))
+	if err := r.ParseForm(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Failed to parse form data</div>"))
+		return
+	}
+
+	token := r.FormValue("token")
+	password := r.FormValue("password")
+	confirmPassword := r.FormValue("confirm_password")
+
+	// Validation
+	if password == "" || confirmPassword == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Password is required</div>"))
+		return
+	}
+
+	if len(password) < 6 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Password must be at least 6 characters long</div>"))
+		return
+	}
+
+	if password != confirmPassword {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>Passwords do not match</div>"))
+		return
+	}
+
+	// Reset password
+	err := h.authService.ResetPassword(token, password)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<div class='text-red-600'>" + err.Error() + "</div>"))
+		return
+	}
+
+	// Success - redirect to login
+	w.Header().Set("HX-Redirect", "/login")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {

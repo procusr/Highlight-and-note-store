@@ -164,3 +164,46 @@ func (s *AuthService) GetUserByID(userID uuid.UUID) (*models.User, error) {
 
 	return &user, nil
 }
+
+// GetUserByEmail returns a user by email
+func (s *AuthService) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	query := `SELECT id, email, created_at, updated_at FROM users WHERE email = $1`
+
+	err := s.db.QueryRow(query, email).Scan(
+		&user.ID, &user.Email, &user.CreatedAt, &user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return &user, nil
+}
+
+// ResetPassword resets a user's password
+func (s *AuthService) ResetPassword(token, password string) error {
+	// Validate token
+	userID, err := s.ValidateToken(token)
+	if err != nil {
+		return fmt.Errorf("invalid or expired token")
+	}
+
+	// Hash new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	// Update password
+	query := `UPDATE users SET password = $1 WHERE id = $2`
+	_, err = s.db.Exec(query, string(hashedPassword), userID)
+	if err != nil {
+		return fmt.Errorf("failed to reset password: %w", err)
+	}
+
+	return nil
+}

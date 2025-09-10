@@ -128,7 +128,7 @@ func (h *LearningHandler) SearchTopics(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	topics, err := h.learningService.SearchTopics(query, limit)
+	topics, _, err := h.learningService.SearchTopics(query, 1, limit)
 	if err != nil {
 		http.Error(w, "Failed to search topics", http.StatusInternalServerError)
 		return

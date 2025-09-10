@@ -465,6 +465,48 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 	return sessions, nil
 }
 
+// SearchTopics searches for topics by name with pagination
+func (s *LearningService) SearchTopics(query string, page, pageSize int) ([]models.Topic, int, error) {
+	var topics []models.Topic
+	offset := (page - 1) * pageSize
+
+	searchQuery := `
+        SELECT id, name, description, category, difficulty_level, created_at, updated_at
+        FROM topics
+        WHERE name ILIKE $1
+        ORDER BY name
+        LIMIT $2 OFFSET $3;
+    `
+
+	rows, err := s.db.Query(searchQuery, "%"+query+"%", pageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to search topics: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var topic models.Topic
+		if err := rows.Scan(&topic.ID, &topic.Name, &topic.Description, &topic.Category, &topic.DifficultyLevel, &topic.CreatedAt, &topic.UpdatedAt); err != nil {
+			return nil, 0, fmt.Errorf("failed to scan topic: %w", err)
+		}
+		topics = append(topics, topic)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("failed to iterate over search results: %w", err)
+	}
+
+	// Get total count for pagination
+	var total int
+	countQuery := `SELECT COUNT(*) FROM topics WHERE name ILIKE $1`
+	if err := s.db.QueryRow(countQuery, "%"+query+"%").Scan(&total); err != nil {
+		return nil, 0, fmt.Errorf("failed to count topics: %w", err)
+	}
+
+	return topics, total, nil
+}
+
+
 // UpdateUserPreferences updates user preferences
 func (s *LearningService) UpdateUserPreferences(prefs *models.UserPreferences) error {
 	query := `

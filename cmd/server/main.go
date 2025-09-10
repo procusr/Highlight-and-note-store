@@ -52,7 +52,7 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
-	contentHandler := handlers.NewContentHandler(contentService, folderService)
+	contentHandler := handlers.NewContentHandler(contentService)
 	learningHandler := handlers.NewLearningHandler(topicService, methodService, progressService, learningService, userService)
 	pageHandler := handlers.NewPageHandler(userService)
 
@@ -110,11 +110,30 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 		// API routes
 		r.Route("/api", func(r chi.Router) {
-			// Folder routes
-			folderHandler.RegisterRoutes(r, authService)
+			r.Route("/folders", func(r chi.Router) {
+				// Folder routes
+				r.Get("/", folderHandler.GetFolders)
+				r.Post("/", folderHandler.CreateFolder)
+				r.Get("/{folderID}", folderHandler.GetFolder)
+				r.Put("/{folderID}", folderHandler.UpdateFolder)
+				r.Delete("/{folderID}", folderHandler.DeleteFolder)
+				r.Get("/{folderID}/path", folderHandler.GetFolderPath)
+
+				// Content routes
+				r.Get("/{folderID}/content", folderHandler.GetContent)
+				r.Post("/{folderID}/content", folderHandler.CreateContent)
+				r.Put("/{folderID}/content/{contentID}", folderHandler.UpdateContent)
+				r.Delete("/{folderID}/content/{contentID}", folderHandler.DeleteContent)
+			})
 
 			// Content routes
-			contentHandler.RegisterRoutes(r, authService)
+			r.Route("/content", func(r chi.Router) {
+				r.Get("/search", contentHandler.SearchContent)
+				r.Post("/", contentHandler.CreateContent)
+				r.Get("/{contentID}", contentHandler.GetContent)
+				r.Put("/{contentID}", contentHandler.UpdateContent)
+				r.Delete("/{contentID}", contentHandler.DeleteContent)
+			})
 
 			// Learning platform API routes
 			r.Route("/learning", func(r chi.Router) {

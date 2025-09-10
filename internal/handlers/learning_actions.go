@@ -55,7 +55,7 @@ func (h *LearningHandler) StartLearning(w http.ResponseWriter, r *http.Request) 
 	var topicModel *models.Topic
 	
 	// First try to find existing topic by name
-	topics, err := h.learningService.SearchTopics(topic, 1)
+	topics, _, err := h.learningService.SearchTopics(topic, 1, 1)
 	if err == nil && len(topics) > 0 {
 		topicModel = &topics[0]
 	} else {
