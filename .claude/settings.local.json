@@ -6,7 +6,17 @@
       "Bash(pkill:*)",
       "Bash(go build:*)",
       "Bash(curl:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "WebSearch",
+      "WebFetch(domain:www.uxbooth.com)",
+      "WebFetch(domain:www.nngroup.com)",
+      "Bash(air:*)",
+      "Bash(sed:*)",
+      "Bash(./bin/server:*)",
+      "Bash(lsof:*)",
+      "Bash(git restore:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

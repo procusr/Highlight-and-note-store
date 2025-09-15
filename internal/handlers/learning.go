@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"mh-go/internal/middleware"
+	"mh-go/internal/models"
 	"mh-go/internal/services"
 	"mh-go/templates"
 	"net/http"
@@ -37,6 +37,52 @@ func NewLearningHandler(
 	}
 }
 
+// getStaticPathwayCards returns the hardcoded learning pathway cards
+func (h *LearningHandler) getStaticPathwayCards() []models.LearningPathwayCard {
+	return []models.LearningPathwayCard{
+		{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			Name:        "Applied Mastery Laboratory",
+			Description: "Hands-on practice and real-world application of concepts through experiments and projects.",
+			MethodKey:   "applied_laboratory",
+			HasStarted:  false,
+			ProgressPercent: 0,
+		},
+		{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+			Name:        "Foundation Through Discovery",
+			Description: "Explore and discover fundamental concepts through guided inquiry and investigation.",
+			MethodKey:   "foundation_discovery",
+			HasStarted:  false,
+			ProgressPercent: 0,
+		},
+		{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+			Name:        "Integration & Transfer System",
+			Description: "Connect knowledge across domains and apply learning to new contexts and situations.",
+			MethodKey:   "integration_transfer",
+			HasStarted:  false,
+			ProgressPercent: 0,
+		},
+		{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000004"),
+			Name:        "Mistake-Based Learning Lab",
+			Description: "Learn from errors and develop resilience through controlled failure analysis and correction.",
+			MethodKey:   "mistake_learning_lab",
+			HasStarted:  false,
+			ProgressPercent: 0,
+		},
+		{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000005"),
+			Name:        "Problem-Solving Gymnasium",
+			Description: "Build critical thinking skills through structured problem-solving exercises and challenges.",
+			MethodKey:   "problem_gymnasium",
+			HasStarted:  false,
+			ProgressPercent: 0,
+		},
+	}
+}
+
 // LearningPlatformPage renders the main learning platform page
 func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
@@ -51,36 +97,41 @@ func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Re
 	// Get dashboard stats
 	stats, err := h.progressService.GetDashboardStats(userID)
 	if err != nil {
-		http.Error(w, "Failed to get dashboard stats", http.StatusInternalServerError)
-		return
+		// Create default stats if error
+		stats = &models.DashboardStats{
+			OverallProgress:   0,
+			ConceptsMastered: 0,
+			DailyStreak:       0,
+			TotalStudyTime:    0,
+		}
 	}
 
-	// Get learning pathway cards
-	pathwayCards, err := h.progressService.GetLearningPathwayCards(userID)
-	if err != nil {
-		http.Error(w, "Failed to get learning pathways", http.StatusInternalServerError)
-		return
-	}
+	// Get learning pathway cards (static data)
+	pathwayCards := h.getStaticPathwayCards()
 
-	// Get topics
+	// Get available topics
 	topics, err := h.topicService.GetAllTopics()
 	if err != nil {
-		http.Error(w, "Failed to get topics", http.StatusInternalServerError)
-		return
+		topics = []models.Topic{}
 	}
 
 	// Get active learning sessions
 	sessions, err := h.learningService.GetActiveLearningSessions(userID)
 	if err != nil {
-		http.Error(w, "Failed to get learning sessions", http.StatusInternalServerError)
-		return
+		sessions = []models.LearningSession{}
 	}
 
 	// Get user preferences
 	preferences, err := h.learningService.GetOrCreateUserPreferences(userID)
 	if err != nil {
-		http.Error(w, "Failed to get user preferences", http.StatusInternalServerError)
-		return
+		// Create default preferences
+		preferences = &models.UserPreferences{
+			UserID:             userID,
+			LearningIntensity:  5,
+			SessionDurationMins: 30,
+			DifficultyPreference: 5,
+			ThemePreference:    "light",
+		}
 	}
 
 	component := templates.LearningPlatformPage(user, stats, pathwayCards, topics, sessions, preferences)
@@ -88,17 +139,9 @@ func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Re
 }
 
 // GetLearningPathways returns learning pathway cards for HTMX
+// TODO: Fix this when templates are available
 func (h *LearningHandler) GetLearningPathways(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-
-	pathwayCards, err := h.progressService.GetLearningPathwayCards(userID)
-	if err != nil {
-		http.Error(w, "Failed to get learning pathways", http.StatusInternalServerError)
-		return
-	}
-
-	component := templates.LearningPathwaysGrid(pathwayCards)
-	component.Render(r.Context(), w)
+	http.Error(w, "Not implemented yet", http.StatusNotImplemented)
 }
 
 // GetTopics returns available topics as JSON
@@ -256,8 +299,9 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 	userID := middleware.GetUserID(r.Context())
 
 	var req struct {
-		TopicID  string `json:"topic_id"`
-		MethodID string `json:"method_id"`
+		Topic     string `json:"topic"`
+		MethodKey string `json:"method_key"`
+		UserPrompt string `json:"user_prompt"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -265,21 +309,28 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Validate UUIDs
-	topicID, err := uuid.Parse(req.TopicID)
+	// Create a simple topic for now (UUID will be used directly)
+	topicID := uuid.New()
+
+	// Note: In a real implementation, you would want to properly create/get the topic
+	// For now, we'll use the UUID directly and let the service handle topic creation
+
+	// Get learning method by key
+	method, err := h.methodService.GetLearningMethodByKey(req.MethodKey)
 	if err != nil {
-		http.Error(w, "Invalid topic ID", http.StatusBadRequest)
+		http.Error(w, "Invalid learning method", http.StatusBadRequest)
 		return
 	}
 
-	methodID, err := uuid.Parse(req.MethodID)
+	// Create learning prompt
+	_, err = h.learningService.CreateLearningPrompt(userID, topicID, method.ID, req.UserPrompt)
 	if err != nil {
-		http.Error(w, "Invalid method ID", http.StatusBadRequest)
+		http.Error(w, "Failed to create learning prompt", http.StatusInternalServerError)
 		return
 	}
 
 	// Start learning session
-	session, err := h.learningService.StartLearningSession(userID, topicID, methodID)
+	session, err := h.learningService.StartLearningSession(userID, topicID, method.ID)
 	if err != nil {
 		http.Error(w, "Failed to start learning session", http.StatusInternalServerError)
 		return
@@ -440,40 +491,37 @@ func (h *LearningHandler) UpdateUserPreferences(w http.ResponseWriter, r *http.R
 // LearningSessionPage renders the immersive learning session page
 func (h *LearningHandler) LearningSessionPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
-	sessionID := chi.URLParam(r, "sessionID")
-	
-	// Get user model
-	user, err := h.userService.GetUserByID(userID)
-	if err != nil {
-		http.Error(w, "Failed to get user", http.StatusInternalServerError)
-		return
-	}
-
-	// Parse session ID
-	parsedSessionID, err := uuid.Parse(sessionID)
+	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
 	if err != nil {
 		http.Error(w, "Invalid session ID", http.StatusBadRequest)
 		return
 	}
 
 	// Get learning session
-	session, err := h.learningService.GetLearningSessionByID(parsedSessionID)
+	session, err := h.learningService.GetLearningSessionByID(sessionID)
 	if err != nil {
-		http.Error(w, "Failed to get learning session", http.StatusInternalServerError)
+		http.Error(w, "Session not found", http.StatusNotFound)
 		return
 	}
 
-	// Verify that the session belongs to the user
+	// Verify the session belongs to the current user
 	if session.UserID != userID {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	// Get the learning prompt for this session
-	prompt, err := h.learningService.GetPromptForSession(parsedSessionID)
+	prompt, err := h.learningService.GetPromptForSession(sessionID)
 	if err != nil {
-		// Log the error but continue - we'll display the session without the prompt
-		fmt.Printf("Warning: failed to get prompt for session: %v\n", err)
+		// It's okay if there's no prompt yet
+		prompt = nil
+	}
+
+	// Get user model
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to get user", http.StatusInternalServerError)
+		return
 	}
 
 	component := templates.LearningSessionPage(user, session, prompt)

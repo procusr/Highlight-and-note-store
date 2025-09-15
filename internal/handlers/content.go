@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"mh-go/internal/middleware"
 	"mh-go/internal/models"
 	"mh-go/internal/services"
+	"mh-go/internal/utils"
 	"mh-go/templates"
 
 	"github.com/go-chi/chi/v5"
@@ -16,12 +18,16 @@ import (
 type ContentHandler struct {
 	contentService *services.ContentService
 	folderService  *services.FolderService
+	userService    *services.UserService
+	openaiService  *services.OpenAIService
 }
 
-func NewContentHandler(contentService *services.ContentService, folderService *services.FolderService) *ContentHandler {
+func NewContentHandler(contentService *services.ContentService, folderService *services.FolderService, userService *services.UserService, openaiService *services.OpenAIService) *ContentHandler {
 	return &ContentHandler{
 		contentService: contentService,
 		folderService:  folderService,
+		userService:    userService,
+		openaiService:  openaiService,
 	}
 }
 
@@ -30,6 +36,8 @@ func (h *ContentHandler) RegisterRoutes(r chi.Router, authService *services.Auth
 	r.Route("/content", func(r chi.Router) {
 		r.Post("/", h.CreateContent)
 		r.Get("/{contentID}", h.GetContent)
+		r.Get("/{contentID}/view", h.GetViewContentModal)
+		r.Get("/{contentID}/edit", h.GetEditContentModal)
 		r.Put("/{contentID}", h.UpdateContent)
 		r.Delete("/{contentID}", h.DeleteContent)
 	})
@@ -37,7 +45,11 @@ func (h *ContentHandler) RegisterRoutes(r chi.Router, authService *services.Auth
 
 // CreateContent creates new content in a folder
 func (h *ContentHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uuid.UUID)
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	var req struct {
 		Title    string    `json:"title"`
@@ -71,6 +83,15 @@ func (h *ContentHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		UserID:   userID,
 	}
 
+	// Generate question using OpenAI if the service is available
+	if h.openaiService != nil {
+		question, err := h.openaiService.GenerateQuestionFromContent(req.Body, req.Title)
+		if err == nil {
+			content.Question = question
+		}
+		// If question generation fails, we continue without it - it's not critical
+	}
+
 	if err := h.contentService.CreateContent(content); err != nil {
 		http.Error(w, "Failed to create content", http.StatusInternalServerError)
 		return
@@ -95,7 +116,11 @@ func (h *ContentHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 
 // GetContent retrieves content by ID
 func (h *ContentHandler) GetContent(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uuid.UUID)
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	contentID, err := uuid.Parse(chi.URLParam(r, "contentID"))
 	if err != nil {
 		http.Error(w, "Invalid content ID", http.StatusBadRequest)
@@ -112,9 +137,65 @@ func (h *ContentHandler) GetContent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(content)
 }
 
+// GetViewContentModal returns the view content modal for a specific content
+func (h *ContentHandler) GetViewContentModal(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	contentID, err := uuid.Parse(chi.URLParam(r, "contentID"))
+	if err != nil {
+		http.Error(w, "Invalid content ID", http.StatusBadRequest)
+		return
+	}
+
+	content, err := h.contentService.GetContentByID(contentID, userID)
+	if err != nil {
+		http.Error(w, "Content not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.ViewContentModal(*content).Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering view modal", http.StatusInternalServerError)
+		return
+	}
+}
+
+// GetEditContentModal returns the edit content modal HTML
+func (h *ContentHandler) GetEditContentModal(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	contentID, err := uuid.Parse(chi.URLParam(r, "contentID"))
+	if err != nil {
+		http.Error(w, "Invalid content ID", http.StatusBadRequest)
+		return
+	}
+
+	content, err := h.contentService.GetContentByID(contentID, userID)
+	if err != nil {
+		http.Error(w, "Content not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.EditContentModal(*content).Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering edit modal", http.StatusInternalServerError)
+		return
+	}
+}
+
 // UpdateContent updates existing content
 func (h *ContentHandler) UpdateContent(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uuid.UUID)
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	contentID, err := uuid.Parse(chi.URLParam(r, "contentID"))
 	if err != nil {
 		http.Error(w, "Invalid content ID", http.StatusBadRequest)
@@ -128,32 +209,86 @@ func (h *ContentHandler) UpdateContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req struct {
-		Title string `json:"title"`
-		Body  string `json:"body"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	// Parse form data
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	// Update content
-	existingContent.Title = req.Title
-	existingContent.Body = req.Body
+	// Update content fields from form
+	title := r.FormValue("title")
+	description := r.FormValue("description")
+	body := r.FormValue("body")
+
+	if title != "" {
+		existingContent.Title = title
+	}
+	if description != "" {
+		existingContent.Description = description
+	}
+	if body != "" {
+		existingContent.Body = body
+		// Auto-detect content type when body is updated
+		existingContent.ContentType = utils.DetectContentType(body)
+
+		// Regenerate question using OpenAI if the service is available
+		if h.openaiService != nil {
+			question, err := h.openaiService.GenerateQuestionFromContent(body, existingContent.Title)
+			if err == nil {
+				existingContent.Question = question
+			}
+			// If question generation fails, we continue without updating it - it's not critical
+		}
+	}
 
 	if err := h.contentService.UpdateContent(existingContent); err != nil {
 		http.Error(w, "Failed to update content", http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(existingContent)
+	// Return the current folder page to show updated content
+	folder, err := h.folderService.GetFolderByID(existingContent.FolderID, userID)
+	if err != nil {
+		http.Error(w, "Failed to load folder", http.StatusInternalServerError)
+		return
+	}
+
+	// Get user information
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to load user", http.StatusInternalServerError)
+		return
+	}
+
+	// Get folder contents
+	contents, err := h.contentService.GetContentByFolderID(folder.ID, userID)
+	if err != nil {
+		http.Error(w, "Failed to load contents", http.StatusInternalServerError)
+		return
+	}
+
+	// Get subfolders
+	subfolders, err := h.folderService.GetFoldersByParent(folder.ID, userID)
+	if err != nil {
+		http.Error(w, "Failed to load subfolders", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.FolderPage(user, *folder, contents, subfolders).Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return
+	}
 }
 
 // DeleteContent deletes content by ID
 func (h *ContentHandler) DeleteContent(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uuid.UUID)
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	contentID, err := uuid.Parse(chi.URLParam(r, "contentID"))
 	if err != nil {
 		http.Error(w, "Invalid content ID", http.StatusBadRequest)
@@ -182,7 +317,11 @@ func (h *ContentHandler) DeleteContent(w http.ResponseWriter, r *http.Request) {
 
 // GetContentByFolder retrieves all content in a folder with pagination
 func (h *ContentHandler) GetContentByFolder(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uuid.UUID)
+	userID := middleware.GetUserID(r.Context())
+	if userID == uuid.Nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	folderID, err := uuid.Parse(chi.URLParam(r, "folderID"))
 	if err != nil {
 		http.Error(w, "Invalid folder ID", http.StatusBadRequest)

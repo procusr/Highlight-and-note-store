@@ -3,11 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"mh-go/internal/middleware"
 	"mh-go/internal/models"
 	"mh-go/internal/services"
+	"mh-go/internal/utils"
 	"mh-go/templates"
 	"net/http"
+	"regexp"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -17,13 +22,15 @@ type FolderHandler struct {
 	folderService  *services.FolderService
 	contentService *services.ContentService
 	userService    *services.UserService
+	openaiService  *services.OpenAIService
 }
 
-func NewFolderHandler(folderService *services.FolderService, contentService *services.ContentService, userService *services.UserService) *FolderHandler {
+func NewFolderHandler(folderService *services.FolderService, contentService *services.ContentService, userService *services.UserService, openaiService *services.OpenAIService) *FolderHandler {
 	return &FolderHandler{
 		folderService:  folderService,
 		contentService: contentService,
 		userService:    userService,
+		openaiService:  openaiService,
 	}
 }
 
@@ -36,6 +43,7 @@ func (h *FolderHandler) RegisterRoutes(r chi.Router, authService *services.AuthS
 		r.Get("/", h.GetFolders)
 		r.Post("/", h.CreateFolder)
 		r.Get("/{folderID}", h.GetFolder)
+		r.Get("/{folderID}/edit", h.GetEditFolderModal)
 		r.Put("/{folderID}", h.UpdateFolder)
 		r.Delete("/{folderID}", h.DeleteFolder)
 		r.Get("/{folderID}/path", h.GetFolderPath)
@@ -295,6 +303,36 @@ func (h *FolderHandler) GetFolder(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(folder)
 }
 
+// GetEditFolderModal returns the edit folder modal HTML
+func (h *FolderHandler) GetEditFolderModal(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	folderIDStr := chi.URLParam(r, "folderID")
+
+	folderID, err := uuid.Parse(folderIDStr)
+	if err != nil {
+		http.Error(w, "Invalid folder ID", http.StatusBadRequest)
+		return
+	}
+
+	folder, err := h.folderService.GetFolderByID(folderID, userID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get folder: %v", err), http.StatusNotFound)
+		return
+	}
+
+	// Check if folder can be edited
+	if !folder.IsEditable() {
+		http.Error(w, "This folder cannot be edited", http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.EditFolderModal(*folder).Render(r.Context(), w); err != nil {
+		http.Error(w, "Error rendering edit modal", http.StatusInternalServerError)
+		return
+	}
+}
+
 // UpdateFolder updates an existing folder
 func (h *FolderHandler) UpdateFolder(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
@@ -340,9 +378,9 @@ func (h *FolderHandler) UpdateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If this is an HTMX request, redirect to dashboard
+	// If this is an HTMX request, redirect to folders page
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/dashboard")
+		w.Header().Set("HX-Redirect", "/folders")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -379,9 +417,9 @@ func (h *FolderHandler) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If this is an HTMX request, redirect to dashboard
+	// If this is an HTMX request, redirect to folders page
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/dashboard")
+		w.Header().Set("HX-Redirect", "/folders")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -430,7 +468,6 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Body        string `json:"body"`
-		ContentType string `json:"content_type"`
 	}
 
 	contentType := r.Header.Get("Content-Type")
@@ -454,31 +491,67 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		title := r.FormValue("title")
 		description := r.FormValue("description")
 		body := r.FormValue("body")
-		contentTypeVal := r.FormValue("content_type")
 
-		fmt.Printf("Content form data: title='%s', description='%s', body='%s', content_type='%s'\n", title, description, body, contentTypeVal)
+		fmt.Printf("Content form data: title='%s', description='%s', body='%s'\n", title, description, body)
 
-		if title == "" || body == "" {
-			http.Error(w, "Title and body are required", http.StatusBadRequest)
+		if body == "" {
+			http.Error(w, "Content body is required", http.StatusBadRequest)
 			return
 		}
 
 		req.Title = title
 		req.Description = description
 		req.Body = body
-		req.ContentType = contentTypeVal
 	}
 
-	if req.ContentType == "" {
-		req.ContentType = "text"
+	// Always attempt to generate a question (primary heading) if body present
+	var generatedQuestion string
+	if strings.TrimSpace(req.Body) == "" {
+		log.Println("[CreateContent] Empty body; skipping question generation")
+	} else {
+		if h.openaiService != nil {
+			log.Println("[CreateContent] Attempting AI question generation...")
+			if question, err := h.openaiService.GenerateQuestionFromContent(req.Body, req.Title); err != nil {
+				log.Printf("[CreateContent] AI generation failed: %v -- using heuristic fallback", err)
+				generatedQuestion = heuristicQuestion(req.Body, req.Title)
+			} else {
+				generatedQuestion = strings.TrimSpace(question)
+				if generatedQuestion == "" {
+					log.Println("[CreateContent] AI returned empty content; using heuristic fallback")
+					generatedQuestion = heuristicQuestion(req.Body, req.Title)
+				} else {
+					log.Printf("[CreateContent] AI question generated (%d chars)", len(generatedQuestion))
+				}
+			}
+		} else {
+			log.Println("[CreateContent] OpenAI service not configured; using heuristic question")
+			generatedQuestion = heuristicQuestion(req.Body, req.Title)
+		}
 	}
+
+	// If user supplied a title but no question produced (unlikely), still fallback heuristic
+	if generatedQuestion == "" {
+		generatedQuestion = heuristicQuestion(req.Body, req.Title)
+	}
+
+	// If user provided no title, keep title empty (we show question). If both absent we fallback for title just for storage/search.
+	if strings.TrimSpace(req.Title) == "" {
+		fallbackTitle := deriveFallbackTitle(req.Body)
+		if fallbackTitle != "" {
+			req.Title = fallbackTitle
+		}
+	}
+
+	// Automatically detect content type based on content
+	detectedContentType := utils.DetectContentType(req.Body)
 
 	content := &models.Content{
 		ID:          uuid.New(),
 		Title:       req.Title,
+		Question:    generatedQuestion,
 		Description: req.Description,
 		Body:        req.Body,
-		ContentType: req.ContentType,
+		ContentType: detectedContentType,
 		FolderID:    folderID,
 		UserID:      userID,
 	}
@@ -487,6 +560,8 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Failed to create content: %v", err), http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("[CreateContent] Saved content ID=%s Title=%q QuestionPresent=%t", content.ID, content.Title, generatedQuestion != "")
 
 	// If this is an HTMX request, redirect to folder page
 	if r.Header.Get("HX-Request") == "true" {
@@ -498,6 +573,114 @@ func (h *FolderHandler) CreateContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(content)
+}
+
+// deriveFallbackTitle builds a short heading from the body when neither title nor AI question is available.
+// Strategy:
+// 1. Split into lines, pick first non-empty trimmed line.
+// 2. If still empty, take first 80 runes of full body.
+// 3. Collapse spaces, trim punctuation, ensure <= 80 chars, append ellipsis if truncated.
+func deriveFallbackTitle(body string) string {
+	trimmed := strings.TrimSpace(body)
+	if trimmed == "" {
+		return ""
+	}
+
+	// Prefer first meaningful line
+	lines := strings.Split(trimmed, "\n")
+	var candidate string
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l != "" {
+			candidate = l
+			break
+		}
+	}
+	if candidate == "" {
+		candidate = trimmed
+	}
+
+	// Normalize whitespace
+	candidate = strings.Join(strings.Fields(candidate), " ")
+
+	// Truncate to 80 runes
+	const limit = 80
+	if utf8.RuneCountInString(candidate) > limit {
+		// build rune slice safely
+		runes := []rune(candidate)
+		candidate = string(runes[:limit]) + "…"
+	}
+
+	// Remove trailing punctuation clusters
+	candidate = strings.TrimRight(candidate, ":;,. -")
+
+	return candidate
+}
+
+// heuristicQuestion creates a simple question when AI generation is unavailable.
+// Strategy: take first meaningful sentence or line; transform to a how/what/why style question.
+func heuristicQuestion(body, title string) string {
+	// Prefer explicit title if present to craft question
+	if t := strings.TrimSpace(title); t != "" {
+		return ensureQuestion(t)
+	}
+	body = strings.TrimSpace(body)
+	if body == "" {
+		return "What is the main idea?"
+	}
+
+	// Extract first sentence-like fragment
+	first := body
+	// Split by sentence end punctuation
+	if idx := regexp.MustCompile(`[.!?]`).FindStringIndex(body); idx != nil && idx[0] > 15 { // require a little length
+		first = body[:idx[0]]
+	} else {
+		// fallback first line
+		if nl := strings.Index(body, "\n"); nl > 0 {
+			first = body[:nl]
+		}
+	}
+	first = strings.TrimSpace(first)
+	if first == "" {
+		return "What is the main idea?"
+	}
+	// Remove leading markdown symbols
+	first = strings.TrimLeft(first, "#*- ")
+	// Truncate
+	runes := []rune(first)
+	if len(runes) > 90 {
+		first = string(runes[:90])
+	}
+	return ensureQuestion(first)
+}
+
+// ensureQuestion ensures text ends with a question mark and starts with an interrogative if reasonable.
+func ensureQuestion(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "What is the main idea?"
+	}
+	// If already ends with ? assume it's a question
+	if strings.HasSuffix(s, "?") {
+		return s
+	}
+	lower := strings.ToLower(s)
+	startsQuestion := false
+	for _, w := range []string{"what", "why", "how", "when", "where", "who", "which"} {
+		if strings.HasPrefix(lower, w+" ") {
+			startsQuestion = true
+			break
+		}
+	}
+	if !startsQuestion {
+		// Prepend "What is" or "How does" heuristically based on length
+		if len(strings.Fields(s)) <= 4 {
+			s = "What is " + s
+		} else {
+			s = "How does " + s
+		}
+	}
+	return strings.TrimSpace(s) + "?"
 }
 
 // UpdateContent updates existing content

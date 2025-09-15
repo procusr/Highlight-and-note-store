@@ -12,14 +12,20 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found or error loading .env file:", err)
+	}
+
 	// Load configuration
 	cfg := config.Load()
 
-	// Initialize database
+	// Initialize databasee
 	db, err := database.Connect(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
@@ -42,6 +48,7 @@ func main() {
 	userService := services.NewUserService(db)
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
+	openaiService := services.NewOpenAIService(cfg.OpenAIKey)
 
 	// Learning platform services
 	topicService := services.NewTopicService(db)
@@ -51,8 +58,8 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
-	contentHandler := handlers.NewContentHandler(contentService)
+	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService, openaiService)
+	contentHandler := handlers.NewContentHandler(contentService, folderService, userService, openaiService)
 	learningHandler := handlers.NewLearningHandler(topicService, methodService, progressService, learningService, userService)
 	pageHandler := handlers.NewPageHandler(userService)
 
@@ -110,6 +117,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 		// API routes
 		r.Route("/api", func(r chi.Router) {
+			r.Use(middleware.RequireAuth(authService))
 			r.Route("/folders", func(r chi.Router) {
 				// Folder routes
 				r.Get("/", folderHandler.GetFolders)
@@ -128,9 +136,10 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 			// Content routes
 			r.Route("/content", func(r chi.Router) {
-				r.Get("/search", contentHandler.SearchContent)
+				r.Get("/search", folderHandler.SearchContent)
 				r.Post("/", contentHandler.CreateContent)
 				r.Get("/{contentID}", contentHandler.GetContent)
+				r.Get("/{contentID}/edit", contentHandler.GetEditContentModal)
 				r.Put("/{contentID}", contentHandler.UpdateContent)
 				r.Delete("/{contentID}", contentHandler.DeleteContent)
 			})

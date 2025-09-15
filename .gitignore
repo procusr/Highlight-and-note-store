@@ -4,6 +4,7 @@
 *.so
 *.dylib
 *.test
+*.env
 
 # Output of build tools
 /bin/
@@ -56,3 +57,6 @@ Thumbs.db
 # Application binaries
 /mh-go
 /tmp/main
+/.env
+.env
+.env

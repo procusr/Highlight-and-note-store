@@ -599,6 +599,21 @@ p {
 
 /* Custom styles for MH-Go application */
 
+/* Line clamping utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Consistent layout system - Simple and reliable */
 .app-container {
   min-height: 100vh;
@@ -623,7 +638,7 @@ p {
     margin-left: 4rem;
     margin-right: auto;
     padding: 0 2rem;
-    
+
     /* Center within the available space after sidebar */
     position: relative;
     left: calc((100vw - 4rem - 1200px) / 2);
@@ -794,9 +809,6 @@ p {
   }
 }
 
-
-
-
 /* Responsive utilities */
 @media (max-width: 768px) {
   .mobile-hidden {
@@ -830,7 +842,6 @@ p {
   background-color: #4f46e5;
   transform: scale(1.1);
 }
-
 
 /* Search results styling */
 #search-results {
@@ -1215,5 +1226,28 @@ p {
 
   .dashboard-grid {
     gap: var(--space-16);
+  }
+}
+
+/* Accordion chevron animation */
+details[open] .details-chevron {
+  transform: rotate(180deg);
+}
+
+.details-chevron {
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Mobile-optimized modal styles */
+@media (max-width: 640px) {
+  .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .modal-body input,
+  .modal-body textarea,
+  .modal-body select {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }

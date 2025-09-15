@@ -22,6 +22,7 @@ type Folder struct {
 	Description string     `json:"description" db:"description"`
 	ParentID    *uuid.UUID `json:"parent_id" db:"parent_id"`
 	UserID      uuid.UUID  `json:"user_id" db:"user_id"`
+	FolderType  string     `json:"folder_type" db:"folder_type"` // "normal", "front_desk", etc.
 	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
 
@@ -32,12 +33,28 @@ type Folder struct {
 	User     *User     `json:"user,omitempty"`
 }
 
+// IsFrontDesk returns true if this is the special Front Desk folder
+func (f *Folder) IsFrontDesk() bool {
+	return f.FolderType == "front_desk"
+}
+
+// IsEditable returns true if this folder can be edited
+func (f *Folder) IsEditable() bool {
+	return f.FolderType == "normal" || f.FolderType == ""
+}
+
+// IsDeletable returns true if this folder can be deleted
+func (f *Folder) IsDeletable() bool {
+	return f.FolderType == "normal" || f.FolderType == ""
+}
+
 // Content represents content within a folder
 type Content struct {
 	ID          uuid.UUID `json:"id" db:"id"`
 	Title       string    `json:"title" db:"title"`
 	Description string    `json:"description" db:"description"`
-	Body        string    `json:"body" db:"body"`
+	Question    string    `json:"question" db:"question"`       // AI-generated question
+	Body        string    `json:"body" db:"body"`               // User's answer content
 	ContentType string    `json:"content_type" db:"content_type"`
 	FolderID    uuid.UUID `json:"folder_id" db:"folder_id"`
 	UserID      uuid.UUID `json:"user_id" db:"user_id"`

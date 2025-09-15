@@ -17,12 +17,20 @@ func NewFolderService(db *sql.DB) *FolderService {
 }
 
 // GetRootFolders returns all root folders (folders without a parent) for a user
+// Front Desk folder will always appear first
 func (s *FolderService) GetRootFolders(userID uuid.UUID) ([]models.Folder, error) {
+	// First ensure Front Desk folder exists
+	if err := s.EnsureFrontDeskFolder(userID); err != nil {
+		return nil, fmt.Errorf("failed to ensure Front Desk folder: %w", err)
+	}
+
 	query := `
-		SELECT id, name, description, parent_id, user_id, created_at, updated_at
+		SELECT id, name, description, parent_id, user_id, folder_type, created_at, updated_at
 		FROM folders
 		WHERE user_id = $1 AND parent_id IS NULL
-		ORDER BY name ASC
+		ORDER BY
+			CASE WHEN folder_type = 'front_desk' THEN 0 ELSE 1 END,
+			name ASC
 	`
 
 	rows, err := s.db.Query(query, userID)
@@ -36,7 +44,7 @@ func (s *FolderService) GetRootFolders(userID uuid.UUID) ([]models.Folder, error
 		var folder models.Folder
 		err := rows.Scan(
 			&folder.ID, &folder.Name, &folder.Description,
-			&folder.ParentID, &folder.UserID, &folder.CreatedAt, &folder.UpdatedAt,
+			&folder.ParentID, &folder.UserID, &folder.FolderType, &folder.CreatedAt, &folder.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan folder: %w", err)
@@ -50,7 +58,7 @@ func (s *FolderService) GetRootFolders(userID uuid.UUID) ([]models.Folder, error
 // GetFoldersByParent returns all child folders for a given parent folder
 func (s *FolderService) GetFoldersByParent(parentID, userID uuid.UUID) ([]models.Folder, error) {
 	query := `
-		SELECT id, name, description, parent_id, user_id, created_at, updated_at
+		SELECT id, name, description, parent_id, user_id, folder_type, created_at, updated_at
 		FROM folders
 		WHERE parent_id = $1 AND user_id = $2
 		ORDER BY name ASC
@@ -67,7 +75,7 @@ func (s *FolderService) GetFoldersByParent(parentID, userID uuid.UUID) ([]models
 		var folder models.Folder
 		err := rows.Scan(
 			&folder.ID, &folder.Name, &folder.Description,
-			&folder.ParentID, &folder.UserID, &folder.CreatedAt, &folder.UpdatedAt,
+			&folder.ParentID, &folder.UserID, &folder.FolderType, &folder.CreatedAt, &folder.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan folder: %w", err)
@@ -81,7 +89,7 @@ func (s *FolderService) GetFoldersByParent(parentID, userID uuid.UUID) ([]models
 // GetFolderByID returns a folder by its ID
 func (s *FolderService) GetFolderByID(folderID, userID uuid.UUID) (*models.Folder, error) {
 	query := `
-		SELECT id, name, description, parent_id, user_id, created_at, updated_at
+		SELECT id, name, description, parent_id, user_id, folder_type, created_at, updated_at
 		FROM folders
 		WHERE id = $1 AND user_id = $2
 	`
@@ -89,7 +97,7 @@ func (s *FolderService) GetFolderByID(folderID, userID uuid.UUID) (*models.Folde
 	var folder models.Folder
 	err := s.db.QueryRow(query, folderID, userID).Scan(
 		&folder.ID, &folder.Name, &folder.Description,
-		&folder.ParentID, &folder.UserID, &folder.CreatedAt, &folder.UpdatedAt,
+		&folder.ParentID, &folder.UserID, &folder.FolderType, &folder.CreatedAt, &folder.UpdatedAt,
 	)
 
 	if err != nil {
@@ -159,15 +167,22 @@ func (s *FolderService) GetFolderPath(folderID, userID uuid.UUID) ([]models.Fold
 
 // CreateFolder creates a new folder
 func (s *FolderService) CreateFolder(folder *models.Folder) error {
-	folder.ID = uuid.New()
+	if folder.ID == uuid.Nil {
+		folder.ID = uuid.New()
+	}
+
+	// Set default folder type if not specified
+	if folder.FolderType == "" {
+		folder.FolderType = "normal"
+	}
 
 	query := `
-		INSERT INTO folders (id, name, description, parent_id, user_id)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO folders (id, name, description, parent_id, user_id, folder_type)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING created_at, updated_at
 	`
 
-	err := s.db.QueryRow(query, folder.ID, folder.Name, folder.Description, folder.ParentID, folder.UserID).
+	err := s.db.QueryRow(query, folder.ID, folder.Name, folder.Description, folder.ParentID, folder.UserID, folder.FolderType).
 		Scan(&folder.CreatedAt, &folder.UpdatedAt)
 
 	if err != nil {
@@ -179,10 +194,15 @@ func (s *FolderService) CreateFolder(folder *models.Folder) error {
 
 // UpdateFolder updates an existing folder
 func (s *FolderService) UpdateFolder(folder *models.Folder) error {
+	// Check if this folder can be edited
+	if !folder.IsEditable() {
+		return fmt.Errorf("this folder cannot be edited")
+	}
+
 	query := `
 		UPDATE folders
 		SET name = $2, description = $3, parent_id = $4
-		WHERE id = $1 AND user_id = $5
+		WHERE id = $1 AND user_id = $5 AND folder_type != 'front_desk'
 		RETURNING updated_at
 	`
 
@@ -198,6 +218,16 @@ func (s *FolderService) UpdateFolder(folder *models.Folder) error {
 
 // DeleteFolder deletes a folder and all its contents
 func (s *FolderService) DeleteFolder(folderID, userID uuid.UUID) error {
+	// First check if this is a Front Desk folder
+	folder, err := s.GetFolderByID(folderID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get folder: %w", err)
+	}
+
+	if !folder.IsDeletable() {
+		return fmt.Errorf("this folder cannot be deleted")
+	}
+
 	query := `DELETE FROM folders WHERE id = $1 AND user_id = $2`
 
 	result, err := s.db.Exec(query, folderID, userID)
@@ -215,4 +245,36 @@ func (s *FolderService) DeleteFolder(folderID, userID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+// EnsureFrontDeskFolder creates the Front Desk folder if it doesn't exist
+func (s *FolderService) EnsureFrontDeskFolder(userID uuid.UUID) error {
+	// Check if Front Desk folder already exists
+	checkQuery := `
+		SELECT COUNT(*) FROM folders
+		WHERE user_id = $1 AND folder_type = 'front_desk'
+	`
+
+	var count int
+	err := s.db.QueryRow(checkQuery, userID).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check for Front Desk folder: %w", err)
+	}
+
+	// If it already exists, we're done
+	if count > 0 {
+		return nil
+	}
+
+	// Create the Front Desk folder
+	frontDeskFolder := &models.Folder{
+		ID:          uuid.New(),
+		Name:        "Front Desk",
+		Description: "Your main workspace for important items and quick access",
+		ParentID:    nil,
+		UserID:      userID,
+		FolderType:  "front_desk",
+	}
+
+	return s.CreateFolder(frontDeskFolder)
 }

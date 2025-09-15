@@ -46,14 +46,16 @@ func main() {
 	folderService := services.NewFolderService(db)
 	contentService := services.NewContentService(db)
 	userService := services.NewUserService(db)
+	openaiService := services.NewOpenAIService(os.Getenv("OPENAI_API_KEY"))
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService)
-	pageHandler := handlers.NewPageHandler()
+	folderHandler := handlers.NewFolderHandler(folderService, contentService, userService, openaiService)
+	contentHandler := handlers.NewContentHandler(contentService, folderService, userService, openaiService)
+	pageHandler := handlers.NewPageHandler(userService)
 
 	// Setup router
-	r := setupRouter(authService, authHandler, folderHandler, pageHandler)
+	r := setupRouter(authService, authHandler, folderHandler, contentHandler, pageHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -66,7 +68,7 @@ func main() {
 	}
 }
 
-func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, pageHandler *handlers.PageHandler) *chi.Mux {
+func setupRouter(authService *services.AuthService, authHandler *handlers.AuthHandler, folderHandler *handlers.FolderHandler, contentHandler *handlers.ContentHandler, pageHandler *handlers.PageHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Global middleware
