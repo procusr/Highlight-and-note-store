@@ -76,8 +76,8 @@ templ RememberPage(userID uuid.UUID) {
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
 								</svg>
 							</div>
@@ -87,15 +87,15 @@ templ RememberPage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">Review flashcards created from your learning sessions.</p>
-						<button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Start Review
 						</button>
 					</div>
 
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[var(--color-feature-green)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-green-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 								</svg>
 							</div>
@@ -105,15 +105,15 @@ templ RememberPage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">Optimize retention with scientifically-timed reviews.</p>
-						<button class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Review Due Items
 						</button>
 					</div>
 
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[var(--color-feature-purple)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-purple-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 								</svg>
 							</div>
@@ -123,7 +123,7 @@ templ RememberPage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">Quick knowledge checks on recent topics.</p>
-						<button class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Take Quiz
 						</button>
 					</div>
@@ -154,7 +154,7 @@ templ AnalyzePage(userID uuid.UUID) {
 								<span class="text-sm font-semibold text-gray-900">85%</span>
 							</div>
 							<div class="w-full bg-gray-200 rounded-full h-2">
-								<div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+								<div class="bg-[var(--color-primary)] h-2 rounded-full" style="width: 85%"></div>
 							</div>
 						</div>
 					</div>
@@ -206,8 +206,8 @@ templ OptimizePage(userID uuid.UUID) {
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[var(--color-feature-yellow)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-yellow-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
 								</svg>
 							</div>
@@ -216,15 +216,15 @@ templ OptimizePage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">AI-optimized learning schedule based on your patterns.</p>
-						<button class="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Generate Schedule
 						</button>
 					</div>
 
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[var(--color-feature-red)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-red-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
 								</svg>
 							</div>
@@ -233,15 +233,15 @@ templ OptimizePage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">Identify and focus on topics that need more attention.</p>
-						<button class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Analyze Gaps
 						</button>
 					</div>
 
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-								<svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-12 h-12 bg-[rgba(var(--color-teal-500-rgb),0.12)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
 								</svg>
 							</div>
@@ -250,7 +250,7 @@ templ OptimizePage(userID uuid.UUID) {
 							</div>
 						</div>
 						<p class="text-gray-600 mb-4">Personalized recommendations based on your learning style.</p>
-						<button class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Assess Style
 						</button>
 					</div>
@@ -266,7 +266,7 @@ templ OptimizePage(userID uuid.UUID) {
 						</div>
 						<h4 class="text-lg font-medium text-gray-900 mb-2">Start Learning to Get Recommendations</h4>
 						<p class="text-gray-600 mb-4">Complete a few learning sessions to receive personalized optimization suggestions.</p>
-						<a href="/learning" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+						<a href="/learning" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Go to Learn Section
 						</a>
 					</div>

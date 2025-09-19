@@ -39,7 +39,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 					<div class="flex items-center gap-3">
 						<button
 							onclick="showCreateContentModal()"
-							class="inline-flex items-center px-5 py-2.5 rounded-md bg-gray-900 hover:bg-black text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition"
+							class="inline-flex items-center px-5 py-2.5 rounded-md bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
 							New Content
@@ -78,7 +78,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 					</svg>
 					<h3 class="mt-4 text-base font-medium text-gray-900">No items yet</h3>
 					<p class="mt-2 text-sm text-gray-500">Start by adding your first note or creating a subfolder.</p>
-					<button onclick="showCreateContentModal()" class="mt-6 inline-flex items-center px-4 py-2 rounded-md bg-gray-900 hover:bg-black text-white text-sm font-medium shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition">Create Content</button>
+					<button onclick="showCreateContentModal()" class="mt-6 inline-flex items-center px-4 py-2 rounded-md bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-medium shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition">Create Content</button>
 				</div>
 			}
 			</div>
@@ -383,7 +383,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 						</div>
 						<button
 							onclick="showCreateFolderModal()"
-							class="inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
+							class="inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-md hover:bg-[var(--color-primary-hover)] transition-colors"
 						>
 							<svg class="w-3 h-3 md:w-4 md:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -411,7 +411,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 						<p class="text-gray-600 text-sm md:text-base px-4 mb-6">Get started by creating your first folder to organize your content.</p>
 						<button
 							onclick="showCreateFolderModal()"
-							class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-md hover:bg-gray-800 transition-colors"
+							class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-md hover:bg-[var(--color-primary-hover)] transition-colors"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>

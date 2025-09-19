@@ -196,7 +196,7 @@ templ LearningPlatformPage(
 									<button type="button"
 										@click="step = 2"
 										:disabled="!topic.trim()"
-										class="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
+										class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
 										Next
 									</button>
 								</div>
@@ -222,7 +222,7 @@ templ LearningPlatformPage(
 									<button type="button"
 										@click="step = 3"
 										:disabled="!goal.trim()"
-										class="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
+										class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
 										Next
 									</button>
 								</div>
@@ -261,7 +261,7 @@ templ LearningPlatformPage(
 									</button>
 									<button type="submit"
 										:disabled="!selectedMethod"
-										class="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
+										class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
 										Start Learning
 									</button>
 								</div>
@@ -411,7 +411,7 @@ templ LearningSessionPage(
 						<svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
 						</svg>
-						<span class="absolute -top-12 right-0 bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+						<span class="absolute -top-12 right-0 bg-[var(--color-primary)] text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
 							Take Note
 						</span>
 					</button>

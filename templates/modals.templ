@@ -13,7 +13,7 @@ templ CreateFolderModal() {
 					id="name"
 					name="name"
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 					placeholder="Enter folder name"
 				/>
 			</div>
@@ -23,7 +23,7 @@ templ CreateFolderModal() {
 					id="description"
 					name="description"
 					rows="3"
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 					placeholder="Enter folder description (optional)"
 				></textarea>
 			</div>
@@ -37,7 +37,7 @@ templ CreateFolderModal() {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]"
 				>
 					Create Folder
 				</button>
@@ -57,7 +57,7 @@ templ CreateContentModal(folderID string) {
 				<label class="text-sm font-medium text-gray-700">Auto generate title as a question</label>
 				<label class="relative inline-flex items-center cursor-pointer">
 					<input type="checkbox" id="autoTitleToggle" class="sr-only peer" checked>
-					<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+					<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[rgba(var(--color-teal-500-rgb),0.3)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
 				</label>
 			</div>
 
@@ -68,7 +68,7 @@ templ CreateContentModal(folderID string) {
 					type="text"
 					id="title"
 					name="title"
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 					placeholder="Enter content title (will be used instead of auto-generated question)"
 				/>
 				<p class="mt-1 text-xs text-gray-500">Leave empty to auto-generate a question from your content</p>
@@ -81,7 +81,7 @@ templ CreateContentModal(folderID string) {
 					name="body"
 					rows="6"
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 					placeholder="Enter your content here... (A question will be automatically generated from this)"
 				></textarea>
 				<p class="mt-1 text-xs text-gray-500">This will be the content. A question will be automatically generated to help you learn.</p>
@@ -97,7 +97,7 @@ templ CreateContentModal(folderID string) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors"
 				>
 					Create Content
 				</button>
@@ -145,11 +145,11 @@ templ ViewContentModal(content models.Content) {
 						<div id="markdown-content" class="whitespace-pre-wrap">{ content.Body }</div>
 					</div>
 				} else if content.ContentType == "link" {
-					<div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
-						<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<div class="flex items-center space-x-3 p-4 bg-[var(--color-feature-blue)] rounded-lg">
+						<svg class="w-5 h-5 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v7a2 2 0 002 2h4m-4-9a2 2 0 012-2h4m5 18v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v8m8 0h4"></path>
 						</svg>
-						<a href={ templ.URL(content.Body) } target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline break-all">
+						<a href={ templ.URL(content.Body) } target="_blank" rel="noopener noreferrer" class="text-[var(--color-feature-blue-text)] hover:text-blue-800 underline break-all">
 							{ content.Body }
 						</a>
 					</div>
@@ -178,7 +178,7 @@ templ ViewContentModal(content models.Content) {
 				<button
 					type="button"
 					onclick="closeModal('viewContentModal'); showEditContentModal('{ content.ID.String() }')"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors"
 				>
 					Edit Content
 				</button>
@@ -199,7 +199,7 @@ templ EditFolderModal(folder models.Folder) {
 					name="name"
 					value={ folder.Name }
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 				/>
 			</div>
 			<div class="mb-4">
@@ -208,7 +208,7 @@ templ EditFolderModal(folder models.Folder) {
 					id="edit_description"
 					name="description"
 					rows="3"
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 				>{ folder.Description }</textarea>
 			</div>
 			<div class="flex justify-end space-x-3">
@@ -221,7 +221,7 @@ templ EditFolderModal(folder models.Folder) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors"
 				>
 					Update Folder
 				</button>
@@ -242,7 +242,7 @@ templ EditContentModal(content models.Content) {
 					name="title"
 					value={ content.Title }
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 				/>
 			</div>
 
@@ -253,7 +253,7 @@ templ EditContentModal(content models.Content) {
 					id="edit_content_description"
 					name="description"
 					value={ content.Description }
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 				/>
 			</div>
 
@@ -264,7 +264,7 @@ templ EditContentModal(content models.Content) {
 					name="body"
 					rows="6"
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
 					placeholder="Enter your content here... (Markdown is automatically detected)"
 				>{ content.Body }</textarea>
 			</div>
@@ -279,7 +279,7 @@ templ EditContentModal(content models.Content) {
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 transition-colors"
+					class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors"
 				>
 					Update Content
 				</button>
