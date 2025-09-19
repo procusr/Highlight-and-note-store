@@ -393,7 +393,7 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 			AND ls.learning_method_id = ulp.learning_method_id
 			AND ls.user_id = ulp.user_id
 		WHERE ls.user_id = $1
-			AND (ls.ended_at IS NULL OR ulp.status = 'in_progress')
+			AND ls.ended_at IS NULL
 		ORDER BY ls.started_at DESC
 		LIMIT 5
 	`
@@ -600,11 +600,11 @@ func (s *LearningService) GetLearningSessionByID(sessionID uuid.UUID) (*models.L
 // GetPromptForSession retrieves the most recent learning prompt for a session
 func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.LearningPrompt, error) {
 	query := `
-		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.user_prompt, lp.ai_prompt, 
+		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.user_prompt, lp.ai_prompt,
 		       lp.ai_response, lp.response_status, lp.error_message, lp.created_at, lp.updated_at
 		FROM learning_prompts lp
-		JOIN learning_sessions ls ON lp.topic_id = ls.topic_id 
-			AND lp.learning_method_id = ls.learning_method_id 
+		JOIN learning_sessions ls ON lp.topic_id = ls.topic_id
+			AND lp.learning_method_id = ls.learning_method_id
 			AND lp.user_id = ls.user_id
 		WHERE ls.id = $1
 		ORDER BY lp.created_at DESC

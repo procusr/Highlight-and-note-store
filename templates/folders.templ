@@ -6,8 +6,8 @@ import "mh-go/internal/models"
 templ FolderPage(user *models.User, folder models.Folder, contents []models.Content, subfolders []models.Folder) {
 	@Layout("Folder: " + folder.Name) {
 		@Sidebar("folder", user)
-		<main class="pt-16 md:pt-6 pb-6">
-			<div class="main-container">
+		<main class="pt-16 md:pt-8 pb-12">
+			<div class="mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-5xl">
 			<!-- Breadcrumb -->
 			<nav class="flex mb-6" aria-label="Breadcrumb">
 				<ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -28,22 +28,25 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 			</nav>
 
 			<!-- Folder Header -->
-			<div class="flex justify-between items-center mb-6">
-				<div>
-					<h1 class="text-2xl font-bold text-gray-900">{ folder.Name }</h1>
-					if folder.Description != "" {
-						<p class="text-gray-600 mt-2">{ folder.Description }</p>
-					}
+			<header class="mb-10">
+				<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+					<div class="flex-1 min-w-0">
+						<h1 class="text-3xl font-semibold tracking-tight text-gray-900 mb-2 break-words">{ folder.Name }</h1>
+						if folder.Description != "" {
+							<p class="text-gray-600 leading-relaxed max-w-prose text-sm md:text-base">{ folder.Description }</p>
+						}
+					</div>
+					<div class="flex items-center gap-3">
+						<button
+							onclick="showCreateContentModal()"
+							class="inline-flex items-center px-5 py-2.5 rounded-md bg-gray-900 hover:bg-black text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition"
+						>
+							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+							New Content
+						</button>
+					</div>
 				</div>
-				<div class="flex space-x-3">
-					<button
-						onclick="showCreateContentModal()"
-						class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-					>
-						New Content
-					</button>
-				</div>
-			</div>
+			</header>
 
 			<!-- Subfolders -->
 			if len(subfolders) > 0 {
@@ -57,33 +60,25 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 				</div>
 			}
 
-			<!-- Content -->
-			if len(contents) > 0 {
-				<div>
-					<h2 class="text-lg font-semibold text-gray-900 mb-4">Content</h2>
-					<div id="content-container" class="space-y-4 content-card-container">
-						for _, content := range contents {
-							@ContentCard(content)
-						}
-					</div>
+			<!-- Content Section -->
+			<section aria-labelledby="content-heading" class="mb-4">
+				<h2 id="content-heading" class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-3">Content</h2>
+				<div id="content-container" class="flex flex-col gap-3">
+					for _, content := range contents {
+						@ContentCard(content)
+					}
 				</div>
-			} else {
-				<div>
-					<h2 class="text-lg font-semibold text-gray-900 mb-4">Content</h2>
-					<div id="content-container" class="space-y-4 content-card-container">
-						<!-- Content will be added here -->
-					</div>
-				</div>
-			}
+			</section>
 
 			if len(subfolders) == 0 && len(contents) == 0 {
-				<div class="text-center py-12">
+				<div class="text-center py-16 border-2 border-dashed border-gray-200 rounded-lg bg-white">
 					<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2a1 1 0 000 2h6a1 1 0 100-2H9z"></path>
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
 					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900">No items</h3>
-					<p class="mt-1 text-sm text-gray-500">Get started by creating a new folder or content.</p>
+					<h3 class="mt-4 text-base font-medium text-gray-900">No items yet</h3>
+					<p class="mt-2 text-sm text-gray-500">Start by adding your first note or creating a subfolder.</p>
+					<button onclick="showCreateContentModal()" class="mt-6 inline-flex items-center px-4 py-2 rounded-md bg-gray-900 hover:bg-black text-white text-sm font-medium shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition">Create Content</button>
 				</div>
 			}
 			</div>

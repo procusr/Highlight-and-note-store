@@ -141,6 +141,10 @@
   --progress-bg: rgba(var(--color-slate-500-rgb), 0.1);
   --transition-smooth: all var(--duration-normal) var(--ease-standard);
   --card-hover-shadow: var(--shadow-md);
+
+  /* New layout tokens */
+  --page-max-width: 1200px;
+  --page-horizontal-padding: 1.25rem;
 }
 
 /* Base styles */
@@ -157,6 +161,92 @@ html {
 body {
   margin: 0;
   padding: 0;
+}
+
+/* Unified page container */
+.page-container {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding-left: var(--page-horizontal-padding);
+  padding-right: var(--page-horizontal-padding);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --page-horizontal-padding: 1.75rem;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --page-horizontal-padding: 2.25rem;
+  }
+}
+
+/* Vertical stack utility */
+.v-stack > * + * {
+  margin-top: var(--space-24);
+}
+.v-stack-tight > * + * {
+  margin-top: var(--space-12);
+}
+
+/* Button size variants */
+.btn-sm {
+  padding: var(--space-6) var(--space-12);
+  font-size: var(--font-size-sm);
+}
+.btn-lg {
+  padding: var(--space-12) var(--space-24);
+  font-size: var(--font-size-lg);
+}
+
+/* Button focus & active states */
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.btn-primary:active {
+  background-color: var(--color-primary-active);
+}
+.btn-secondary:active {
+  background-color: var(--color-secondary-active);
+}
+
+/* Destructive button */
+.btn-danger {
+  background: var(--color-error);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: var(--color-red-400);
+}
+.btn-danger:active {
+  background: var(--color-error);
+}
+
+/* Ghost subtle button */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+.btn-ghost:hover {
+  background: rgba(var(--color-teal-500-rgb), 0.08);
+  color: var(--color-text);
+}
+.btn-ghost:active {
+  background: rgba(var(--color-teal-500-rgb), 0.12);
+}
+
+/* Elevated surface card utility */
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.surface-card:hover {
+  box-shadow: var(--card-hover-shadow);
 }
 
 *,

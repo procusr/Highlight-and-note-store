@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"mh-go/internal/middleware"
 	"mh-go/internal/models"
 	"mh-go/internal/services"
@@ -120,6 +121,7 @@ func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		sessions = []models.LearningSession{}
 	}
+	fmt.Printf("[LearningPlatformPage] user=%s active_sessions=%d\n", userID.String(), len(sessions))
 
 	// Get user preferences
 	preferences, err := h.learningService.GetOrCreateUserPreferences(userID)
@@ -299,21 +301,43 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 	userID := middleware.GetUserID(r.Context())
 
 	var req struct {
-		Topic     string `json:"topic"`
-		MethodKey string `json:"method_key"`
+		Topic      string `json:"topic"`
+		MethodKey  string `json:"method_key"`
 		UserPrompt string `json:"user_prompt"`
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
+	contentType := r.Header.Get("Content-Type")
+	if contentType != "" && (contentType == "application/json" || contentType[:16] == "application/json") {
+		// JSON body
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+	} else {
+		// Assume form submission (e.g., from HTMX form post)
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Invalid form submission", http.StatusBadRequest)
+			return
+		}
+		req.Topic = r.FormValue("topic")
+		req.MethodKey = r.FormValue("method_key")
+		req.UserPrompt = r.FormValue("user_prompt")
 	}
 
-	// Create a simple topic for now (UUID will be used directly)
-	topicID := uuid.New()
+	// Create a topic for the user's learning session
+	topic := &models.Topic{
+		Name:            req.Topic,
+		Description:     fmt.Sprintf("Learning topic: %s", req.Topic),
+		Category:        "user-generated",
+		DifficultyLevel: "intermediate",
+	}
 
-	// Note: In a real implementation, you would want to properly create/get the topic
-	// For now, we'll use the UUID directly and let the service handle topic creation
+	err := h.topicService.CreateTopic(topic)
+	if err != nil {
+		http.Error(w, "Failed to create topic", http.StatusInternalServerError)
+		return
+	}
+	topicID := topic.ID
 
 	// Get learning method by key
 	method, err := h.methodService.GetLearningMethodByKey(req.MethodKey)
@@ -333,6 +357,14 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 	session, err := h.learningService.StartLearningSession(userID, topicID, method.ID)
 	if err != nil {
 		http.Error(w, "Failed to start learning session", http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("[StartLearningSession] user=%s session=%s topic=%s method=%s method_key=%s\n", userID.String(), session.ID.String(), topicID.String(), method.ID.String(), method.MethodKey)
+
+	// If HTMX request, issue redirect header for refresh
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/learning")
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 

@@ -1,0 +1,38 @@
+package templates
+
+import "mh-go/internal/models"
+
+// AIPromptDisplay isolated component
+templ AIPromptDisplay(prompt *models.LearningPrompt, topic string, methodKey string) {
+    <div class="surface-card p-6 text-center">
+        <div class="mx-auto mb-5 w-16 h-16 rounded-full flex items-center justify-center bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)]">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Learning Session Created</h3>
+        <p class="text-gray-600 mb-6 text-sm">Your personalized learning experience is ready to begin.</p>
+        <div class="rounded-lg p-4 bg-gray-50 text-left mb-6">
+            <div class="flex items-center mb-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <h4 class="font-medium text-gray-900 leading-snug">{ topic }</h4>
+            </div>
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-gray-600">{ getMethodName(methodKey) }</span>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onclick="window.location.reload()" class="btn btn-secondary btn-sm">Start Another Session</button>
+            <button onclick="window.location.href='/learning'" class="btn btn-primary btn-sm">View All Sessions</button>
+        </div>
+    </div>
+}
