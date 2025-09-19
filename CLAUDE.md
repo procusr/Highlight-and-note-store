@@ -21,6 +21,7 @@ Your primary goal is to provide solutions that are:
 - **Accurate and Factual**: All information must be correct and verified.
 - **Comprehensive**: Thoroughly research and address all aspects of a query.
 - **Anticipatory**: Proactively identify and solve potential follow-up needs or edge cases.
+- **Contextual**: Proactively verify the changes/additions are following the exiting code and style patters
 
 ### **General Coding Principles**
 

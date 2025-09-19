@@ -43,16 +43,124 @@ templ SettingsPage(user *models.User) {
 					<p class="text-gray-600 text-sm md:text-base">Manage your account preferences and application settings.</p>
 				</div>
 
-				<div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-					<h3 class="text-base md:text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-					<div class="space-y-4">
-						<div>
-							<label class="block text-xs md:text-sm font-medium text-gray-700">Email</label>
-							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.Email }</p>
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+					<!-- Account Information -->
+					<div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+						<h3 class="text-base md:text-lg font-medium text-gray-900 mb-4">Account Information</h3>
+						<div class="space-y-4">
+							<div>
+								<label class="block text-xs md:text-sm font-medium text-gray-700">Email</label>
+								<p class="mt-1 text-sm md:text-base text-gray-900">{ user.Email }</p>
+							</div>
+							<div>
+								<label class="block text-xs md:text-sm font-medium text-gray-700">Account created</label>
+								<p class="mt-1 text-sm md:text-base text-gray-900">{ user.CreatedAt.Format("January 2, 2006") }</p>
+							</div>
 						</div>
-						<div>
-							<label class="block text-xs md:text-sm font-medium text-gray-700">Account created</label>
-							<p class="mt-1 text-sm md:text-base text-gray-900">{ user.CreatedAt.Format("January 2, 2006") }</p>
+					</div>
+
+					<!-- Adaptive Learning Engine Settings -->
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Adaptive Learning Engine</h3>
+								<p class="text-sm text-gray-600">AI-powered learning optimization</p>
+							</div>
+						</div>
+
+						<div class="space-y-4">
+							<div class="control-group">
+								<label class="block text-sm font-medium text-gray-700 mb-2">Learning Intensity</label>
+								<div class="flex items-center space-x-3">
+									<input type="range" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" min="1" max="10" value="7">
+									<span class="text-sm font-medium text-gray-700 min-w-[3rem]">7/10</span>
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="block text-sm font-medium text-gray-700 mb-2">Session Duration</label>
+								<div class="flex items-center space-x-3">
+									<input type="range" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" min="15" max="90" value="45">
+									<span class="text-sm font-medium text-gray-700 min-w-[3rem]">45 min</span>
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="block text-sm font-medium text-gray-700 mb-2">Difficulty Level</label>
+								<div class="flex items-center space-x-3">
+									<input type="range" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" min="1" max="10" value="6">
+									<span class="text-sm font-medium text-gray-700 min-w-[3rem]">6/10</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="mt-6 p-4 bg-gray-50 rounded-lg">
+							<h4 class="text-sm font-semibold text-gray-900 mb-3">Learning Path Recommendations</h4>
+							<ul class="space-y-2 text-sm text-gray-600">
+								<li class="flex items-start">
+									<span class="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+									More spaced repetition for Physics concepts
+								</li>
+								<li class="flex items-start">
+									<span class="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+									Memory palace training for Historical dates
+								</li>
+								<li class="flex items-start">
+									<span class="w-2 h-2 bg-[var(--color-primary)] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+									Error pattern analysis for Math problems
+								</li>
+							</ul>
+						</div>
+
+						<button class="w-full mt-4 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+							Save Learning Settings
+						</button>
+					</div>
+				</div>
+
+				<!-- Additional Settings -->
+				<div class="mt-8 space-y-6">
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<div>
+									<h4 class="text-sm font-medium text-gray-900">Learning Reminders</h4>
+									<p class="text-sm text-gray-600">Get notified when it's time to review</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" checked>
+									<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
+								</label>
+							</div>
+
+							<div class="flex items-center justify-between">
+								<div>
+									<h4 class="text-sm font-medium text-gray-900">Progress Updates</h4>
+									<p class="text-sm text-gray-600">Weekly summaries of your learning progress</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer">
+									<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-white rounded-lg border border-gray-200 p-6">
+						<h3 class="text-lg font-semibold text-gray-900 mb-4">Data & Privacy</h3>
+						<div class="space-y-4">
+							<button class="w-full md:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+								Export My Data
+							</button>
+							<button class="w-full md:w-auto px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors">
+								Delete Account
+							</button>
 						</div>
 					</div>
 				</div>
@@ -69,67 +177,285 @@ templ RememberPage(userID uuid.UUID) {
 		<main class="pt-16 md:pt-6 pb-6">
 			<div class="main-container">
 				<div class="mb-6 md:mb-8">
-					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Remember</h1>
-					<p class="text-gray-600 text-sm md:text-base">Reinforce your learning with spaced repetition and flashcards.</p>
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Memory Techniques & Active Recall</h1>
+					<p class="text-gray-600 text-sm md:text-base">Enhance your retention and recall with proven memory strategies.</p>
 				</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					<div class="bg-white rounded-lg border border-gray-200 p-6">
-						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center">
+				<!-- Tab Navigation -->
+				<div class="memory-tabs border-b border-gray-200 mb-8">
+					<div class="flex space-x-8">
+						<button class="tab-button active py-2 px-1 border-b-2 border-[var(--color-primary)] font-medium text-[var(--color-primary)]" data-tab="techniques">
+							Memory Techniques
+						</button>
+						<button class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="spaced-repetition">
+							Spaced Repetition
+						</button>
+						<button class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="active-recall">
+							Active Recall
+						</button>
+					</div>
+				</div>
+
+				<!-- Memory Techniques Tab -->
+				<div id="techniques" class="tab-panel active">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div class="technique-card bg-white rounded-lg border border-gray-200 p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+							<div class="mb-4">
+								<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center mb-3">
+									<svg class="w-6 h-6 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 mb-2">Memory Palace Builder</h3>
+								<p class="text-sm text-gray-600 mb-3">Create spatial memory frameworks for complex information storage</p>
+								<span class="inline-block text-xs font-medium text-[var(--color-primary)]">Visual-Spatial Enhancement</span>
+							</div>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Building
+							</button>
+						</div>
+
+						<div class="technique-card bg-white rounded-lg border border-gray-200 p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+							<div class="mb-4">
+								<div class="w-12 h-12 bg-[var(--color-feature-green)] rounded-lg flex items-center justify-center mb-3">
+									<svg class="w-6 h-6 text-[var(--color-feature-green-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 mb-2">Link Method Training</h3>
+								<p class="text-sm text-gray-600 mb-3">Chain related concepts through visual storytelling</p>
+								<span class="inline-block text-xs font-medium text-[var(--color-primary)]">Narrative Memory</span>
+							</div>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Practice Linking
+							</button>
+						</div>
+
+						<div class="technique-card bg-white rounded-lg border border-gray-200 p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+							<div class="mb-4">
+								<div class="w-12 h-12 bg-[var(--color-feature-purple)] rounded-lg flex items-center justify-center mb-3">
+									<svg class="w-6 h-6 text-[var(--color-feature-purple-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 mb-2">Substitute Word System</h3>
+								<p class="text-sm text-gray-600 mb-3">Transform abstract concepts into memorable concrete images</p>
+								<span class="inline-block text-xs font-medium text-[var(--color-primary)]">Abstract Learning</span>
+							</div>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Learn Substitution
+							</button>
+						</div>
+
+						<div class="technique-card bg-white rounded-lg border border-gray-200 p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+							<div class="mb-4">
+								<div class="w-12 h-12 bg-[var(--color-feature-yellow)] rounded-lg flex items-center justify-center mb-3">
+									<svg class="w-6 h-6 text-[var(--color-feature-yellow-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 mb-2">Chunking Exercises</h3>
+								<p class="text-sm text-gray-600 mb-3">Break down complex information into manageable, memorable units</p>
+								<span class="inline-block text-xs font-medium text-[var(--color-primary)]">Information Organization</span>
+							</div>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Chunking
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Spaced Repetition Tab -->
+				<div id="spaced-repetition" class="tab-panel hidden">
+					<div class="space-y-6">
+						<!-- Scheduling Info -->
+						<div class="bg-white rounded-lg border border-gray-200 p-6 text-center">
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Intelligent Scheduling</h3>
+							<p class="text-sm text-gray-600">Optimized intervals: 1hr → 1day → 3days → 1week → 2weeks → 1month → 3months</p>
+						</div>
+
+						<!-- Review Queue -->
+						<div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-4">Review Queue Management</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="spaced-card bg-white rounded-lg border border-gray-200 p-4">
+									<div class="flex justify-between items-start mb-3">
+										<div>
+											<div class="text-xs font-medium text-[var(--color-primary)] mb-1">Due Now</div>
+											<h4 class="font-semibold text-gray-900">JavaScript Fundamentals</h4>
+										</div>
+										<span class="text-xs text-gray-500">24 cards</span>
+									</div>
+									<div class="text-sm text-gray-600 mb-3">Basic syntax • Easy difficulty</div>
+									<button class="w-full px-3 py-2 bg-[var(--color-primary)] text-white text-sm rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+										Review Now
+									</button>
+								</div>
+
+								<div class="spaced-card bg-white rounded-lg border border-gray-200 p-4">
+									<div class="flex justify-between items-start mb-3">
+										<div>
+											<div class="text-xs font-medium text-orange-600 mb-1">Due in 2 hours</div>
+											<h4 class="font-semibold text-gray-900">Data Structures</h4>
+										</div>
+										<span class="text-xs text-gray-500">18 cards</span>
+									</div>
+									<div class="text-sm text-gray-600 mb-3">Arrays & Objects • Medium difficulty</div>
+									<button class="w-full px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+										Schedule Later
+									</button>
+								</div>
+
+								<div class="spaced-card bg-white rounded-lg border border-gray-200 p-4">
+									<div class="flex justify-between items-start mb-3">
+										<div>
+											<div class="text-xs font-medium text-green-600 mb-1">Due Tomorrow</div>
+											<h4 class="font-semibold text-gray-900">React Components</h4>
+										</div>
+										<span class="text-xs text-gray-500">15 cards</span>
+									</div>
+									<div class="text-sm text-gray-600 mb-3">Hooks & State • Medium difficulty</div>
+									<button class="w-full px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+										Schedule Later
+									</button>
+								</div>
+
+								<div class="spaced-card bg-white rounded-lg border border-gray-200 p-4">
+									<div class="flex justify-between items-start mb-3">
+										<div>
+											<div class="text-xs font-medium text-blue-600 mb-1">Due in 3 days</div>
+											<h4 class="font-semibold text-gray-900">Algorithms</h4>
+										</div>
+										<span class="text-xs text-gray-500">32 cards</span>
+									</div>
+									<div class="text-sm text-gray-600 mb-3">Sorting & Searching • Hard difficulty</div>
+									<button class="w-full px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+										Schedule Later
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Active Recall Tab -->
+				<div id="active-recall" class="tab-panel hidden">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center mb-4">
 								<svg class="w-6 h-6 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
 								</svg>
 							</div>
-							<div class="ml-4">
-								<h3 class="text-lg font-semibold text-gray-900">Flashcards</h3>
-								<p class="text-sm text-gray-600">0 active sets</p>
-							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Smart Flashcard System</h3>
+							<p class="text-sm text-gray-600 mb-4">Spaced repetition algorithm with immediate feedback</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Flashcards
+							</button>
 						</div>
-						<p class="text-gray-600 mb-4">Review flashcards created from your learning sessions.</p>
-						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
-							Start Review
-						</button>
-					</div>
 
-					<div class="bg-white rounded-lg border border-gray-200 p-6">
-						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-[var(--color-feature-green)] rounded-lg flex items-center justify-center">
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-green)] rounded-lg flex items-center justify-center mb-4">
 								<svg class="w-6 h-6 text-[var(--color-feature-green-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 								</svg>
 							</div>
-							<div class="ml-4">
-								<h3 class="text-lg font-semibold text-gray-900">Spaced Repetition</h3>
-								<p class="text-sm text-gray-600">0 due today</p>
-							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Quiz Generator</h3>
+							<p class="text-sm text-gray-600 mb-4">Multiple question types with adaptive difficulty</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Generate Quiz
+							</button>
 						</div>
-						<p class="text-gray-600 mb-4">Optimize retention with scientifically-timed reviews.</p>
-						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
-							Review Due Items
-						</button>
-					</div>
 
-					<div class="bg-white rounded-lg border border-gray-200 p-6">
-						<div class="flex items-center mb-4">
-							<div class="w-12 h-12 bg-[var(--color-feature-purple)] rounded-lg flex items-center justify-center">
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-purple)] rounded-lg flex items-center justify-center mb-4">
 								<svg class="w-6 h-6 text-[var(--color-feature-purple-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 								</svg>
 							</div>
-							<div class="ml-4">
-								<h3 class="text-lg font-semibold text-gray-900">Quick Quiz</h3>
-								<p class="text-sm text-gray-600">Test retention</p>
-							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Retrieval Practice</h3>
+							<p class="text-sm text-gray-600 mb-4">Self-testing exercises with performance tracking</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Practice
+							</button>
 						</div>
-						<p class="text-gray-600 mb-4">Quick knowledge checks on recent topics.</p>
-						<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
-							Take Quiz
-						</button>
+
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-yellow)] rounded-lg flex items-center justify-center mb-4">
+								<svg class="w-6 h-6 text-[var(--color-feature-yellow-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Blank Sheet Retrieval</h3>
+							<p class="text-sm text-gray-600 mb-4">Write everything you remember from memory</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Try It Now
+							</button>
+						</div>
+
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-red)] rounded-lg flex items-center justify-center mb-4">
+								<svg class="w-6 h-6 text-[var(--color-feature-red-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Summary Practice</h3>
+							<p class="text-sm text-gray-600 mb-4">Summarize concepts without looking at source material</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Summarizing
+							</button>
+						</div>
+
+						<div class="recall-tool bg-white rounded-lg border border-gray-200 p-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-blue)] rounded-lg flex items-center justify-center mb-4">
+								<svg class="w-6 h-6 text-[var(--color-feature-blue-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-semibold text-gray-900 mb-2">Teach-Back Method</h3>
+							<p class="text-sm text-gray-600 mb-4">Explain concepts as if teaching someone else</p>
+							<button class="w-full px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+								Start Teaching
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</main>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				// Tab switching functionality
+				const tabButtons = document.querySelectorAll('.tab-button');
+				const tabPanels = document.querySelectorAll('.tab-panel');
+
+				tabButtons.forEach(button => {
+					button.addEventListener('click', () => {
+						const targetTab = button.getAttribute('data-tab');
+
+						// Update button states
+						tabButtons.forEach(btn => {
+							btn.classList.remove('active', 'text-[var(--color-primary)]', 'border-[var(--color-primary)]');
+							btn.classList.add('text-gray-500', 'border-transparent');
+						});
+						button.classList.add('active', 'text-[var(--color-primary)]', 'border-[var(--color-primary)]');
+						button.classList.remove('text-gray-500', 'border-transparent');
+
+						// Update panel visibility
+						tabPanels.forEach(panel => {
+							panel.classList.add('hidden');
+							panel.classList.remove('active');
+						});
+
+						const targetPanel = document.getElementById(targetTab);
+						if (targetPanel) {
+							targetPanel.classList.remove('hidden');
+							targetPanel.classList.add('active');
+						}
+					});
+				});
+			});
+		</script>
 	}
 }
 
@@ -199,11 +525,12 @@ templ OptimizePage(userID uuid.UUID) {
 		<main class="pt-16 md:pt-6 pb-6">
 			<div class="main-container">
 				<div class="mb-6 md:mb-8">
-					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Optimize</h1>
-					<p class="text-gray-600 text-sm md:text-base">Enhance your learning efficiency with AI-powered recommendations.</p>
+					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Adaptive Optimization</h1>
+					<p class="text-gray-600 text-sm md:text-base">Fine-tune your learning experience with intelligent optimization tools.</p>
 				</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+					<!-- Study Schedule Card -->
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
 							<div class="w-12 h-12 bg-[var(--color-feature-yellow)] rounded-lg flex items-center justify-center">
@@ -221,6 +548,7 @@ templ OptimizePage(userID uuid.UUID) {
 						</button>
 					</div>
 
+					<!-- Weak Areas Card -->
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
 							<div class="w-12 h-12 bg-[var(--color-feature-red)] rounded-lg flex items-center justify-center">
@@ -238,6 +566,7 @@ templ OptimizePage(userID uuid.UUID) {
 						</button>
 					</div>
 
+					<!-- Learning Style Card -->
 					<div class="bg-white rounded-lg border border-gray-200 p-6">
 						<div class="flex items-center mb-4">
 							<div class="w-12 h-12 bg-[rgba(var(--color-teal-500-rgb),0.12)] rounded-lg flex items-center justify-center">
@@ -256,7 +585,68 @@ templ OptimizePage(userID uuid.UUID) {
 					</div>
 				</div>
 
-				<div class="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+				<!-- Interleaving System Section -->
+				<div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+						<div class="flex items-center mb-6">
+							<div class="w-12 h-12 bg-[var(--color-feature-purple)] rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6 text-[var(--color-feature-purple-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-semibold text-gray-900">Interleaving System</h3>
+								<p class="text-sm text-gray-600">Smart topic mixing for better retention</p>
+							</div>
+						</div>
+
+						<div class="mb-6">
+							<h4 class="text-sm font-semibold text-gray-900 mb-3">Smart Topic Mixing</h4>
+							<p class="text-sm text-gray-600 mb-4">Optimal interleaving schedule based on your learning patterns</p>
+
+							<div class="interleaving-visual flex flex-wrap gap-2 mb-4">
+								<div class="px-3 py-2 bg-[rgba(var(--color-teal-500-rgb),0.1)] text-[var(--color-primary)] rounded-lg text-sm font-medium">Math</div>
+								<div class="px-3 py-2 bg-[rgba(var(--color-feature-blue-rgb),0.1)] text-[var(--color-feature-blue-text)] rounded-lg text-sm font-medium">Science</div>
+								<div class="px-3 py-2 bg-[rgba(var(--color-feature-purple-rgb),0.1)] text-[var(--color-feature-purple-text)] rounded-lg text-sm font-medium">History</div>
+								<div class="px-3 py-2 bg-[rgba(var(--color-teal-500-rgb),0.1)] text-[var(--color-primary)] rounded-lg text-sm font-medium">Math</div>
+							</div>
+						</div>
+
+						<div class="space-y-3">
+							<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+								<span class="text-sm font-medium text-gray-700">Mixing Frequency</span>
+								<select class="text-sm border border-gray-300 rounded px-2 py-1">
+									<option>High (every 15 min)</option>
+									<option>Medium (every 30 min)</option>
+									<option>Low (every 45 min)</option>
+								</select>
+							</div>
+
+							<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+								<span class="text-sm font-medium text-gray-700">Topic Diversity</span>
+								<select class="text-sm border border-gray-300 rounded px-2 py-1">
+									<option>3 Topics</option>
+									<option>4 Topics</option>
+									<option>5 Topics</option>
+								</select>
+							</div>
+
+							<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+								<span class="text-sm font-medium text-gray-700">Adaptive Mode</span>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" checked>
+									<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
+								</label>
+							</div>
+						</div>
+
+						<button class="w-full mt-4 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
+							Customize Mixing
+						</button>
+					</div>
+				</div>
+
+				<!-- AI Recommendations Section -->
+				<div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
 					<h3 class="text-lg font-semibold text-gray-900 mb-4">AI Recommendations</h3>
 					<div class="text-center py-12">
 						<div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -269,6 +659,25 @@ templ OptimizePage(userID uuid.UUID) {
 						<a href="/learning" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors">
 							Go to Learn Section
 						</a>
+					</div>
+				</div>
+
+				<!-- Optimization Summary -->
+				<div class="bg-white rounded-lg border border-gray-200 p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4">Optimization Summary</h3>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<div class="text-center p-4 bg-[rgba(var(--color-teal-500-rgb),0.05)] rounded-lg">
+							<div class="text-2xl font-bold text-[var(--color-primary)] mb-1">85%</div>
+							<div class="text-sm text-gray-600">Learning Efficiency</div>
+						</div>
+						<div class="text-center p-4 bg-[rgba(var(--color-feature-blue-rgb),0.05)] rounded-lg">
+							<div class="text-2xl font-bold text-[var(--color-feature-blue-text)] mb-1">92%</div>
+							<div class="text-sm text-gray-600">Pattern Recognition</div>
+						</div>
+						<div class="text-center p-4 bg-[rgba(var(--color-feature-purple-rgb),0.05)] rounded-lg">
+							<div class="text-2xl font-bold text-[var(--color-feature-purple-text)] mb-1">78%</div>
+							<div class="text-sm text-gray-600">Adaptation Score</div>
+						</div>
 					</div>
 				</div>
 			</div>
