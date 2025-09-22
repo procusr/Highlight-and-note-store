@@ -12,13 +12,13 @@
   --color-charcoal-700: rgba(31, 33, 33, 1);
   --color-charcoal-800: rgba(38, 40, 40, 1);
   --color-slate-900: rgba(19, 52, 59, 1);
-  /* Primary color scale (new brand base #3182CE) */
-  --color-teal-300: rgba(99, 169, 226, 1);
-  --color-teal-400: rgba(70, 150, 216, 1);
-  --color-teal-500: rgba(49, 130, 206, 1); /* #3182CE base */
-  --color-teal-600: rgba(42, 115, 182, 1);
-  --color-teal-700: rgba(36, 100, 158, 1);
-  --color-teal-800: rgba(30, 85, 134, 1);
+  /* Primary color scale (new brand base #1E293B Deep Slate Blue) */
+  --color-teal-300: rgba(94, 111, 138, 1);
+  --color-teal-400: rgba(70, 85, 110, 1);
+  --color-teal-500: rgba(30, 41, 59, 1); /* #1E293B base */
+  --color-teal-600: rgba(24, 33, 48, 1);
+  --color-teal-700: rgba(18, 26, 38, 1);
+  --color-teal-800: rgba(13, 19, 28, 1);
   --color-red-400: rgba(255, 84, 89, 1);
   --color-red-500: rgba(192, 21, 47, 1);
   --color-orange-400: rgba(230, 129, 97, 1);
@@ -26,7 +26,7 @@
 
   /* RGB versions for opacity control */
   --color-brown-600-rgb: 94, 82, 64;
-  --color-teal-500-rgb: 49, 130, 206; /* updated primary RGB (#3182CE) */
+  --color-teal-500-rgb: 30, 41, 59; /* updated primary RGB (#1E293B) */
   --color-slate-900-rgb: 19, 52, 59;
   --color-slate-500-rgb: 98, 108, 113;
   --color-red-500-rgb: 192, 21, 47;
@@ -45,11 +45,11 @@
   --color-bg-8: rgba(6, 182, 212, 0.08); /* Light cyan */
 
   /* Semantic Color Tokens (Light Mode) */
-  /* Updated semantic colors for blue theme */
-  --color-background: #f7fafc; /* Light background */
+  /* Updated semantic colors for warm slate theme */
+  --color-background: #f8fafc; /* Soft Neutral Gray */
   --color-surface: #ffffff; /* Surface */
-  --color-text: #2d3748; /* Dark text */
-  --color-text-secondary: #4a5568; /* Secondary text */
+  --color-text: #374151; /* Warm Dark Gray */
+  --color-text-secondary: #6b7280; /* Secondary */
   --color-primary: var(--color-teal-500);
   --color-primary-hover: var(--color-teal-600);
   --color-primary-active: var(--color-teal-700);
@@ -63,10 +63,10 @@
   --color-error: var(--color-red-500);
   --color-success: var(
     --color-teal-500
-  ); /* success continues to align with primary */
+  ); /* success aligns with primary (placeholder) */
   --color-warning: var(--color-orange-500);
   --color-info: var(--color-slate-500);
-  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.5);
   --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
 
   /* Common style patterns */
@@ -78,7 +78,7 @@
   --select-caret-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5f5f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
   /* RGB versions for opacity control */
-  --color-success-rgb: 49, 130, 206; /* aligned with primary (placeholder) */
+  --color-success-rgb: 30, 41, 59; /* aligned with new primary (placeholder) */
   --color-error-rgb: 192, 21, 47;
   --color-warning-rgb: 168, 75, 47;
   --color-info-rgb: 98, 108, 113;
@@ -270,7 +270,7 @@
 [data-color-scheme="light"] {
   /* RGB versions for opacity control (light mode) */
   --color-brown-600-rgb: 94, 82, 64;
-  --color-teal-500-rgb: 49, 130, 206; /* primary RGB (#3182CE) */
+  --color-teal-500-rgb: 30, 41, 59; /* primary RGB (#1E293B) */
   --color-slate-900-rgb: 19, 52, 59;
 
   /* Semantic Color Tokens (Light Mode) */
@@ -574,12 +574,12 @@ select.form-control {
 
 .status--success {
   background-color: rgba(
-    var(--color-success-rgb, 49, 130, 206),
+    var(--color-success-rgb, 30, 41, 59),
     var(--status-bg-opacity)
   );
   color: var(--color-success);
   border: 1px solid
-    rgba(var(--color-success-rgb, 49, 130, 206), var(--status-border-opacity));
+    rgba(var(--color-success-rgb, 30, 41, 59), var(--status-border-opacity));
 }
 
 .status--error {
