@@ -82,6 +82,9 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
+	// Health check endpoint (public - no auth)
+	r.Get("/api/health", handlers.HealthCheckHandler)
+
 	// Auth routes (public)
 	r.Get("/", authHandler.LoginPage)
 	r.Get("/login", authHandler.LoginPage)
@@ -118,45 +121,46 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		// API routes
 		r.Route("/api", func(r chi.Router) {
 			r.Use(middleware.RequireAuth(authService))
-			r.Route("/folders", func(r chi.Router) {
-				// Folder routes
-				r.Get("/", folderHandler.GetFolders)
-				r.Post("/", folderHandler.CreateFolder)
-				r.Get("/{folderID}", folderHandler.GetFolder)
-				r.Put("/{folderID}", folderHandler.UpdateFolder)
-				r.Delete("/{folderID}", folderHandler.DeleteFolder)
-				r.Get("/{folderID}/path", folderHandler.GetFolderPath)
+
+				r.Route("/folders", func(r chi.Router) {
+					// Folder routes
+					r.Get("/", folderHandler.GetFolders)
+					r.Post("/", folderHandler.CreateFolder)
+					r.Get("/{folderID}", folderHandler.GetFolder)
+					r.Put("/{folderID}", folderHandler.UpdateFolder)
+					r.Delete("/{folderID}", folderHandler.DeleteFolder)
+					r.Get("/{folderID}/path", folderHandler.GetFolderPath)
+
+					// Content routes
+					r.Get("/{folderID}/content", folderHandler.GetContent)
+					r.Post("/{folderID}/content", folderHandler.CreateContent)
+					r.Put("/{folderID}/content/{contentID}", folderHandler.UpdateContent)
+					r.Delete("/{folderID}/content/{contentID}", folderHandler.DeleteContent)
+				})
 
 				// Content routes
-				r.Get("/{folderID}/content", folderHandler.GetContent)
-				r.Post("/{folderID}/content", folderHandler.CreateContent)
-				r.Put("/{folderID}/content/{contentID}", folderHandler.UpdateContent)
-				r.Delete("/{folderID}/content/{contentID}", folderHandler.DeleteContent)
-			})
+				r.Route("/content", func(r chi.Router) {
+					r.Get("/search", folderHandler.SearchContent)
+					r.Post("/", contentHandler.CreateContent)
+					r.Get("/{contentID}", contentHandler.GetContent)
+					r.Get("/{contentID}/edit", contentHandler.GetEditContentModal)
+					r.Put("/{contentID}", contentHandler.UpdateContent)
+					r.Delete("/{contentID}", contentHandler.DeleteContent)
+				})
 
-			// Content routes
-			r.Route("/content", func(r chi.Router) {
-				r.Get("/search", folderHandler.SearchContent)
-				r.Post("/", contentHandler.CreateContent)
-				r.Get("/{contentID}", contentHandler.GetContent)
-				r.Get("/{contentID}/edit", contentHandler.GetEditContentModal)
-				r.Put("/{contentID}", contentHandler.UpdateContent)
-				r.Delete("/{contentID}", contentHandler.DeleteContent)
-			})
-
-			// Learning platform API routes
-			r.Route("/learning", func(r chi.Router) {
-				r.Get("/topics", learningHandler.GetTopics)
-				r.Get("/topics/search", learningHandler.SearchTopics)
-				r.Get("/pathways", learningHandler.GetLearningPathways)
-				r.Get("/stats", learningHandler.GetDashboardStats)
-				r.Get("/sessions/active", learningHandler.GetActiveLearningSessions)
-				r.Get("/prompts", learningHandler.GetUserPrompts)
-				r.Get("/preferences", learningHandler.GetUserPreferences)
-				r.Post("/preferences", learningHandler.UpdateUserPreferences)
-				r.Post("/prompts", learningHandler.CreateLearningPrompt)
-				r.Post("/progress", learningHandler.UpdateProgress)
-				r.Post("/sessions", learningHandler.StartLearningSession)
+				// Learning platform API routes
+				r.Route("/learning", func(r chi.Router) {
+					r.Get("/topics", learningHandler.GetTopics)
+					r.Get("/topics/search", learningHandler.SearchTopics)
+					r.Get("/pathways", learningHandler.GetLearningPathways)
+					r.Get("/stats", learningHandler.GetDashboardStats)
+					r.Get("/sessions/active", learningHandler.GetActiveLearningSessions)
+					r.Get("/prompts", learningHandler.GetUserPrompts)
+					r.Get("/preferences", learningHandler.GetUserPreferences)
+					r.Post("/preferences", learningHandler.UpdateUserPreferences)
+					r.Post("/prompts", learningHandler.CreateLearningPrompt)
+					r.Post("/progress", learningHandler.UpdateProgress)
+					r.Post("/sessions", learningHandler.StartLearningSession)
 				r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
 			})
 		})
