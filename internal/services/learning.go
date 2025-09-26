@@ -385,13 +385,23 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 		       ls.activities_completed, ls.session_notes, ls.started_at, ls.ended_at, ls.created_at,
 		       t.name as topic_name, t.description as topic_description, t.category as topic_category,
 		       lm.name as method_name, lm.description as method_description, lm.icon as method_icon, lm.method_key as method_key,
-		       ulp.progress_percentage, ulp.status as progress_status
+		       ulp.progress_percentage, ulp.status as progress_status,
+		       latest_lp.user_prompt as goal
 		FROM learning_sessions ls
 		LEFT JOIN topics t ON ls.topic_id = t.id
 		LEFT JOIN learning_methods lm ON ls.learning_method_id = lm.id
 		LEFT JOIN user_learning_progress ulp ON ls.topic_id = ulp.topic_id
 			AND ls.learning_method_id = ulp.learning_method_id
 			AND ls.user_id = ulp.user_id
+		LEFT JOIN LATERAL (
+			SELECT user_prompt
+			FROM learning_prompts lp
+			WHERE lp.topic_id = ls.topic_id
+			  AND lp.learning_method_id = ls.learning_method_id
+			  AND lp.user_id = ls.user_id
+			ORDER BY lp.created_at DESC
+			LIMIT 1
+		) latest_lp ON true
 		WHERE ls.user_id = $1
 			AND ls.ended_at IS NULL
 		ORDER BY ls.started_at DESC
@@ -412,6 +422,7 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 		var topicName, topicDescription, topicCategory, methodName, methodDescription, methodIcon, methodKey sql.NullString
 		var progressPercent sql.NullInt32
 		var progressStatus sql.NullString
+		var goal sql.NullString
 
 		err := rows.Scan(
 			&session.ID, &session.UserID, &session.TopicID, &session.LearningMethodID,
@@ -419,7 +430,7 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 			&session.StartedAt, &endedAt, &session.CreatedAt,
 			&topicName, &topicDescription, &topicCategory,
 			&methodName, &methodDescription, &methodIcon, &methodKey,
-			&progressPercent, &progressStatus,
+			&progressPercent, &progressStatus, &goal,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan active session: %w", err)
@@ -430,6 +441,9 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 		}
 		if sessionNotes.Valid {
 			session.SessionNotes = &sessionNotes.String
+		}
+		if goal.Valid {
+			session.Goal = goal.String
 		}
 
 		// Create topic relationship

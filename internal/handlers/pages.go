@@ -53,7 +53,7 @@ func (h *PageHandler) OptimizePage(w http.ResponseWriter, r *http.Request) {
 // SettingsPage renders the settings page
 func (h *PageHandler) SettingsPage(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
-	
+
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)

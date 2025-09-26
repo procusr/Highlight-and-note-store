@@ -1,0 +1,217 @@
+package templates
+
+// NoteModalTitleToggle renders the auto-title toggle switch
+templ NoteModalTitleToggle() {
+	<div class="mb-4 flex items-center justify-between">
+		<label class="text-sm font-medium text-gray-700">Auto generate title as a question</label>
+		<label class="relative inline-flex items-center cursor-pointer">
+			<input type="checkbox" x-model="autoTitleMode" class="sr-only peer" checked>
+			<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[rgba(var(--color-teal-500-rgb),0.3)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
+		</label>
+	</div>
+}
+
+// NoteModalTitleField renders the manual title input field
+templ NoteModalTitleField() {
+	<div class="mb-4" :class="{ 'hidden': autoTitleMode }">
+		<label class="block text-sm font-medium text-gray-700">Title</label>
+		<input
+			type="text"
+			x-model="noteTitle"
+			class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+			placeholder="Enter content title (will be used instead of auto-generated question)"
+		/>
+		<p class="mt-1 text-xs text-gray-500">Leave empty to auto-generate a question from your content</p>
+	</div>
+}
+
+// NoteModalContentField renders the content textarea
+templ NoteModalContentField() {
+	<div class="mb-4">
+		<label class="block text-sm font-medium text-gray-700">Content</label>
+		<textarea
+			x-model="noteContent"
+			rows="6"
+			required
+			class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+			placeholder="Enter your content here... (A question will be automatically generated from this)"
+		></textarea>
+		<p class="mt-1 text-xs text-gray-500">This will be the content. A question will be automatically generated to help you learn.</p>
+	</div>
+}
+
+// FolderDropdownItem renders individual folder in the dropdown
+templ FolderDropdownItem() {
+	<template x-for="folder in filteredFolders" :key="folder.id">
+		<div @click="noteFolder = folder.id; showFolderDropdown = false; noteFolderSearch = ''"
+			class="px-3 py-2 text-sm cursor-pointer hover:bg-[rgba(var(--color-teal-500-rgb),0.06)] flex items-center">
+			<svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+			</svg>
+			<span x-text="folder.name" class="text-gray-900"></span>
+		</div>
+	</template>
+}
+
+// FolderDropdownMenu renders the complete folder dropdown
+templ FolderDropdownMenu() {
+	<div x-show="showFolderDropdown"
+		x-transition:enter="transition ease-out duration-100"
+		x-transition:enter-start="opacity-0 transform scale-95"
+		x-transition:enter-end="opacity-100 transform scale-100"
+		x-transition:leave="transition ease-in duration-75"
+		x-transition:leave-start="opacity-100 transform scale-100"
+		x-transition:leave-end="opacity-0 transform scale-95"
+		@click.away="showFolderDropdown = false"
+		class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+
+		<!-- Search Input -->
+		<div class="p-2 border-b border-gray-200">
+			<input type="text"
+				x-model="noteFolderSearch"
+				x-ref="folderSearch"
+				placeholder="Search folders..."
+				class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-transparent">
+		</div>
+
+		<!-- Folder List -->
+		<div class="max-h-32 overflow-y-auto overscroll-contain">
+			<div x-show="folderLoading" class="p-3 text-center text-sm text-gray-500">
+				Loading folders...
+			</div>
+			<div x-show="folderError" class="p-3 text-center text-sm text-red-600">
+				<span x-text="folderError"></span>
+			</div>
+			@FolderDropdownItem()
+			<div x-show="!folderLoading && !folderError && filteredFolders.length === 0" class="p-3 text-center text-sm text-gray-500">
+				No folders found
+			</div>
+		</div>
+	</div>
+}
+
+// NoteModalFolderSelection renders the folder selection dropdown
+templ NoteModalFolderSelection() {
+	<div class="mb-4">
+		<label class="block text-sm font-medium text-gray-700">Save to Folder</label>
+
+		<!-- Custom Dropdown -->
+		<div class="relative">
+			<button type="button"
+					@click="showFolderDropdown = !showFolderDropdown; $nextTick(() => $refs.folderSearch?.focus())"
+					@keydown.escape="showFolderDropdown = false"
+					class="mt-1 w-full px-3 py-2 text-left text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] flex items-center justify-between">
+				<span x-show="!noteFolder" class="text-gray-500">Select a folder...</span>
+				<span x-show="noteFolder" x-text="getFolderName(noteFolder)" class="text-gray-900"></span>
+				<svg class="w-4 h-4 text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+				</svg>
+			</button>
+
+			@FolderDropdownMenu()
+		</div>
+	</div>
+}
+
+// NoteModalActions renders the cancel and save buttons
+templ NoteModalActions() {
+	<div class="flex justify-end space-x-3">
+		<button
+			@click="showNoteModal = false"
+			class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+			Cancel
+		</button>
+		<button
+			@click="saveNote()"
+			:disabled="!noteContent.trim() || !noteFolder"
+			:class="{
+				'bg-green-500 hover:bg-green-600': saveStatus === 'success',
+				'bg-red-500 hover:bg-red-600': saveStatus === 'error',
+				'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]': saveStatus === ''
+			}"
+			class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+			<span x-show="saveStatus === ''" x-transition>Create Content</span>
+			<span x-show="saveStatus === 'success'" x-transition class="flex items-center gap-1">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+				</svg>
+				Saved!
+			</span>
+			<span x-show="saveStatus === 'error'" x-transition class="flex items-center gap-1">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+				Error
+			</span>
+		</button>
+	</div>
+}
+
+// FloatingTakeNoteButton renders the floating button to open the note modal
+templ FloatingTakeNoteButton() {
+	<div class="fixed z-40">
+		<!-- Desktop: Top right corner -->
+		<div class="hidden md:block fixed top-20 right-6">
+			<button
+				@click="showNoteModal = !showNoteModal"
+				class="group relative p-4 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110">
+				<svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+				</svg>
+				<span class="absolute -top-12 right-0 bg-[var(--color-primary)] text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+					Take Note
+				</span>
+			</button>
+		</div>
+
+		<!-- Mobile: Bottom right corner -->
+		<div class="md:hidden fixed bottom-6 right-6">
+			<button
+				@click="showNoteModal = !showNoteModal"
+				class="group relative p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-200">
+				<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+				</svg>
+			</button>
+		</div>
+	</div>
+}
+
+// TakeNoteModal renders the complete note-taking modal
+templ TakeNoteModal() {
+	<div x-show="showNoteModal"
+		x-transition:enter="transition ease-out duration-200"
+		x-transition:enter-start="opacity-0 scale-95"
+		x-transition:enter-end="opacity-100 scale-100"
+		x-transition:leave="transition ease-in duration-150"
+		x-transition:leave-start="opacity-100 scale-100"
+		x-transition:leave-end="opacity-0 scale-95"
+		class="fixed z-50"
+		:class="{
+			'top-20 right-6': window.innerWidth >= 768,
+			'bottom-20 right-6': window.innerWidth < 768
+		}">
+
+		<div class="bg-white rounded-lg shadow-xl border border-gray-200 w-80 md:w-96">
+			<!-- Header -->
+			<div class="flex items-center justify-between p-4 border-b border-gray-200">
+				<h3 class="text-lg font-medium text-gray-900">Quick Note</h3>
+				<button @click="showNoteModal = false" class="text-gray-400 hover:text-gray-600">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+
+			<!-- Content -->
+			<div class="p-4">
+				@NoteModalTitleToggle()
+				@NoteModalTitleField()
+				@NoteModalContentField()
+				@NoteModalFolderSelection()
+				@NoteModalActions()
+			</div>
+		</div>
+	</div>
+}

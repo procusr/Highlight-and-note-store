@@ -1,0 +1,47 @@
+package templates
+
+import (
+	"fmt"
+	"mh-go/internal/models"
+)
+
+// LearningPathCard renders an individual learning pathway card
+templ LearningPathCard(card *models.LearningPathwayCard) {
+	<div class="surface-card p-4 cursor-pointer transition-all duration-200 hover:-translate-y-1 border border-[var(--color-card-border)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+		data-method-id={ card.ID.String() }
+		data-method-name={ card.Name }
+		data-method-key={ card.MethodKey }
+		data-has-started={ templ.EscapeString(fmt.Sprintf("%t", card.HasStarted)) }
+		@click="selectedMethod = { id: $el.dataset.methodId, name: $el.dataset.methodName, key: $el.dataset.methodKey, hasStarted: $el.dataset.hasStarted === 'true' }; showModal = true">
+
+		<div class="text-left">
+			<h4 class="text-sm font-semibold text-gray-900 mb-2">{ card.Name }</h4>
+			<p class="text-xs text-gray-600 mb-4 line-clamp-3 min-h-[3.5rem]">{ card.Description }</p>
+
+			<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-medium bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)]">
+				Start
+			</span>
+		</div>
+	</div>
+}
+
+// LearningPathsSection renders the complete learning paths section with header and grid
+templ LearningPathsSection(pathwayCards []models.LearningPathwayCard, hasActiveSessions bool) {
+	<!-- Learning Paths Section -->
+	<div class="mb-6 md:mb-8">
+		if hasActiveSessions {
+			<h2 class="text-xl font-semibold text-gray-900 mb-2">Explore Learning Paths</h2>
+			<p class="text-gray-600">Start a new learning adventure or explore different methods.</p>
+		} else {
+			<h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Start Your Learning Journey</h2>
+			<p class="text-gray-600 text-sm md:text-base">Choose your learning adventure and begin your journey.</p>
+		}
+	</div>
+
+	<!-- Learning Paths Grid -->
+	<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-10">
+		for _, card := range pathwayCards {
+			@LearningPathCard(&card)
+		}
+	</div>
+}

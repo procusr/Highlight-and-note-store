@@ -152,6 +152,7 @@ type LearningSession struct {
 	StartedAt            time.Time  `json:"started_at" db:"started_at"`
 	EndedAt              *time.Time `json:"ended_at" db:"ended_at"`
 	CreatedAt            time.Time  `json:"created_at" db:"created_at"`
+	Goal                 string     `json:"goal,omitempty"`
 
 	// Relationships
 	User           *User           `json:"user,omitempty"`

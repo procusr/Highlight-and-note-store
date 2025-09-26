@@ -1,0 +1,176 @@
+package templates
+
+import "mh-go/internal/models"
+
+// Learning Platform Page - Refactored with modular components
+templ LearningPlatformPage(
+	user *models.User,
+	stats *models.DashboardStats,
+	pathwayCards []models.LearningPathwayCard,
+	topics []models.Topic,
+	sessions []models.LearningSession,
+	preferences *models.UserPreferences,
+) {
+	@Layout("Learn") {
+		@Sidebar("learning", user)
+
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container" x-data="{
+				showModal: false,
+				step: 1,
+				topic: '',
+				goal: '',
+				selectedMethod: '',
+				// Use server-provided pathway cards instead of duplicating data
+				get availableMethods() {
+					return [
+						{ key: 'applied_laboratory', name: 'Applied Mastery Laboratory', description: 'Hands-on practice and real-world application' },
+						{ key: 'foundation_discovery', name: 'Foundation Through Discovery', description: 'Explore concepts from first principles' },
+						{ key: 'integration_transfer', name: 'Integration & Transfer System', description: 'Connect knowledge across domains' },
+						{ key: 'mistake_learning_lab', name: 'Mistake-Based Learning Lab', description: 'Learn through errors and refinement' },
+						{ key: 'problem_gymnasium', name: 'Problem-Solving Gymnasium', description: 'Build skills through targeted challenges' }
+					];
+				}
+			}">
+				@PlatformHeader()
+				@ActiveLearningSessionsSection(sessions)
+				@LearningPathsSection(pathwayCards, len(sessions) > 0)
+
+				@NewLearningSessionModal()
+				<div id="learning-result"></div>
+			</div>
+		</main>
+	}
+}
+
+// LearningSessionPage - Refactored with modular components
+templ LearningSessionPage(
+	user *models.User,
+	session *models.LearningSession,
+	prompt *models.LearningPrompt,
+) {
+	@Layout("learning") {
+		<div class="flex h-screen overflow-hidden bg-gray-50 relative" x-data="{
+			showNoteModal: false,
+			noteTitle: '',
+			noteContent: '',
+			autoTitleMode: true,
+			folders: [],
+			noteFolder: '',
+			folderLoading: false,
+			folderError: null,
+			showFolderDropdown: false,
+			noteFolderSearch: '',
+			saveStatus: '', // success, error, or empty
+
+			async init() {
+				// Pre-load folders when component initializes
+				await this.loadFolders();
+			},
+
+			// Load folders from API
+			async loadFolders() {
+				if (this.folders.length > 0) return; // Already loaded
+
+				this.folderLoading = true;
+				this.folderError = null;
+
+				try {
+					const response = await fetch('/api/folders');
+					if (response.ok) {
+						this.folders = await response.json();
+						// Set default folder if none selected and folders exist
+						if (!this.noteFolder && this.folders.length > 0) {
+							this.noteFolder = this.folders[0].id;
+						}
+					} else {
+						this.folderError = 'Failed to load folders';
+					}
+				} catch (error) {
+					console.error('Failed to load folders:', error);
+					this.folderError = 'Network error loading folders';
+				} finally {
+					this.folderLoading = false;
+				}
+			},
+
+			// Helper method to get folder name by ID
+			getFolderName(folderId) {
+				const folder = this.folders.find(f => f.id === folderId);
+				return folder ? folder.name : 'Unknown Folder';
+			},
+
+			// Computed property for filtered folders
+			get filteredFolders() {
+				if (!this.noteFolderSearch.trim()) return this.folders;
+				return this.folders.filter(folder =>
+					folder.name.toLowerCase().includes(this.noteFolderSearch.toLowerCase()) ||
+					(folder.description && folder.description.toLowerCase().includes(this.noteFolderSearch.toLowerCase()))
+				);
+			},
+
+			// Save note function with Alpine.js feedback
+			saveNote() {
+				if (!this.noteContent.trim() || !this.noteFolder) {
+					this.saveStatus = 'error';
+					setTimeout(() => { this.saveStatus = ''; }, 2000);
+					return;
+				}
+
+				// Title logic:
+				// - If autoTitleMode is false and noteTitle is provided, use it
+				// - If autoTitleMode is true or noteTitle is empty, send empty title for auto-generation
+				let finalTitle = '';
+				if (!this.autoTitleMode && this.noteTitle.trim()) {
+					finalTitle = this.noteTitle.trim();
+				}
+				// For auto-generated titles, we send empty title and let the backend handle it
+
+				const noteData = {
+					title: finalTitle,
+					body: this.noteContent,
+					folder_id: this.noteFolder
+				};
+
+				fetch('/api/folders/' + noteData.folder_id + '/content', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(noteData)
+				})
+				.then(response => {
+					if (response.ok) {
+						// Reset form
+						this.noteContent = '';
+						this.noteTitle = '';
+						this.showNoteModal = false;
+						this.saveStatus = 'success';
+						setTimeout(() => { this.saveStatus = ''; }, 2000);
+					} else {
+						this.saveStatus = 'error';
+						setTimeout(() => { this.saveStatus = ''; }, 2000);
+					}
+				})
+				.catch(error => {
+					console.error('Error saving note:', error);
+					this.saveStatus = 'error';
+					setTimeout(() => { this.saveStatus = ''; }, 2000);
+				});
+			}
+		}">
+
+			@Sidebar("learning", user)
+			@FloatingTakeNoteButton()
+
+			<main class="flex-1 overflow-y-auto pt-16 md:pt-6">
+				<div class="container mx-auto px-4 md:px-6 max-w-4xl">
+					@LearningSessionHeader(session, prompt)
+					@LearningContentPlaceholder()
+				</div>
+			</main>
+
+			@TakeNoteModal()
+		</div>
+	}
+}
+
+// Note: AIPromptDisplay and getMethodName are implemented in their dedicated templ/helper files to avoid duplication.
