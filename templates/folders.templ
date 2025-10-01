@@ -6,8 +6,8 @@ import "mh-go/internal/models"
 templ FolderPage(user *models.User, folder models.Folder, contents []models.Content, subfolders []models.Folder) {
 	@Layout("Folder: " + folder.Name) {
 		@Sidebar("folder", user)
-		<main class="pt-16 md:pt-8 pb-12">
-			<div class="mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-5xl">
+		<main class="pt-16 md:pt-6 pb-6">
+			<div class="main-container">
 			<!-- Breadcrumb -->
 			<nav class="flex mb-6" aria-label="Breadcrumb">
 				<ol class="inline-flex items-center space-x-1 md:space-x-3">
