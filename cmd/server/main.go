@@ -108,7 +108,6 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 
 		// New learning-focused routes matching architect template
 		r.Get("/remember", pageHandler.RememberPage)
-		r.Get("/analyze", pageHandler.AnalyzePage)
 		r.Get("/optimize", pageHandler.OptimizePage)
 
 		// Keep existing folder functionality

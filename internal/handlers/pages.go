@@ -34,13 +34,6 @@ func (h *PageHandler) RememberPage(w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
 }
 
-// AnalyzePage renders the analytics page
-func (h *PageHandler) AnalyzePage(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-
-	component := templates.AnalyzePage(userID)
-	component.Render(r.Context(), w)
-}
 
 // OptimizePage renders the learning optimization page
 func (h *PageHandler) OptimizePage(w http.ResponseWriter, r *http.Request) {

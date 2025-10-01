@@ -440,63 +440,6 @@ templ RememberPage(userID uuid.UUID) {
 	}
 }
 
-// Analyze page (analytics and progress tracking)
-templ AnalyzePage(userID uuid.UUID) {
-	@Layout("Analyze") {
-		@Sidebar("analyze", &models.User{ID: userID})
-
-		<main class="pt-16 md:pt-6 pb-6">
-			<div class="main-container">
-				<div class="mb-6 md:mb-8">
-					<h1 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Analyze</h1>
-					<p class="text-gray-600 text-sm md:text-base">Track your progress and analyze learning patterns.</p>
-				</div>
-
-				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-						<h3 class="text-xl font-semibold text-gray-900 mb-6">Learning Progress</h3>
-						<div class="space-y-4">
-							<div class="flex justify-between items-center">
-								<span class="text-sm text-gray-600">Weekly Progress</span>
-								<span class="text-sm font-semibold text-gray-900">85%</span>
-							</div>
-							<div class="w-full bg-gray-200 rounded-full h-2">
-								<div class="bg-[var(--color-primary)] h-2 rounded-full" style="width: 85%"></div>
-							</div>
-						</div>
-					</div>
-
-					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-						<h3 class="text-xl font-semibold text-gray-900 mb-6">Study Statistics</h3>
-						<div class="grid grid-cols-2 gap-4">
-							<div class="text-center">
-								<div class="text-2xl font-bold text-blue-600">0</div>
-								<div class="text-sm text-gray-600">Hours This Week</div>
-							</div>
-							<div class="text-center">
-								<div class="text-2xl font-bold text-green-600">0</div>
-								<div class="text-sm text-gray-600">Topics Mastered</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
-					<h3 class="text-xl font-semibold text-gray-900 mb-4">Learning Analytics</h3>
-					<div class="text-center py-12">
-						<div class="mb-6">
-							<h4 class="text-lg font-medium text-gray-900 mb-2">Analytics Coming Soon</h4>
-							<p class="text-gray-600">Start learning to see detailed analytics and insights about your progress.</p>
-						</div>
-						<button class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-							Start Learning
-						</button>
-					</div>
-				</div>
-			</div>
-		</main>
-	}
-}
 
 // Optimize page (learning optimization)
 templ OptimizePage(userID uuid.UUID) {

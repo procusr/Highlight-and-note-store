@@ -26,8 +26,6 @@ templ Sidebar(currentPage string, user *models.User) {
 					Learn
 				} else if currentPage == "remember" {
 					Remember
-				} else if currentPage == "analyze" {
-					Analyze
 				} else if currentPage == "optimize" {
 					Optimize
 				} else if currentPage == "folders" {
@@ -102,14 +100,6 @@ templ Sidebar(currentPage string, user *models.User) {
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
 							</svg>
 							<span class="text-sm font-medium">Remember</span>
-						</a>
-					</li>
-					<li>
-						<a href="/analyze" class={ getMobileSidebarLinkClass("analyze", currentPage) } @click="closeSidebar()">
-							<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-							</svg>
-							<span class="text-sm font-medium">Analyze</span>
 						</a>
 					</li>
 					<li>
@@ -204,27 +194,6 @@ templ Sidebar(currentPage string, user *models.User) {
 									class="text-gray-700 text-base font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
 								>
 									Remember
-								</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href="/analyze" class={ getDesktopSidebarLinkClass("analyze", currentPage) }>
-							<div class="flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-md transition-all duration-150 hover:bg-[rgba(var(--color-teal-500-rgb),0.1)]">
-								<svg class="w-6 h-6 flex-shrink-0 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-								</svg>
-								<span
-									x-show="expanded"
-									x-transition:enter="transition-opacity duration-300 delay-150"
-									x-transition:enter-start="opacity-0"
-									x-transition:enter-end="opacity-100"
-									x-transition:leave="transition-opacity duration-150"
-									x-transition:leave-start="opacity-100"
-									x-transition:leave-end="opacity-0"
-									class="text-gray-700 text-base font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-nowrap"
-								>
-									Analyze
 								</span>
 							</div>
 						</a>

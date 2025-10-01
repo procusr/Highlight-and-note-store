@@ -16,7 +16,8 @@
       "Bash(lsof:*)",
       "Bash(git restore:*)",
       "Bash(git checkout:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Read(//Users/ibrahim009/.claude/output-styles/**)"
     ],
     "deny": [],
     "ask": []
