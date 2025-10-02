@@ -1,3 +1,8 @@
+/* Alpine.js x-cloak directive - hides elements until Alpine initializes */
+[x-cloak] {
+  display: none !important;
+}
+
 :root {
   /* Theme: Warm Reading-Focused Palette (Sep 2025)
      Background: #FAFAF8 (Warm Off-White)

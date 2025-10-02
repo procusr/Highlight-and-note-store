@@ -6,7 +6,7 @@ import "mh-go/internal/models"
 templ FolderPage(user *models.User, folder models.Folder, contents []models.Content, subfolders []models.Folder) {
 	@Layout("Folder: " + folder.Name) {
 		@Sidebar("folder", user)
-		<main class="pt-16 md:pt-6 pb-6">
+		<main class="pt-16 md:pt-6 pb-6" x-data="folderPageData()">
 			<div class="main-container">
 			<!-- Breadcrumb -->
 			<nav class="flex mb-6" aria-label="Breadcrumb">
@@ -38,7 +38,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 					</div>
 					<div class="flex items-center gap-3">
 						<button
-							onclick="showCreateContentModal()"
+							@click="showCreateContentModal()"
 							class="inline-flex items-center px-5 py-2.5 rounded-md bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -78,7 +78,7 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 					</svg>
 					<h3 class="mt-4 text-base font-medium text-gray-900">No items yet</h3>
 					<p class="mt-2 text-sm text-gray-500">Start by adding your first note or creating a subfolder.</p>
-					<button onclick="showCreateContentModal()" class="mt-6 inline-flex items-center px-4 py-2 rounded-md bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-medium shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition">Create Content</button>
+					<button @click="showCreateContentModal()" class="mt-6 inline-flex items-center px-4 py-2 rounded-md bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-medium shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition">Create Content</button>
 				</div>
 			}
 			</div>
@@ -94,12 +94,19 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 		<div id="viewContentModalContainer"></div>
 
 		<!-- Delete Content Modal -->
-		<div id="deleteContentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+		<div 
+			x-data="{ open: false, contentId: '', contentTitle: '', deleting: false }"
+			@show-delete-content-modal.window="open = true; contentId = $event.detail.contentId; contentTitle = $event.detail.contentTitle; deleting = false"
+			x-show="open" 
+			x-cloak
+			class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+			@click.self="open = false"
+		>
 			<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
 				<div class="mt-3">
 					<div class="flex justify-between items-center mb-4">
 						<h3 class="text-lg font-medium text-gray-900">Delete Content</h3>
-						<button onclick="closeModal('deleteContentModal')" class="text-gray-400 hover:text-gray-600">
+						<button @click="open = false" class="text-gray-400 hover:text-gray-600">
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 							</svg>
@@ -117,23 +124,24 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 							<div class="text-center">
 								<h3 class="text-lg font-medium text-gray-900 mb-2">Delete Content</h3>
 								<p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this content? This action cannot be undone.</p>
-								<p class="text-sm font-medium text-gray-900" id="contentTitleToDelete"></p>
+								<p class="text-sm font-medium text-gray-900" x-text="contentTitle"></p>
 							</div>
 						</div>
 						<div class="flex justify-end space-x-3">
 							<button
 								type="button"
-								onclick="closeModal('deleteContentModal')"
+								@click="open = false"
 								class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
 							>
 								Cancel
 							</button>
 							<button
 								type="button"
-								id="confirmDeleteContent"
-								class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+								@click="deleteContent()"
+								:disabled="deleting"
+								class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								x-text="deleting ? 'Deleting...' : 'Delete Content'"
 							>
-								Delete Content
 							</button>
 						</div>
 					</div>
@@ -141,179 +149,125 @@ templ FolderPage(user *models.User, folder models.Folder, contents []models.Cont
 			</div>
 		</div>
 
-		<!-- JavaScript for modal functionality -->
+		<!-- Alpine.js Component -->
 		<script>
-			document.addEventListener('DOMContentLoaded', function() {
-				// Show create content modal
-				window.showCreateContentModal = function() {
-					document.getElementById('createContentModal').classList.remove('hidden');
-				};
+			function folderPageData() {
+				return {
+					showCreateContentModal() {
+						document.getElementById('createContentModal').classList.remove('hidden');
+					},
 
-				// Close modal by ID
-				window.closeModal = function(modalId) {
-					document.getElementById(modalId).classList.add('hidden');
-				};
-
-				// Handle modal close buttons
-				document.addEventListener('click', function(e) {
-					if (e.target.hasAttribute('data-modal-close')) {
-						const modalId = e.target.getAttribute('data-modal-close');
-						closeModal(modalId);
-					}
-				});
-
-				// Close modal when clicking outside
-				document.addEventListener('click', function(e) {
-					const modal = document.getElementById('createContentModal');
-					if (e.target === modal) {
-						closeModal('createContentModal');
-					}
-				});
-
-				// Content management functions
-				window.showEditContentModal = function(contentId) {
-					// Load the edit modal with the content data
-					fetch(`/api/content/${contentId}/edit`)
-						.then(response => {
+					async showEditContentModal(contentId) {
+						try {
+							const response = await fetch(`/api/content/${contentId}/edit`);
 							if (!response.ok) {
 								throw new Error(`HTTP error! status: ${response.status}`);
 							}
-							return response.text();
-						})
-						.then(html => {
+							const html = await response.text();
 							document.getElementById('editContentModalContainer').innerHTML = html;
-							// The modal should now be in the DOM, try to show it
 							const modal = document.getElementById('editContentModal');
 							if (modal) {
 								modal.classList.remove('hidden');
 							} else {
 								console.error('Edit content modal not found in returned HTML');
 							}
-						})
-						.catch(error => {
+						} catch (error) {
 							console.error('Error loading edit content modal:', error);
 							alert('Failed to load edit form. Please try again.');
-						});
-				};
+						}
+					},
 
-				window.showDeleteContentModal = function(contentId, contentTitle) {
-					document.getElementById('contentTitleToDelete').textContent = contentTitle;
-					document.getElementById('deleteContentModal').classList.remove('hidden');
+					showDeleteContentModal(contentId, contentTitle) {
+						window.dispatchEvent(new CustomEvent('show-delete-content-modal', {
+							detail: { contentId, contentTitle }
+						}));
+					},
 
-					// Remove any existing event listeners to prevent duplicates
-					const confirmButton = document.getElementById('confirmDeleteContent');
-					const newConfirmButton = confirmButton.cloneNode(true);
-					confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+					async deleteContent() {
+						const modal = Alpine.$data(document.querySelector('[x-data*="contentId"]'));
+						modal.deleting = true;
 
-					// Set up the delete confirmation
-					newConfirmButton.addEventListener('click', function() {
-						// Disable button to prevent multiple clicks
-						newConfirmButton.disabled = true;
-						newConfirmButton.textContent = 'Deleting...';
+						try {
+							const response = await fetch(`/api/content/${modal.contentId}`, {
+								method: 'DELETE',
+								headers: {
+									'HX-Request': 'true'
+								}
+							});
 
-						// Make delete request
-						fetch(`/api/content/${contentId}`, {
-							method: 'DELETE',
-							headers: {
-								'HX-Request': 'true'
-							}
-						})
-						.then(response => {
 							if (response.ok) {
-								// Close modal first
-								closeModal('deleteContentModal');
-								// Reload the page to show updated content list
+								modal.open = false;
 								window.location.reload();
 							} else {
-								return response.text().then(text => {
-									throw new Error(text || 'Failed to delete content');
-								});
+								const text = await response.text();
+								throw new Error(text || 'Failed to delete content');
 							}
-						})
-						.catch(error => {
+						} catch (error) {
 							console.error('Error deleting content:', error);
 							alert('Error deleting content: ' + error.message);
-							// Re-enable button on error
-							newConfirmButton.disabled = false;
-							newConfirmButton.textContent = 'Delete Content';
-						});
-					});
-				};
+							modal.deleting = false;
+						}
+					},
 
-				// View content modal function
-				window.showViewContentModal = function(contentId) {
-					// Load the view modal with the content data
-					fetch(`/api/content/${contentId}/view`)
-						.then(response => {
+					async showViewContentModal(contentId) {
+						try {
+							const response = await fetch(`/api/content/${contentId}/view`);
 							if (!response.ok) {
 								throw new Error(`HTTP error! status: ${response.status}`);
 							}
-							return response.text();
-						})
-						.then(html => {
+							const html = await response.text();
 							document.getElementById('viewContentModalContainer').innerHTML = html;
-							// The modal should now be in the DOM, try to show it
 							const modal = document.getElementById('viewContentModal');
 							if (modal) {
 								modal.classList.remove('hidden');
-
-								// If content is markdown, we can enhance it with a markdown parser if needed
 								const markdownContent = modal.querySelector('#markdown-content');
 								if (markdownContent && markdownContent.textContent.trim()) {
-									// For now, just preserve whitespace and basic formatting
-									// In the future, we could add a markdown parser like marked.js
 									markdownContent.style.whiteSpace = 'pre-wrap';
 								}
 							} else {
 								console.error('View content modal not found in returned HTML');
 							}
-						})
-						.catch(error => {
+						} catch (error) {
 							console.error('Error loading view content modal:', error);
 							alert('Failed to load content. Please try again.');
-						});
+						}
+					}
+				}
+			}
+
+			// Expose functions globally for backward compatibility
+			document.addEventListener('alpine:init', () => {
+				window.showCreateContentModal = () => {
+					const data = Alpine.$data(document.querySelector('[x-data*="folderPageData"]'));
+					if (data) data.showCreateContentModal();
 				};
 
+				window.showEditContentModal = (contentId) => {
+					const data = Alpine.$data(document.querySelector('[x-data*="folderPageData"]'));
+					if (data) data.showEditContentModal(contentId);
+				};
 
-				// Handle content card interactions (edit/delete)
-				document.addEventListener('click', function(e) {
-					// Handle edit button clicks
-					if (e.target.closest('.edit-content-btn')) {
-						e.preventDefault();
-						e.stopPropagation();
-						const button = e.target.closest('.edit-content-btn');
-						const contentId = button.getAttribute('data-edit-content');
-						showEditContentModal(contentId);
-					}
+				window.showDeleteContentModal = (contentId, contentTitle) => {
+					const data = Alpine.$data(document.querySelector('[x-data*="folderPageData"]'));
+					if (data) data.showDeleteContentModal(contentId, contentTitle);
+				};
 
-					// Handle delete button clicks
-					if (e.target.closest('.delete-content-btn')) {
-						e.preventDefault();
-						e.stopPropagation();
-						const button = e.target.closest('.delete-content-btn');
-						const contentId = button.getAttribute('data-delete-content');
-						const contentTitle = button.getAttribute('data-content-title') || 'this content';
-						showDeleteContentModal(contentId, contentTitle);
-					}
+				window.showViewContentModal = (contentId) => {
+					const data = Alpine.$data(document.querySelector('[x-data*="folderPageData"]'));
+					if (data) data.showViewContentModal(contentId);
+				};
 
-					// Legacy support for old data attributes (if any still exist)
-					if (e.target.closest('[data-edit-content]') && !e.target.closest('.edit-content-btn')) {
-						e.preventDefault();
-						e.stopPropagation();
-						const button = e.target.closest('[data-edit-content]');
-						const contentId = button.getAttribute('data-edit-content');
-						showEditContentModal(contentId);
-					}
+				window.closeModal = (modalId) => {
+					document.getElementById(modalId).classList.add('hidden');
+				};
+			});
 
-					if (e.target.closest('[data-delete-content]') && !e.target.closest('.delete-content-btn')) {
-						e.preventDefault();
-						e.stopPropagation();
-						const button = e.target.closest('[data-delete-content]');
-						const contentId = button.getAttribute('data-delete-content');
-						const contentTitle = button.getAttribute('data-content-title') || 'this content';
-						showDeleteContentModal(contentId, contentTitle);
-					}
-				});
+			// Handle modal close buttons
+			document.addEventListener('click', function(e) {
+				if (e.target.hasAttribute('data-modal-close')) {
+					const modalId = e.target.getAttribute('data-modal-close');
+					window.closeModal(modalId);
+				}
 			});
 		</script>
 
@@ -373,7 +327,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 	@Layout("Folders") {
 		@Sidebar("folders", user)
 
-		<main class="pt-16 md:pt-6 pb-6">
+		<main class="pt-16 md:pt-6 pb-6" x-data="foldersPageData()">
 			<div class="main-container">
 				<div class="mb-6 md:mb-8">
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -382,7 +336,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 							<p class="text-gray-600 text-sm md:text-base">Organize your content into folders for easy management.</p>
 						</div>
 						<button
-							onclick="showCreateFolderModal()"
+							@click="showCreateFolderModal()"
 							class="inline-flex items-center px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-md hover:bg-[var(--color-primary-hover)] transition-colors"
 						>
 							<svg class="w-3 h-3 md:w-4 md:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,7 +364,7 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 						<h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
 						<p class="text-gray-600 text-sm md:text-base px-4 mb-6">Get started by creating your first folder to organize your content.</p>
 						<button
-							onclick="showCreateFolderModal()"
+							@click="showCreateFolderModal()"
 							class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-md hover:bg-[var(--color-primary-hover)] transition-colors"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,123 +386,125 @@ templ FoldersPage(user *models.User, folders []models.Folder) {
 		<!-- Delete Folder Modal -->
 		@DeleteFolderModal()
 
-		<!-- JavaScript for modal functionality -->
+		<!-- Alpine.js Component -->
 		<script>
-			// Simple modal management
-			document.addEventListener('DOMContentLoaded', function() {
-				// Show create folder modal
-				window.showCreateFolderModal = function() {
-					document.getElementById('createFolderModal').classList.remove('hidden');
-				}
+			function foldersPageData() {
+				return {
+					showCreateFolderModal() {
+						document.getElementById('createFolderModal').classList.remove('hidden');
+					},
 
-				// Close modal by ID
-				window.closeModal = function(modalId) {
-					document.getElementById(modalId).classList.add('hidden');
-				}
+					closeModal(modalId) {
+						document.getElementById(modalId).classList.add('hidden');
+					},
 
-				// Handle modal close buttons
-				document.addEventListener('click', function(e) {
-					if (e.target.hasAttribute('data-modal-close')) {
-						const modalId = e.target.getAttribute('data-modal-close');
-						closeModal(modalId);
-					}
-				});
-
-				// Close modal when clicking outside
-				window.onclick = function(event) {
-					const modal = document.getElementById('createFolderModal');
-					if (event.target === modal) {
-						modal.classList.add('hidden');
-					}
-				}
-
-				// Folder management functions
-				window.showEditFolderModal = function(folderId, folderName, folderDescription) {
-					// Load the edit modal with the folder data
-					fetch(`/folders/${folderId}/edit`)
-						.then(response => {
+					async showEditFolderModal(folderId, folderName, folderDescription) {
+						try {
+							const response = await fetch(`/folders/${folderId}/edit`);
 							if (!response.ok) {
 								throw new Error(`HTTP error! status: ${response.status}`);
 							}
-							return response.text();
-						})
-						.then(html => {
+							const html = await response.text();
 							document.getElementById('editFolderModalContainer').innerHTML = html;
-							// The modal should now be in the DOM, try to show it
 							const modal = document.getElementById('editFolderModal');
 							if (modal) {
 								modal.classList.remove('hidden');
 							} else {
 								console.error('Edit modal not found in returned HTML');
 							}
-						})
-						.catch(error => {
+						} catch (error) {
 							console.error('Error loading edit modal:', error);
 							alert('Failed to load edit form. Please try again.');
-						});
-				}
+						}
+					},
 
-				window.showDeleteFolderModal = function(folderId, folderName) {
-					document.getElementById('folderNameToDelete').textContent = folderName;
-					document.getElementById('deleteFolderModal').classList.remove('hidden');
+					showDeleteFolderModal(folderId, folderName) {
+						document.getElementById('folderNameToDelete').textContent = folderName;
+						document.getElementById('deleteFolderModal').classList.remove('hidden');
 
-					// Set up the delete confirmation
-					document.getElementById('confirmDeleteFolder').onclick = function() {
-						// Make HTMX delete request
-						fetch(`/api/folders/${folderId}`, {
-							method: 'DELETE',
-							headers: {
-								'HX-Request': 'true'
+						// Set up the delete confirmation
+						document.getElementById('confirmDeleteFolder').onclick = async () => {
+							try {
+								const response = await fetch(`/api/folders/${folderId}`, {
+									method: 'DELETE',
+									headers: {
+										'HX-Request': 'true'
+									}
+								});
+
+								if (response.ok) {
+									window.location.reload();
+								} else {
+									console.error('Failed to delete folder');
+									alert('Failed to delete folder. Please try again.');
+								}
+							} catch (error) {
+								console.error('Error deleting folder:', error);
+								alert('Error deleting folder. Please try again.');
+							} finally {
+								this.closeModal('deleteFolderModal');
 							}
-						})
-						.then(response => {
-							if (response.ok) {
-								// Reload the page to show updated folder list
-								window.location.reload();
-							} else {
-								console.error('Failed to delete folder');
-								alert('Failed to delete folder. Please try again.');
-							}
-						})
-						.catch(error => {
-							console.error('Error deleting folder:', error);
-							alert('Error deleting folder. Please try again.');
-						})
-						.finally(() => {
-							closeModal('deleteFolderModal');
-						});
+						};
 					}
 				}
+			}
 
-				// Listen for HTMX events to close modals after successful operations
-				document.addEventListener('htmx:afterRequest', function(e) {
-					// Check if this was a successful request
-					if (e.detail.successful) {
-						const url = e.detail.xhr.responseURL;
-						console.log('HTMX request successful:', url);
+			// Expose functions globally for backward compatibility
+			document.addEventListener('alpine:init', () => {
+				window.showCreateFolderModal = () => {
+					const data = Alpine.$data(document.querySelector('[x-data*="foldersPageData"]'));
+					if (data) data.showCreateFolderModal();
+				};
 
-						// Close modals after successful folder operations
-						if (url.includes('/api/folders')) {
-							console.log('Folder operation successful, closing modals');
-							closeModal('createFolderModal');
-							closeModal('editFolderModal');
-							closeModal('deleteFolderModal');
+				window.showEditFolderModal = (folderId, folderName, folderDescription) => {
+					const data = Alpine.$data(document.querySelector('[x-data*="foldersPageData"]'));
+					if (data) data.showEditFolderModal(folderId, folderName, folderDescription);
+				};
 
-							// Clear the forms
-							const createForm = document.querySelector('#createFolderModal form');
-							if (createForm) createForm.reset();
+				window.showDeleteFolderModal = (folderId, folderName) => {
+					const data = Alpine.$data(document.querySelector('[x-data*="foldersPageData"]'));
+					if (data) data.showDeleteFolderModal(folderId, folderName);
+				};
 
-							// Clear the edit modal container
-							const editContainer = document.getElementById('editFolderModalContainer');
-							if (editContainer) editContainer.innerHTML = '';
+				window.closeModal = (modalId) => {
+					document.getElementById(modalId).classList.add('hidden');
+				};
+			});
 
-							// If we're on the folders page and this was a folder update/delete, reload
-							if (window.location.pathname === '/folders' && (e.detail.xhr.method === 'PUT' || e.detail.xhr.method === 'DELETE')) {
-								window.location.reload();
-							}
+			// Handle modal close buttons
+			document.addEventListener('click', function(e) {
+				if (e.target.hasAttribute('data-modal-close')) {
+					const modalId = e.target.getAttribute('data-modal-close');
+					window.closeModal(modalId);
+				}
+			});
+
+			// Listen for HTMX events to close modals after successful operations
+			document.addEventListener('htmx:afterRequest', function(e) {
+				if (e.detail.successful) {
+					const url = e.detail.xhr.responseURL;
+					console.log('HTMX request successful:', url);
+
+					if (url.includes('/api/folders')) {
+						console.log('Folder operation successful, closing modals');
+						window.closeModal('createFolderModal');
+						window.closeModal('editFolderModal');
+						window.closeModal('deleteFolderModal');
+
+						// Clear the forms
+						const createForm = document.querySelector('#createFolderModal form');
+						if (createForm) createForm.reset();
+
+						// Clear the edit modal container
+						const editContainer = document.getElementById('editFolderModalContainer');
+						if (editContainer) editContainer.innerHTML = '';
+
+						// If we're on the folders page and this was a folder update/delete, reload
+						if (window.location.pathname === '/folders' && (e.detail.xhr.method === 'PUT' || e.detail.xhr.method === 'DELETE')) {
+							window.location.reload();
 						}
 					}
-				});
+				}
 			});
 		</script>
 	}

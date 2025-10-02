@@ -4,12 +4,12 @@ import "fmt"
 
 // ProgressStep renders individual step indicator in the modal
 templ ProgressStep(stepNumber int, title string, currentStep int) {
-	<div class="flex items-center text-sm">
+	<div class="flex flex-col items-center text-sm">
 		<div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white font-medium"
 			:class={ fmt.Sprintf("step >= %d ? 'bg-[var(--color-primary)]' : 'bg-gray-300'", stepNumber) }>
 			{ fmt.Sprintf("%d", stepNumber) }
 		</div>
-		<div class="ml-2 text-sm font-medium"
+		<div class="mt-2 text-xs sm:text-sm font-medium text-center whitespace-nowrap"
 			:class={ fmt.Sprintf("step >= %d ? 'text-[var(--color-primary)]' : 'text-gray-500'", stepNumber) }>
 			{ title }
 		</div>
@@ -18,15 +18,11 @@ templ ProgressStep(stepNumber int, title string, currentStep int) {
 
 // ProgressStepIndicator renders the complete progress indicator with steps
 templ ProgressStepIndicator() {
-	<div class="mb-6">
-		<div class="flex items-center justify-between mb-4">
-			<div class="flex items-center">
-				@ProgressStep(1, "Subject", 1)
-				<div class="ml-4 w-16 h-0.5 bg-gray-300"></div>
-				@ProgressStep(2, "Goal", 2)
-				<div class="ml-4 w-16 h-0.5 bg-gray-300"></div>
-				@ProgressStep(3, "Method", 3)
-			</div>
+	<div class="mb-4 flex justify-center">
+		<div class="flex items-center justify-between my-4 w-[70%]">
+			@ProgressStep(1, "Subject", 1)
+			@ProgressStep(2, "Goal", 2)
+			@ProgressStep(3, "Method", 3)
 		</div>
 	</div>
 }
@@ -59,12 +55,16 @@ templ GoalStep() {
 	<div x-show="step === 2" class="space-y-4">
 		<div>
 			<label class="block text-sm font-medium text-gray-900 mb-2">What's your learning goal?</label>
-			<textarea name="learning_goal"
+			<select name="learning_goal"
 				x-model="goal"
 				required
-				rows="3"
-				class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
-				placeholder="What would you like to achieve?"></textarea>
+				class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+				<option value="">Select your level...</option>
+				<option value="intro">Intro - Just getting started</option>
+				<option value="basics">Basics - Learn fundamental concepts</option>
+				<option value="intermediate">Intermediate - Build on existing knowledge</option>
+				<option value="mastery">Mastery - Achieve expert-level understanding</option>
+			</select>
 		</div>
 		<div class="flex justify-between">
 			<button type="button"
@@ -74,7 +74,7 @@ templ GoalStep() {
 			</button>
 			<button type="button"
 				@click="step = 3"
-				:disabled="!goal.trim()"
+				:disabled="!goal"
 				class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
 				Next
 			</button>
@@ -130,7 +130,7 @@ templ NewLearningSessionModal() {
 		style="display: none;">
 		<div class="fixed inset-0 bg-black bg-opacity-50" @click="showModal = false"></div>
 
-		<div class="relative bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+		<div class="relative bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
 			<button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -139,6 +139,7 @@ templ NewLearningSessionModal() {
 
 			<!-- Progress Steps -->
 			@ProgressStepIndicator()
+
 
 			<form hx-post="/learning/start" hx-target="#learning-result" @submit.prevent="$el.querySelector('button[type=submit]').disabled = true; htmx.process($el); setTimeout(() => showModal = false, 500)">
 				<!-- Step 1: Subject -->
@@ -149,6 +150,8 @@ templ NewLearningSessionModal() {
 
 				<!-- Step 3: Learning Method -->
 				@MethodStep()
+
+
 			</form>
 		</div>
 	</div>
