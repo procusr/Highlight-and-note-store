@@ -4,12 +4,12 @@ import "fmt"
 
 // ProgressStep renders individual step indicator in the modal
 templ ProgressStep(stepNumber int, title string, currentStep int) {
-	<div class="flex flex-col items-center text-sm">
+	<div class="flex flex-col items-center text-sm min-w-0">
 		<div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white font-medium"
 			:class={ fmt.Sprintf("step >= %d ? 'bg-[var(--color-primary)]' : 'bg-gray-300'", stepNumber) }>
 			{ fmt.Sprintf("%d", stepNumber) }
 		</div>
-		<div class="mt-2 text-xs sm:text-sm font-medium text-center whitespace-nowrap"
+		<div class="mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap"
 			:class={ fmt.Sprintf("step >= %d ? 'text-[var(--color-primary)]' : 'text-gray-500'", stepNumber) }>
 			{ title }
 		</div>
@@ -19,7 +19,7 @@ templ ProgressStep(stepNumber int, title string, currentStep int) {
 // ProgressStepIndicator renders the complete progress indicator with steps
 templ ProgressStepIndicator() {
 	<div class="mb-4 flex justify-center">
-		<div class="flex items-center justify-between my-4 w-[70%]">
+		<div class="flex flex-row items-center justify-between my-4 w-[85%] sm:w-[70%]">
 			@ProgressStep(1, "Subject", 1)
 			@ProgressStep(2, "Goal", 2)
 			@ProgressStep(3, "Method", 3)
@@ -43,7 +43,7 @@ templ SubjectStep() {
 			<button type="button"
 				@click="step = 2"
 				:disabled="!topic.trim()"
-				class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
+				class="px-4 sm:px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
 				Next
 			</button>
 		</div>
@@ -66,16 +66,16 @@ templ GoalStep() {
 				<option value="mastery">Mastery - Achieve expert-level understanding</option>
 			</select>
 		</div>
-		<div class="flex justify-between">
+		<div class="flex justify-between gap-2">
 			<button type="button"
 				@click="step = 1"
-				class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+				class="px-4 sm:px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap">
 				Back
 			</button>
 			<button type="button"
 				@click="step = 3"
 				:disabled="!goal"
-				class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
+				class="px-4 sm:px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
 				Next
 			</button>
 		</div>
@@ -89,34 +89,32 @@ templ MethodStep() {
 			<label class="block text-sm font-medium text-gray-900 mb-3">Choose your learning style</label>
 			<div class="space-y-3">
 				<template x-for="method in availableMethods" :key="method.key">
-					<div class="border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-gray-300 transition-colors"
-						:class="{ 'border-gray-900 bg-gray-50': selectedMethod === method.key }"
+					<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+						:class="selectedMethod === method.key ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
 						@click="selectedMethod = method.key">
-						<div class="flex items-start">
-							<input type="radio"
-								name="method_key"
-								:value="method.key"
-								:checked="selectedMethod === method.key"
-								class="mt-1 mr-3"
-								required>
-							<div class="flex-1">
-								<h4 class="font-medium text-gray-900 text-sm mb-1" x-text="method.name"></h4>
-								<p class="text-xs text-gray-600" x-text="method.description"></p>
-							</div>
+						<input type="radio"
+							name="method_key"
+							:value="method.key"
+							:checked="selectedMethod === method.key"
+							class="hidden"
+							required>
+						<div>
+							<h4 class="font-medium text-gray-900 text-sm mb-1" x-text="method.name"></h4>
+							<p class="text-xs text-gray-600" x-text="method.description"></p>
 						</div>
 					</div>
 				</template>
 			</div>
 		</div>
-		<div class="flex justify-between">
+		<div class="flex justify-between gap-2">
 			<button type="button"
 				@click="step = 2"
-				class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+				class="px-4 sm:px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap">
 				Back
 			</button>
 			<button type="submit"
 				:disabled="!selectedMethod"
-				class="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
+				class="px-4 sm:px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] border border-transparent rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
 				Start Learning
 			</button>
 		</div>
@@ -130,29 +128,32 @@ templ NewLearningSessionModal() {
 		style="display: none;">
 		<div class="fixed inset-0 bg-black bg-opacity-50" @click="showModal = false"></div>
 
-		<div class="relative bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-			<button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-				</svg>
-			</button>
+		<div class="relative bg-white rounded-lg max-w-md w-full max-h-[90vh] flex flex-col">
+			<!-- Sticky Header with Close Button -->
+			<div class="sticky top-0 bg-white rounded-t-lg z-10 px-6 pt-6 pb-2">
+				<button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-20">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
 
-			<!-- Progress Steps -->
-			@ProgressStepIndicator()
+				<!-- Progress Steps -->
+				@ProgressStepIndicator()
+			</div>
 
+			<!-- Scrollable Form Content -->
+			<div class="flex-1 overflow-y-auto px-6 pb-6">
+				<form hx-post="/learning/start" hx-target="#learning-result" @submit.prevent="$el.querySelector('button[type=submit]').disabled = true; htmx.process($el); setTimeout(() => showModal = false, 500)">
+					<!-- Step 1: Subject -->
+					@SubjectStep()
 
-			<form hx-post="/learning/start" hx-target="#learning-result" @submit.prevent="$el.querySelector('button[type=submit]').disabled = true; htmx.process($el); setTimeout(() => showModal = false, 500)">
-				<!-- Step 1: Subject -->
-				@SubjectStep()
+					<!-- Step 2: Goal -->
+					@GoalStep()
 
-				<!-- Step 2: Goal -->
-				@GoalStep()
-
-				<!-- Step 3: Learning Method -->
-				@MethodStep()
-
-
-			</form>
+					<!-- Step 3: Learning Method -->
+					@MethodStep()
+				</form>
+			</div>
 		</div>
 	</div>
 }
