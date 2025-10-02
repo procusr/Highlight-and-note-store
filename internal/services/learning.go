@@ -27,7 +27,7 @@ func NewLearningService(db *sql.DB, topicService *TopicService, methodService *L
 }
 
 // CreateLearningPrompt creates a new learning prompt with AI generation
-func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UUID, userPrompt string) (*models.LearningPrompt, error) {
+func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UUID, learningGoal string) (*models.LearningPrompt, error) {
 	// Get the topic to use its name in the AI prompt
 	topic, err := s.topicService.GetTopicByID(topicID)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UU
 	}
 
 	// Generate the AI prompt using the method template
-	aiPrompt, err := s.methodService.GenerateAIPrompt(methodID, topic.Name, userPrompt)
+	aiPrompt, err := s.methodService.GenerateAIPrompt(methodID, topic.Name, learningGoal)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate AI prompt: %w", err)
 	}
@@ -45,21 +45,21 @@ func (s *LearningService) CreateLearningPrompt(userID, topicID, methodID uuid.UU
 		UserID:           userID,
 		TopicID:          topicID,
 		LearningMethodID: methodID,
-		UserPrompt:       userPrompt,
+		LearningGoal:     learningGoal,
 		AiPrompt:         aiPrompt,
 		ResponseStatus:   "pending",
 	}
 
 	query := `
 		INSERT INTO learning_prompts
-		(id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt, response_status)
+		(id, user_id, topic_id, learning_method_id, learning_goal, ai_prompt, response_status)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING created_at, updated_at
 	`
 
 	err = s.db.QueryRow(
 		query, prompt.ID, prompt.UserID, prompt.TopicID,
-		prompt.LearningMethodID, prompt.UserPrompt, prompt.AiPrompt,
+		prompt.LearningMethodID, prompt.LearningGoal, prompt.AiPrompt,
 		prompt.ResponseStatus,
 	).Scan(&prompt.CreatedAt, &prompt.UpdatedAt)
 
@@ -130,7 +130,7 @@ func (s *LearningService) UpdatePromptError(promptID uuid.UUID, errorMessage str
 // GetUserPrompts returns all prompts for a user
 func (s *LearningService) GetUserPrompts(userID uuid.UUID, limit int) ([]models.LearningPrompt, error) {
 	query := `
-		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt,
+		SELECT id, user_id, topic_id, learning_method_id, learning_goal, ai_prompt,
 		       ai_response, response_status, error_message, created_at, updated_at
 		FROM learning_prompts
 		WHERE user_id = $1
@@ -151,7 +151,7 @@ func (s *LearningService) GetUserPrompts(userID uuid.UUID, limit int) ([]models.
 
 		err := rows.Scan(
 			&prompt.ID, &prompt.UserID, &prompt.TopicID, &prompt.LearningMethodID,
-			&prompt.UserPrompt, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
+			&prompt.LearningGoal, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
 			&errorMessage, &prompt.CreatedAt, &prompt.UpdatedAt,
 		)
 		if err != nil {
@@ -181,7 +181,7 @@ func (s *LearningService) GetPromptByID(promptID uuid.UUID) (*models.LearningPro
 	var aiResponse, errorMessage sql.NullString
 
 	query := `
-		SELECT id, user_id, topic_id, learning_method_id, user_prompt, ai_prompt,
+		SELECT id, user_id, topic_id, learning_method_id, learning_goal, ai_prompt,
 		       ai_response, response_status, error_message, created_at, updated_at
 		FROM learning_prompts
 		WHERE id = $1
@@ -189,7 +189,7 @@ func (s *LearningService) GetPromptByID(promptID uuid.UUID) (*models.LearningPro
 
 	err := s.db.QueryRow(query, promptID).Scan(
 		&prompt.ID, &prompt.UserID, &prompt.TopicID, &prompt.LearningMethodID,
-		&prompt.UserPrompt, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
+		&prompt.LearningGoal, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
 		&errorMessage, &prompt.CreatedAt, &prompt.UpdatedAt,
 	)
 
@@ -386,7 +386,7 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 		       t.name as topic_name, t.description as topic_description, t.category as topic_category,
 		       lm.name as method_name, lm.description as method_description, lm.icon as method_icon, lm.method_key as method_key,
 		       ulp.progress_percentage, ulp.status as progress_status,
-		       latest_lp.user_prompt as goal
+		       latest_lp.learning_goal as goal
 		FROM learning_sessions ls
 		LEFT JOIN topics t ON ls.topic_id = t.id
 		LEFT JOIN learning_methods lm ON ls.learning_method_id = lm.id
@@ -394,7 +394,7 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 			AND ls.learning_method_id = ulp.learning_method_id
 			AND ls.user_id = ulp.user_id
 		LEFT JOIN LATERAL (
-			SELECT user_prompt
+			SELECT learning_goal
 			FROM learning_prompts lp
 			WHERE lp.topic_id = ls.topic_id
 			  AND lp.learning_method_id = ls.learning_method_id
@@ -614,7 +614,7 @@ func (s *LearningService) GetLearningSessionByID(sessionID uuid.UUID) (*models.L
 // GetPromptForSession retrieves the most recent learning prompt for a session
 func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.LearningPrompt, error) {
 	query := `
-		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.user_prompt, lp.ai_prompt,
+		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.learning_goal, lp.ai_prompt,
 		       lp.ai_response, lp.response_status, lp.error_message, lp.created_at, lp.updated_at
 		FROM learning_prompts lp
 		JOIN learning_sessions ls ON lp.topic_id = ls.topic_id
@@ -630,7 +630,7 @@ func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.Lear
 
 	err := s.db.QueryRow(query, sessionID).Scan(
 		&prompt.ID, &prompt.UserID, &prompt.TopicID, &prompt.LearningMethodID,
-		&prompt.UserPrompt, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
+		&prompt.LearningGoal, &prompt.AiPrompt, &aiResponse, &prompt.ResponseStatus,
 		&errorMessage, &prompt.CreatedAt, &prompt.UpdatedAt,
 	)
 

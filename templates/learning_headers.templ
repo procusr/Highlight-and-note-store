@@ -10,13 +10,21 @@ templ LearningSessionHeader(session *models.LearningSession, prompt *models.Lear
 			<span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)] border border-[rgba(var(--color-teal-500-rgb),0.3)]">
 				{ session.LearningMethod.Name }
 			</span>
-			if prompt != nil {
+			if session.Goal != "" {
 				<span class="text-gray-300">•</span>
 				<span class="flex items-center gap-1 max-w-full">
 					<svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
 					</svg>
-					<span class="truncate max-w-[16rem] sm:max-w-[28rem]" title={ prompt.UserPrompt }>{ prompt.UserPrompt }</span>
+					<span class="truncate max-w-[16rem] sm:max-w-[28rem]" title={ session.Goal }>Goal: { session.Goal }</span>
+				</span>
+			} else if prompt != nil && prompt.LearningGoal != "" {
+				<span class="text-gray-300">•</span>
+				<span class="flex items-center gap-1 max-w-full">
+					<svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+					</svg>
+					<span class="truncate max-w-[16rem] sm:max-w-[28rem]" title={ prompt.LearningGoal }>Goal: { prompt.LearningGoal }</span>
 				</span>
 			}
 		</div>

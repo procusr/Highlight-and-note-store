@@ -126,7 +126,7 @@ type LearningPrompt struct {
 	UserID           uuid.UUID  `json:"user_id" db:"user_id"`
 	TopicID          uuid.UUID  `json:"topic_id" db:"topic_id"`
 	LearningMethodID uuid.UUID  `json:"learning_method_id" db:"learning_method_id"`
-	UserPrompt       string     `json:"user_prompt" db:"user_prompt"`
+	LearningGoal     string     `json:"learning_goal" db:"learning_goal"`
 	AiPrompt         string     `json:"ai_prompt" db:"ai_prompt"`
 	AiResponse       *string    `json:"ai_response" db:"ai_response"`
 	ResponseStatus   string     `json:"response_status" db:"response_status"`

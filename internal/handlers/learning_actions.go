@@ -23,9 +23,9 @@ func (h *LearningHandler) StartLearning(w http.ResponseWriter, r *http.Request) 
 	methodID := strings.TrimSpace(r.FormValue("method_id"))
 	methodKey := strings.TrimSpace(r.FormValue("method_key"))
 	topic := strings.TrimSpace(r.FormValue("topic"))
-	userPrompt := strings.TrimSpace(r.FormValue("user_prompt"))
+	learningGoal := strings.TrimSpace(r.FormValue("learning_goal"))
 
-	if topic == "" || userPrompt == "" || (methodID == "" && methodKey == "") {
+	if topic == "" || learningGoal == "" || (methodID == "" && methodKey == "") {
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`
@@ -91,7 +91,7 @@ func (h *LearningHandler) StartLearning(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create learning prompt
-	prompt, err := h.learningService.CreateLearningPrompt(userID, topicModel.ID, resolvedMethodID, userPrompt)
+	prompt, err := h.learningService.CreateLearningPrompt(userID, topicModel.ID, resolvedMethodID, learningGoal)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)

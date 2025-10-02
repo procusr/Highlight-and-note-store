@@ -188,9 +188,9 @@ func (h *LearningHandler) CreateLearningPrompt(w http.ResponseWriter, r *http.Re
 	userID := middleware.GetUserID(r.Context())
 
 	var req struct {
-		TopicID    string `json:"topic_id"`
-		MethodID   string `json:"method_id"`
-		UserPrompt string `json:"user_prompt"`
+		TopicID      string `json:"topic_id"`
+		MethodID     string `json:"method_id"`
+		LearningGoal string `json:"learning_goal"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -211,13 +211,13 @@ func (h *LearningHandler) CreateLearningPrompt(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if req.UserPrompt == "" {
-		http.Error(w, "User prompt is required", http.StatusBadRequest)
+	if req.LearningGoal == "" {
+		http.Error(w, "Learning goal is required", http.StatusBadRequest)
 		return
 	}
 
 	// Create the learning prompt
-	prompt, err := h.learningService.CreateLearningPrompt(userID, topicID, methodID, req.UserPrompt)
+	prompt, err := h.learningService.CreateLearningPrompt(userID, topicID, methodID, req.LearningGoal)
 	if err != nil {
 		http.Error(w, "Failed to create learning prompt", http.StatusInternalServerError)
 		return
@@ -301,9 +301,9 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 	userID := middleware.GetUserID(r.Context())
 
 	var req struct {
-		Topic      string `json:"topic"`
-		MethodKey  string `json:"method_key"`
-		UserPrompt string `json:"user_prompt"`
+		Topic        string `json:"topic"`
+		MethodKey    string `json:"method_key"`
+		LearningGoal string `json:"learning_goal"`
 	}
 
 	contentType := r.Header.Get("Content-Type")
@@ -321,7 +321,7 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 		}
 		req.Topic = r.FormValue("topic")
 		req.MethodKey = r.FormValue("method_key")
-		req.UserPrompt = r.FormValue("user_prompt")
+		req.LearningGoal = r.FormValue("learning_goal")
 	}
 
 	// Create a topic for the user's learning session
@@ -347,7 +347,7 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 	}
 
 	// Create learning prompt
-	_, err = h.learningService.CreateLearningPrompt(userID, topicID, method.ID, req.UserPrompt)
+	_, err = h.learningService.CreateLearningPrompt(userID, topicID, method.ID, req.LearningGoal)
 	if err != nil {
 		http.Error(w, "Failed to create learning prompt", http.StatusInternalServerError)
 		return
