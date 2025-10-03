@@ -2,13 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
-
 	"mh-go/internal/config"
 	"mh-go/internal/database"
 	"mh-go/internal/handlers"
 	"mh-go/internal/middleware"
 	"mh-go/internal/services"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -151,17 +150,16 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 				r.Route("/learning", func(r chi.Router) {
 					r.Get("/topics", learningHandler.GetTopics)
 					r.Get("/topics/search", learningHandler.SearchTopics)
-					r.Get("/pathways", learningHandler.GetLearningPathways)
 					r.Get("/stats", learningHandler.GetDashboardStats)
 					r.Get("/sessions/active", learningHandler.GetActiveLearningSessions)
 					r.Get("/prompts", learningHandler.GetUserPrompts)
 					r.Get("/preferences", learningHandler.GetUserPreferences)
 					r.Post("/preferences", learningHandler.UpdateUserPreferences)
-					r.Post("/prompts", learningHandler.CreateLearningPrompt)
 					r.Post("/progress", learningHandler.UpdateProgress)
 					r.Post("/sessions", learningHandler.StartLearningSession)
-				r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
-			})
+					r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
+					r.Delete("/sessions/{sessionID}", learningHandler.DeleteLearningSession)
+				})
 		})
 	})
 

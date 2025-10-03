@@ -7,7 +7,46 @@ import (
 
 // LearningSessionCard renders an individual active learning session card
 templ LearningSessionCard(session *models.LearningSession) {
-	<div class="surface-card p-6 hover:shadow-md transition-all duration-200">
+	<div class="surface-card p-6 hover:shadow-md transition-all duration-200 relative" data-session-id={ session.ID.String() }>
+		<!-- Three-dot menu button (subtle but always accessible) -->
+		<div class="absolute top-3 right-3" x-data="{ open: false }" @click.away="open = false">
+			<button
+				@click="open = !open"
+				class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+				title="More options"
+				aria-label="Session options"
+			>
+				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+					<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+				</svg>
+			</button>
+
+			<!-- Dropdown menu -->
+			<div
+				x-show="open"
+				x-transition:enter="transition ease-out duration-100"
+				x-transition:enter-start="transform opacity-0 scale-95"
+				x-transition:enter-end="transform opacity-100 scale-100"
+				x-transition:leave="transition ease-in duration-75"
+				x-transition:leave-start="transform opacity-100 scale-100"
+				x-transition:leave-end="transform opacity-0 scale-95"
+				class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+				style="display: none;"
+			>
+				<div class="py-1 ">
+					<button
+						onclick={ templ.ComponentScript{Call: "showDeleteSessionModal('" + session.ID.String() + "', '" + session.Topic.Name + "')"} }
+						class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50  items-center flex flex-row"
+					>
+						<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+						</svg>
+						Delete Session
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<!-- Learning Path Badge -->
 		<div class="mb-4">
 			<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[rgba(var(--color-teal-500-rgb),0.12)] text-[var(--color-primary)] border border-[rgba(var(--color-teal-500-rgb),0.3)]">
@@ -33,15 +72,15 @@ templ LearningSessionCard(session *models.LearningSession) {
 			</p>
 		</div>
 
-		<!-- Progress indicator -->
+	<!-- Progress indicator -->
 		<div class="mb-4">
-			<div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+			<div class="flex items-center justify-between text-xs text-gray-500 mb-1 flex-row">
 				<span>Progress</span>
 				<span>15%</span>
 			</div>
 			<div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-				<div class="bg-[var(--color-primary)] h-2 rounded-full" style="width: 15%"></div>
-			</div>
+			<div class="bg-[var(--color-primary)] h-2 rounded-full" style="width: 15%"></div>
+		</div>
 		</div>
 
 		<!-- Continue button -->

@@ -251,7 +251,7 @@ func (s *ProgressService) GetDashboardStats(userID uuid.UUID) (*models.Dashboard
 	// Get overall progress (average of all user progress)
 	progressQuery := `
 		SELECT 
-			COALESCE(AVG(progress_percentage), 0) as overall_progress,
+			COALESCE(ROUND(AVG(progress_percentage))::integer, 0) as overall_progress,
 			COUNT(*) as total_started,
 			COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
 		FROM user_learning_progress

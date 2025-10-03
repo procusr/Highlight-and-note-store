@@ -20,26 +20,98 @@ templ LearningPlatformPage(
 				step: 1,
 				topic: '',
 				goal: '',
-				selectedMethod: '',
-				// Use server-provided pathway cards instead of duplicating data
-				get availableMethods() {
-					return [
-						{ key: 'applied_laboratory', name: 'Applied Mastery Laboratory', description: 'Hands-on practice and real-world application' },
-						{ key: 'foundation_discovery', name: 'Foundation Through Discovery', description: 'Explore concepts from first principles' },
-						{ key: 'integration_transfer', name: 'Integration & Transfer System', description: 'Connect knowledge across domains' },
-						{ key: 'mistake_learning_lab', name: 'Mistake-Based Learning Lab', description: 'Learn through errors and refinement' },
-						{ key: 'problem_gymnasium', name: 'Problem-Solving Gymnasium', description: 'Build skills through targeted challenges' }
-					];
-				}
+				selectedMethod: ''
 			}">
 				@PlatformHeader()
 				@ActiveLearningSessionsSection(sessions)
 				@LearningPathsSection(pathwayCards, len(sessions) > 0)
 
 				@NewLearningSessionModal()
+				@DeleteLearningSessionModal()
 				<div id="learning-result"></div>
 			</div>
 		</main>
+
+		<script>
+			// Modal control functions
+			document.addEventListener('DOMContentLoaded', function() {
+				// Show delete session modal
+				window.showDeleteSessionModal = (sessionId, sessionName) => {
+					const modal = document.getElementById('deleteSessionModal');
+					const sessionNameElement = document.getElementById('sessionNameToDelete');
+					const confirmButton = document.getElementById('confirmDeleteSession');
+
+					if (sessionNameElement) {
+						sessionNameElement.textContent = sessionName;
+					}
+
+					if (confirmButton) {
+						// Remove old event listeners by cloning
+						const newButton = confirmButton.cloneNode(true);
+						confirmButton.parentNode.replaceChild(newButton, confirmButton);
+
+						// Add new click handler
+						newButton.addEventListener('click', function() {
+							// Use HTMX to delete the session
+							fetch('/api/learning/sessions/' + sessionId, {
+								method: 'DELETE',
+								headers: {
+									'HX-Request': 'true'
+								}
+							})
+							.then(response => {
+								if (response.ok) {
+									// Remove the session card from the DOM
+									const sessionCard = document.querySelector(`[data-session-id="${sessionId}"]`);
+									if (sessionCard) {
+										sessionCard.style.transition = 'opacity 0.3s, transform 0.3s';
+										sessionCard.style.opacity = '0';
+										sessionCard.style.transform = 'scale(0.95)';
+										setTimeout(() => {
+											sessionCard.remove();
+
+											// Check if there are no more sessions
+											const sessionContainer = document.querySelector('.grid');
+											if (sessionContainer && sessionContainer.children.length === 0) {
+												// Reload the page to show the empty state
+												window.location.reload();
+											}
+										}, 300);
+									}
+									closeModal('deleteSessionModal');
+								} else {
+									alert('Failed to delete session. Please try again.');
+								}
+							})
+							.catch(error => {
+								console.error('Error deleting session:', error);
+								alert('An error occurred. Please try again.');
+							});
+						});
+					}
+
+					if (modal) {
+						modal.classList.remove('hidden');
+					}
+				};
+
+				// Close modal function
+				window.closeModal = (modalId) => {
+					const modal = document.getElementById(modalId);
+					if (modal) {
+						modal.classList.add('hidden');
+					}
+				};
+
+				// Handle modal close buttons
+				document.addEventListener('click', function(e) {
+					if (e.target.hasAttribute('data-modal-close')) {
+						const modalId = e.target.getAttribute('data-modal-close');
+						closeModal(modalId);
+					}
+				});
+			});
+		</script>
 	}
 }
 
@@ -51,7 +123,7 @@ templ LearningSessionPage(
 ) {
 	@Layout("Learning Session") {
 		@Sidebar("learning", user)
-		
+
 		<main class="pt-16 md:pt-6 pb-6">
 			<div class="main-container" x-data="{
 			showNoteModal: false,

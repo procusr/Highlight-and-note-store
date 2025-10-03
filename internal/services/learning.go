@@ -405,7 +405,6 @@ func (s *LearningService) GetActiveLearningSessions(userID uuid.UUID) ([]models.
 		WHERE ls.user_id = $1
 			AND ls.ended_at IS NULL
 		ORDER BY ls.started_at DESC
-		LIMIT 5
 	`
 
 	rows, err := s.db.Query(query, userID)
@@ -649,4 +648,40 @@ func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.Lear
 	}
 
 	return &prompt, nil
+}
+
+// DeleteLearningSession deletes a learning session by ID
+func (s *LearningService) DeleteLearningSession(sessionID uuid.UUID, userID uuid.UUID) error {
+	// First verify the session belongs to the user
+	var ownerID uuid.UUID
+	checkQuery := `SELECT user_id FROM learning_sessions WHERE id = $1`
+	err := s.db.QueryRow(checkQuery, sessionID).Scan(&ownerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("session not found")
+		}
+		return fmt.Errorf("failed to verify session ownership: %w", err)
+	}
+
+	if ownerID != userID {
+		return fmt.Errorf("unauthorized: session does not belong to user")
+	}
+
+	// Delete the session
+	deleteQuery := `DELETE FROM learning_sessions WHERE id = $1`
+	result, err := s.db.Exec(deleteQuery, sessionID)
+	if err != nil {
+		return fmt.Errorf("failed to delete learning session: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("session not found")
+	}
+
+	return nil
 }

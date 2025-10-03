@@ -101,27 +101,17 @@ func (h *LearningHandler) StartLearning(w http.ResponseWriter, r *http.Request) 
 					<div class="ml-3">
 						<h3 class="text-sm font-medium text-red-800">Error</h3>
 						<div class="mt-2 text-sm text-red-700">
-							<p>Failed to create learning session (prompt error). Please try again.</p>
+							<p>Failed to create learning session. Please try again.</p>
 						</div>
 					</div>
 				</div>
 			</div>
 		`))
-		fmt.Printf("[StartLearning] ERROR prompt creation user=%s topic=%s method_key=%s err=%v\n", userID, topic, resolvedMethodKey, err)
 		return
 	}
 
-	session, err := h.learningService.StartLearningSession(userID, topicModel.ID, resolvedMethodID)
-	if err != nil {
-		fmt.Printf("[StartLearning] WARNING failed to create session user=%s topic=%s method_key=%s err=%v\n", userID, topic, resolvedMethodKey, err)
-	}
-
-	if session != nil {
-		fmt.Printf("[StartLearning] SUCCESS user=%s topic=%s method_key=%s method_id=%s prompt_id=%s session_id=%s\n",
-			userID, topic, resolvedMethodKey, resolvedMethodID, prompt.ID, session.ID)
-	} else {
-		fmt.Printf("[StartLearning] SUCCESS (no session) user=%s topic=%s method_key=%s method_id=%s prompt_id=%s\n",
-			userID, topic, resolvedMethodKey, resolvedMethodID, prompt.ID)
+	if _, err = h.learningService.StartLearningSession(userID, topicModel.ID, resolvedMethodID); err != nil {
+		fmt.Printf("[StartLearning] WARNING failed to create session user=%s topic=%s err=%v\n", userID, topic, err)
 	}
 
 	// HTMX redirect to refresh page so new session appears

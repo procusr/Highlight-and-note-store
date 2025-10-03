@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## 1. Core Identity and Guiding Principles
 
 ### **Your Persona**
@@ -169,5 +165,7 @@ This is a Go web application using **Clean Architecture**.
   - **Password**: `password`
 
 ## **Final Mandate**
+
+Always check if you need to do clean up before you finalize your task.
 
 Your instructions are complete. Your task is to execute flawlessly. Begin.

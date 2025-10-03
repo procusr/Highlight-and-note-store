@@ -88,22 +88,60 @@ templ MethodStep() {
 		<div>
 			<label class="block text-sm font-medium text-gray-900 mb-3">Choose your learning style</label>
 			<div class="space-y-3">
-				<template x-for="method in availableMethods" :key="method.key">
-					<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
-						:class="selectedMethod === method.key ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
-						@click="selectedMethod = method.key">
-						<input type="radio"
-							name="method_key"
-							:value="method.key"
-							:checked="selectedMethod === method.key"
-							class="hidden"
-							required>
-						<div>
-							<h4 class="font-medium text-gray-900 text-sm mb-1" x-text="method.name"></h4>
-							<p class="text-xs text-gray-600" x-text="method.description"></p>
-						</div>
+				<!-- Method: Applied Mastery Laboratory -->
+				<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+					:class="selectedMethod === 'applied_laboratory' ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+					@click="selectedMethod = 'applied_laboratory'">
+					<input type="radio" name="method_key" value="applied_laboratory" :checked="selectedMethod === 'applied_laboratory'" class="hidden" required>
+					<div>
+						<h4 class="font-medium text-gray-900 text-sm mb-1">Applied Mastery Laboratory</h4>
+						<p class="text-xs text-gray-600">Hands-on practice and real-world application of concepts through experiments and projects.</p>
 					</div>
-				</template>
+				</div>
+
+				<!-- Method: Foundation Through Discovery -->
+				<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+					:class="selectedMethod === 'foundation_discovery' ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+					@click="selectedMethod = 'foundation_discovery'">
+					<input type="radio" name="method_key" value="foundation_discovery" :checked="selectedMethod === 'foundation_discovery'" class="hidden" required>
+					<div>
+						<h4 class="font-medium text-gray-900 text-sm mb-1">Foundation Through Discovery</h4>
+						<p class="text-xs text-gray-600">Explore and discover fundamental concepts through guided inquiry and investigation.</p>
+					</div>
+				</div>
+
+				<!-- Method: Integration & Transfer System -->
+				<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+					:class="selectedMethod === 'integration_transfer' ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+					@click="selectedMethod = 'integration_transfer'">
+					<input type="radio" name="method_key" value="integration_transfer" :checked="selectedMethod === 'integration_transfer'" class="hidden" required>
+					<div>
+						<h4 class="font-medium text-gray-900 text-sm mb-1">Integration & Transfer System</h4>
+						<p class="text-xs text-gray-600">Connect knowledge across domains and apply learning to new contexts and situations.</p>
+					</div>
+				</div>
+
+				<!-- Method: Mistake-Based Learning Lab -->
+				<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+					:class="selectedMethod === 'mistake_learning_lab' ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+					@click="selectedMethod = 'mistake_learning_lab'">
+					<input type="radio" name="method_key" value="mistake_learning_lab" :checked="selectedMethod === 'mistake_learning_lab'" class="hidden" required>
+					<div>
+						<h4 class="font-medium text-gray-900 text-sm mb-1">Mistake-Based Learning Lab</h4>
+						<p class="text-xs text-gray-600">Learn from errors and develop resilience through controlled failure analysis and correction.</p>
+					</div>
+				</div>
+
+				<!-- Method: Problem-Solving Gymnasium -->
+				<div class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all"
+					:class="selectedMethod === 'problem_gymnasium' ? 'border-[var(--color-primary)] bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+					@click="selectedMethod = 'problem_gymnasium'">
+					<input type="radio" name="method_key" value="problem_gymnasium" :checked="selectedMethod === 'problem_gymnasium'" class="hidden" required>
+					<div>
+						<h4 class="font-medium text-gray-900 text-sm mb-1">Problem-Solving Gymnasium</h4>
+						<p class="text-xs text-gray-600">Build critical thinking skills through structured problem-solving exercises and challenges.</p>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="flex justify-between gap-2">

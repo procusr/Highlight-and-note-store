@@ -140,12 +140,6 @@ func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Re
 	component.Render(r.Context(), w)
 }
 
-// GetLearningPathways returns learning pathway cards for HTMX
-// TODO: Fix this when templates are available
-func (h *LearningHandler) GetLearningPathways(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not implemented yet", http.StatusNotImplemented)
-}
-
 // GetTopics returns available topics as JSON
 func (h *LearningHandler) GetTopics(w http.ResponseWriter, r *http.Request) {
 	topics, err := h.topicService.GetAllTopics()
@@ -181,55 +175,6 @@ func (h *LearningHandler) SearchTopics(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(topics)
-}
-
-// CreateLearningPrompt handles prompt creation from learning method cards
-func (h *LearningHandler) CreateLearningPrompt(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-
-	var req struct {
-		TopicID      string `json:"topic_id"`
-		MethodID     string `json:"method_id"`
-		LearningGoal string `json:"learning_goal"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	// Validate UUIDs
-	topicID, err := uuid.Parse(req.TopicID)
-	if err != nil {
-		http.Error(w, "Invalid topic ID", http.StatusBadRequest)
-		return
-	}
-
-	methodID, err := uuid.Parse(req.MethodID)
-	if err != nil {
-		http.Error(w, "Invalid method ID", http.StatusBadRequest)
-		return
-	}
-
-	if req.LearningGoal == "" {
-		http.Error(w, "Learning goal is required", http.StatusBadRequest)
-		return
-	}
-
-	// Create the learning prompt
-	prompt, err := h.learningService.CreateLearningPrompt(userID, topicID, methodID, req.LearningGoal)
-	if err != nil {
-		http.Error(w, "Failed to create learning prompt", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":   true,
-		"prompt_id": prompt.ID,
-		"ai_prompt": prompt.AiPrompt,
-		"message":   "Learning prompt created successfully",
-	})
 }
 
 // GetDashboardStats returns dashboard statistics
@@ -558,4 +503,40 @@ func (h *LearningHandler) LearningSessionPage(w http.ResponseWriter, r *http.Req
 
 	component := templates.LearningSessionPage(user, session, prompt)
 	component.Render(r.Context(), w)
+}
+
+// DeleteLearningSession deletes a learning session
+func (h *LearningHandler) DeleteLearningSession(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
+	if err != nil {
+		http.Error(w, "Invalid session ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.learningService.DeleteLearningSession(sessionID, userID)
+	if err != nil {
+		if err.Error() == "session not found" {
+			http.Error(w, "Session not found", http.StatusNotFound)
+			return
+		}
+		if err.Error() == "unauthorized: session does not belong to user" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Failed to delete learning session", http.StatusInternalServerError)
+		return
+	}
+
+	// If HTMX request, return success response
+	if r.Header.Get("HX-Request") == "true" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Learning session deleted successfully",
+	})
 }

@@ -18,7 +18,7 @@ templ LoadingSpinner() {
 templ Modal(id, title string) {
 	<div id={ id } class="fixed inset-0 bg-gray-600/60 backdrop-blur-sm flex items-start sm:items-center justify-center overflow-y-auto h-full w-full hidden z-50 p-2 sm:p-4">
 		<div class="relative w-full max-w-md sm:max-w-lg md:max-w-xl bg-white shadow-xl rounded-lg border border-gray-200 animate-fade-in">
-			<div class="flex justify-between items-start gap-4 p-4 pb-2 border-b border-gray-100">
+			<div class="flex flex-row justify-between items-start gap-4 p-4 pb-2 border-b border-gray-100">
 				<h3 class="text-base sm:text-lg font-semibold text-gray-900 leading-tight flex-1">{ title }</h3>
 				<button data-modal-close={ id } class="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors">
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
