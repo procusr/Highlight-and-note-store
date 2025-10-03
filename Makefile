@@ -34,6 +34,40 @@ docker-reset:
 	docker-compose down -v
 	docker-compose up -d
 
+# Docker deployment commands
+docker-build:
+	docker-compose build --no-cache
+
+docker-logs:
+	docker-compose logs -f
+
+docker-logs-app:
+	docker-compose logs -f app
+
+docker-logs-db:
+	docker-compose logs -f postgres
+
+docker-restart:
+	docker-compose restart
+
+docker-ps:
+	docker-compose ps
+
+docker-shell:
+	docker exec -it mhgo-app sh
+
+docker-db-shell:
+	docker exec -it mhgo-postgres psql -U user -d mhgo
+
+docker-prod-up:
+	docker-compose up -d --build
+
+docker-prod-down:
+	docker-compose down
+
+docker-clean:
+	docker-compose down -v --rmi all --remove-orphans
+
 # Database commands
 db-backup:
 	./db-utils.sh backup
@@ -63,9 +97,20 @@ help:
 	@echo "  make test        - Run tests"
 	@echo ""
 	@echo "Docker:"
-	@echo "  make docker-up   - Start all services"
-	@echo "  make docker-down - Stop all services"
-	@echo "  make docker-reset- Reset all services and volumes"
+	@echo "  make docker-up          - Start all services"
+	@echo "  make docker-down        - Stop all services"
+	@echo "  make docker-reset       - Reset all services and volumes"
+	@echo "  make docker-build       - Build Docker images (no cache)"
+	@echo "  make docker-logs        - View all container logs"
+	@echo "  make docker-logs-app    - View application logs"
+	@echo "  make docker-logs-db     - View database logs"
+	@echo "  make docker-restart     - Restart all services"
+	@echo "  make docker-ps          - List running containers"
+	@echo "  make docker-shell       - Open shell in app container"
+	@echo "  make docker-db-shell    - Open PostgreSQL shell"
+	@echo "  make docker-prod-up     - Build and start production services"
+	@echo "  make docker-prod-down   - Stop production services"
+	@echo "  make docker-clean       - Remove all containers, volumes, and images"
 	@echo ""
 	@echo "Database:"
 	@echo "  make db-backup   - Create database backup"

@@ -81,7 +81,8 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
-	// Health check endpoint (public - no auth)
+	// Health check endpoints (public - no auth)
+	r.Get("/health", handlers.HealthCheckHandler)
 	r.Get("/api/health", handlers.HealthCheckHandler)
 
 	// Auth routes (public)

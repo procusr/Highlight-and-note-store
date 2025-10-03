@@ -1,6 +1,7 @@
 services:
+  # PostgreSQL Database
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: mhgo-postgres
     environment:
       POSTGRES_USER: user
@@ -19,8 +20,55 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - mhgo-network
+
+  # MH-Go Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mhgo-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Application config
+      PORT: 8080
+      ENVIRONMENT: production
+
+      # Database connection (internal Docker network)
+      DATABASE_URL: postgres://user:password@postgres:5432/mhgo?sslmode=disable
+
+      # JWT Secret (override with .env file)
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+
+      # Email configuration (optional)
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      FROM_EMAIL: ${FROM_EMAIL:-noreply@mh-go.com}
+
+      # OpenAI configuration (optional)
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mhgo-network
 
 volumes:
   # Named volume persists data even when containers are removed
   postgres_data:
     driver: local
+
+networks:
+  mhgo-network:
+    driver: bridge

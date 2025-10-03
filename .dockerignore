@@ -1,0 +1,70 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Development files
+.air.toml
+tmp/
+bin/
+*.log
+.vscode/
+.idea/
+
+# Documentation
+*.md
+!README.md
+
+# Environment files (never include in image)
+.env
+.env.*
+!.env.example
+
+# Test files
+tests/
+*_test.go
+test-*.sh
+debug-*.sh
+
+# Build artifacts
+main
+server
+mh-go
+
+# Node modules (if using npm for frontend tooling)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Database files
+*.sql
+backups/
+!migrations/*.sql
+
+# Docker files (don't need these in the image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Architecture/planning docs
+architect/
+nextjs-version/
+
+# Backup files
+*.bak
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+cookies.txt
+CLAUDEoriginal
+CLAUDE.md
+WARP.md
+db-utils.sh
+setup-dev.sh
+start-app.sh
