@@ -16,10 +16,9 @@ import (
 )
 
 func main() {
-	// Load environment variables from .env file
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found or error loading .env file:", err)
-	}
+	// Load environment variables from .env file (optional for local development)
+	// In production (Railway, Docker, etc.), environment variables are set directly
+	_ = godotenv.Load() // Silently ignore if .env doesn't exist
 
 	// Load configuration
 	cfg := config.Load()

@@ -6,7 +6,7 @@
 
    ```bash
    cp .env.example .env
-   # Edit .env and set your JWT_SECRET
+   # Edit .env and set your JWT_SECRET and DATABASE_URL
    ```
 
 2. **Run the deployment script:**
@@ -18,6 +18,23 @@
 3. **Access your application:**
    - App: http://localhost:8080
    - Health: http://localhost:8080/health
+
+---
+
+## Universal Docker Support
+
+This application uses **standard Docker** and works on any platform that supports containers:
+
+✅ **Local Development** - Docker Desktop (Mac/Windows/Linux)
+✅ **Cloud VMs** - AWS EC2, GCP Compute Engine, Azure VMs, DigitalOcean Droplets
+✅ **Container Services** - AWS ECS/Fargate, GCP Cloud Run, Azure Container Instances
+✅ **Kubernetes** - Any K8s cluster (EKS, GKE, AKS, self-hosted)
+✅ **PaaS Platforms** - Railway, Render, Fly.io, Heroku, Porter
+✅ **Self-Hosted** - Any Linux server with Docker installed
+
+**No platform-specific configuration needed!** Just set environment variables.
+
+---
 
 ## Manual Deployment
 
@@ -118,11 +135,14 @@ ports:
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive deployment guide including:
 
-- Cloud deployment strategies
-- Security best practices
-- Monitoring setup
-- Production optimizations
-- CI/CD integration
+- **Platform-agnostic deployment** strategies
+- **Multi-cloud support** (AWS, GCP, Azure, DigitalOcean)
+- **PaaS platforms** (Railway, Render, Fly.io, Heroku)
+- **Kubernetes** deployment manifests
+- **Security best practices**
+- **Monitoring and logging** setup
+- **Production optimizations**
+- **CI/CD integration** examples
 
 ## Support
 

@@ -142,6 +142,51 @@ export ENVIRONMENT="development"
 
 - **Backend**: Go with Chi router
 - **Templates**: Templ (type-safe HTML templates)
-- **Frontend**: HTMX + Tailwind CSS
+- **Frontend**: HTMX + Alpine.js + Tailwind CSS
 - **Database**: PostgreSQL
 - **Containerization**: Docker
+
+## 🐳 Production Deployment
+
+This application is **fully containerized** and can be deployed anywhere Docker is supported.
+
+### Quick Deploy (3 commands)
+
+```bash
+cp .env.example .env        # Configure environment
+nano .env                   # Edit JWT_SECRET and DATABASE_URL
+./deploy.sh                 # Deploy with Docker
+```
+
+### Supported Platforms
+
+✅ **Any platform with Docker support:**
+
+- Local (Docker Desktop)
+- Cloud VMs (AWS EC2, GCP Compute, Azure VMs, DigitalOcean)
+- Container Services (AWS ECS, GCP Cloud Run, Azure Container Instances)
+- Kubernetes (EKS, GKE, AKS, self-hosted)
+- PaaS (Railway, Render, Fly.io, Heroku, Porter)
+- Self-hosted servers
+
+### Documentation
+
+- **📦 Quick Start**: [DOCKER_README.md](./DOCKER_README.md)
+- **📚 Complete Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md)
+  - Docker deployment
+  - Kubernetes manifests
+  - Cloud platform guides
+  - VPS/self-hosted setup
+  - CI/CD pipelines
+  - Security best practices
+
+### Key Features
+
+- ✅ Multi-stage Docker build (optimized ~25MB image)
+- ✅ Automatic database migrations
+- ✅ Health checks included
+- ✅ Non-root user security
+- ✅ PostgreSQL with persistent volumes
+- ✅ Platform-agnostic (works everywhere)
+
+---
