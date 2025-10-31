@@ -133,6 +133,12 @@ type LearningPrompt struct {
 	ErrorMessage     *string    `json:"error_message" db:"error_message"`
 	CreatedAt        time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt        time.Time  `json:"updated_at" db:"updated_at"`
+	
+	// Enhanced fields for AI-powered learning
+	SessionID        *uuid.UUID `json:"session_id" db:"session_id"`
+	StepNumber       *int       `json:"step_number" db:"step_number"`
+	InteractionType  *string    `json:"interaction_type" db:"interaction_type"`
+	AssessmentPassed *bool      `json:"assessment_passed" db:"assessment_passed"`
 
 	// Relationships
 	User           *User           `json:"user,omitempty"`
@@ -153,6 +159,14 @@ type LearningSession struct {
 	EndedAt              *time.Time `json:"ended_at" db:"ended_at"`
 	CreatedAt            time.Time  `json:"created_at" db:"created_at"`
 	Goal                 string     `json:"goal,omitempty"`
+	
+	// Enhanced fields for AI-powered learning
+	CurrentStep       int      `json:"current_step" db:"current_step"`
+	ConceptsCompleted []string `json:"concepts_completed" db:"concepts_completed"`
+	SessionSummary    *string  `json:"session_summary" db:"session_summary"`
+	TotalAssessments  int      `json:"total_assessments" db:"total_assessments"`
+	PassedAssessments int      `json:"passed_assessments" db:"passed_assessments"`
+	Status            string   `json:"status" db:"status"`
 
 	// Relationships
 	User           *User           `json:"user,omitempty"`
@@ -199,4 +213,81 @@ type DashboardStats struct {
 	ConceptsMastered    int `json:"concepts_mastered"`
 	QuizAccuracy        int `json:"quiz_accuracy"`
 	RetentionRate       int `json:"retention_rate"`
+}
+
+// AI-Powered Learning Models
+
+// InteractionType represents different types of learning interactions
+type InteractionType string
+
+const (
+	InteractionInitialContent    InteractionType = "initial_content"
+	InteractionUserQuestion      InteractionType = "user_question"
+	InteractionAIResponse        InteractionType = "ai_response"
+	InteractionAssessmentQuestion InteractionType = "assessment_question"
+	InteractionAssessmentAnswer  InteractionType = "assessment_answer"
+	InteractionConceptCompletion InteractionType = "concept_completion"
+	InteractionNextStep          InteractionType = "next_step"
+)
+
+// SessionStatus represents different learning session states
+type SessionStatus string
+
+const (
+	SessionStatusActive    SessionStatus = "active"
+	SessionStatusPaused    SessionStatus = "paused"
+	SessionStatusEnded     SessionStatus = "ended"
+	SessionStatusCompleted SessionStatus = "completed"
+)
+
+// AIRequest represents a request to the AI service
+type AIRequest struct {
+	SystemPrompt       string                `json:"system_prompt"`
+	SessionSummary     string                `json:"session_summary"`
+	RecentInteractions []LearningInteraction `json:"recent_interactions"`
+	CurrentInput       string                `json:"current_input"`
+	InteractionType    InteractionType       `json:"interaction_type"`
+}
+
+// LearningInteraction represents a single interaction in the learning flow
+type LearningInteraction struct {
+	Role    string `json:"role"`    // "user" or "assistant"
+	Content string `json:"content"` // the message content
+}
+
+// AIResponse represents a response from the AI service
+type AIResponse struct {
+	Content           string            `json:"content"`
+	ContextualActions []ContextualAction `json:"contextual_actions"`
+	SuggestedActions  []string          `json:"suggested_actions"`
+}
+
+// ContextualAction represents an action button that should be shown based on AI response
+type ContextualAction struct {
+	Type        string `json:"type"`        // "continue", "retry", "complete", etc.
+	Label       string `json:"label"`       // Button text
+	Action      string `json:"action"`      // API endpoint or action
+	Style       string `json:"style"`       // CSS class or style
+	Enabled     bool   `json:"enabled"`     // Whether the action is enabled
+	Description string `json:"description"` // Tooltip or description
+}
+
+// CreateSessionRequest represents the request to create a new learning session
+type CreateSessionRequest struct {
+	TopicName        string    `json:"topic_name"`
+	LearningMethodID uuid.UUID `json:"learning_method_id"`
+	UserGoal         string    `json:"user_goal"`
+}
+
+// SessionResponse represents the response when creating a session
+type SessionResponse struct {
+	SessionID      uuid.UUID `json:"session_id"`
+	InitialContent string    `json:"initial_content"`
+	LearningPath   []string  `json:"learning_path"`
+}
+
+// InteractionRequest represents a user interaction within a session
+type InteractionRequest struct {
+	Message         string          `json:"message"`
+	InteractionType InteractionType `json:"interaction_type"`
 }

@@ -17,7 +17,11 @@
       "Bash(git restore:*)",
       "Bash(git checkout:*)",
       "Bash(find:*)",
-      "Read(//Users/ibrahim009/.claude/output-styles/**)"
+      "Read(//Users/ibrahim009/.claude/output-styles/**)",
+      "Bash(migrate:*)",
+      "Bash(psql:*)",
+      "Bash(kill:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []
