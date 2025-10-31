@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"mh-go/internal/middleware"
@@ -10,7 +9,6 @@ import (
 	"mh-go/templates"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -88,11 +86,6 @@ func (h *LearningHandler) getStaticPathwayCards() []models.LearningPathwayCard {
 
 // LearningPlatformPage renders the main learning platform page
 func (h *LearningHandler) LearningPlatformPage(w http.ResponseWriter, r *http.Request) {
-	// Prevent caching to ensure fresh data for new sessions
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-	
 	userID := middleware.GetUserID(r.Context())
 
 	// Get user model
@@ -248,7 +241,7 @@ func (h *LearningHandler) UpdateProgress(w http.ResponseWriter, r *http.Request)
 	})
 }
 
-// StartLearningSession starts a new AI-powered learning session
+// StartLearningSession starts a new learning session
 func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
 
@@ -276,11 +269,20 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 		req.LearningGoal = r.FormValue("learning_goal")
 	}
 
-	// Validate request
-	if req.Topic == "" || req.LearningGoal == "" || req.MethodKey == "" {
-		http.Error(w, "Topic, learning goal, and method are required", http.StatusBadRequest)
+	// Create a topic for the user's learning session
+	topic := &models.Topic{
+		Name:            req.Topic,
+		Description:     fmt.Sprintf("Learning topic: %s", req.Topic),
+		Category:        "user-generated",
+		DifficultyLevel: "intermediate",
+	}
+
+	err := h.topicService.CreateTopic(topic)
+	if err != nil {
+		http.Error(w, "Failed to create topic", http.StatusInternalServerError)
 		return
 	}
+	topicID := topic.ID
 
 	// Get learning method by key
 	method, err := h.methodService.GetLearningMethodByKey(req.MethodKey)
@@ -289,42 +291,33 @@ func (h *LearningHandler) StartLearningSession(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Create enhanced session request
-	createReq := models.CreateSessionRequest{
-		TopicName:        req.Topic,
-		LearningMethodID: method.ID,
-		UserGoal:         req.LearningGoal,
-	}
-
-	// Create context with timeout for AI generation
-	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
-	defer cancel()
-
-	// Create enhanced learning session with AI generation
-	response, err := h.learningService.CreateEnhancedLearningSession(ctx, createReq, userID)
+	// Create learning prompt
+	_, err = h.learningService.CreateLearningPrompt(userID, topicID, method.ID, req.LearningGoal)
 	if err != nil {
-		fmt.Printf("Error creating enhanced session: %v\n", err)
-		http.Error(w, "Failed to create AI-powered learning session", http.StatusInternalServerError)
+		http.Error(w, "Failed to create learning prompt", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Printf("[StartLearningSession] user=%s session=%s topic=%s method=%s\n", userID.String(), response.SessionID.String(), req.Topic, method.MethodKey)
+	// Start learning session
+	session, err := h.learningService.StartLearningSession(userID, topicID, method.ID)
+	if err != nil {
+		http.Error(w, "Failed to start learning session", http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("[StartLearningSession] user=%s session=%s topic=%s method=%s method_key=%s\n", userID.String(), session.ID.String(), topicID.String(), method.ID.String(), method.MethodKey)
 
-	// If HTMX request, redirect to the session page
+	// If HTMX request, issue redirect header for refresh
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", fmt.Sprintf("/learning/session/%s", response.SessionID))
+		w.Header().Set("HX-Redirect", "/learning")
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	// JSON response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":         true,
-		"session_id":      response.SessionID,
-		"initial_content": response.InitialContent,
-		"learning_path":   response.LearningPath,
-		"message":         "AI-powered learning session created successfully",
+		"success":    true,
+		"session_id": session.ID,
+		"message":    "Learning session started",
 	})
 }
 
@@ -545,275 +538,5 @@ func (h *LearningHandler) DeleteLearningSession(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"message": "Learning session deleted successfully",
-	})
-}
-
-// Enhanced AI-powered learning handlers
-
-// ProcessSessionInteraction handles user interactions within a learning session
-func (h *LearningHandler) ProcessSessionInteraction(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	var req models.InteractionRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	// Validate request
-	if req.Message == "" {
-		http.Error(w, "Message is required", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
-	defer cancel()
-
-	// Process interaction
-	response, err := h.learningService.ProcessSessionInteraction(ctx, sessionID, req)
-	if err != nil {
-		fmt.Printf("Error processing interaction: %v\n", err)
-		http.Error(w, "Failed to process interaction", http.StatusInternalServerError)
-		return
-	}
-
-	// Return AI response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":            true,
-		"content":            response.Content,
-		"contextual_actions": response.ContextualActions,
-		"suggested_actions":  response.SuggestedActions,
-	})
-}
-
-// NextStep generates the next learning step
-func (h *LearningHandler) NextStep(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Create next step request
-	req := models.InteractionRequest{
-		Message:         "Please provide the next learning step or concept.",
-		InteractionType: models.InteractionNextStep,
-	}
-
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
-	defer cancel()
-
-	// Process next step
-	response, err := h.learningService.ProcessSessionInteraction(ctx, sessionID, req)
-	if err != nil {
-		fmt.Printf("Error generating next step: %v\n", err)
-		http.Error(w, "Failed to generate next step", http.StatusInternalServerError)
-		return
-	}
-
-	// Return response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":            true,
-		"content":            response.Content,
-		"contextual_actions": response.ContextualActions,
-		"suggested_actions":  response.SuggestedActions,
-	})
-}
-
-// PauseSession pauses the current learning session
-func (h *LearningHandler) PauseSession(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Pause session
-	err = h.learningService.PauseSession(sessionID)
-	if err != nil {
-		fmt.Printf("Error pausing session: %v\n", err)
-		http.Error(w, "Failed to pause session", http.StatusInternalServerError)
-		return
-	}
-
-	// Return success
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Session paused successfully",
-	})
-}
-
-// ResumeSession resumes a paused learning session
-func (h *LearningHandler) ResumeSession(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Resume session
-	err = h.learningService.ResumeSession(sessionID)
-	if err != nil {
-		fmt.Printf("Error resuming session: %v\n", err)
-		http.Error(w, "Failed to resume session", http.StatusInternalServerError)
-		return
-	}
-
-	// Return success
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Session resumed successfully",
-	})
-}
-
-// CompleteConceptHandler marks a concept as complete and generates summary
-func (h *LearningHandler) CompleteConceptHandler(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	var req struct {
-		ConceptName string `json:"concept_name"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	if req.ConceptName == "" {
-		http.Error(w, "Concept name is required", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
-	defer cancel()
-
-	// Complete concept and generate summary
-	err = h.learningService.CompleteConceptAndSummarize(ctx, sessionID, req.ConceptName)
-	if err != nil {
-		fmt.Printf("Error completing concept: %v\n", err)
-		http.Error(w, "Failed to complete concept", http.StatusInternalServerError)
-		return
-	}
-
-	// Return success
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": fmt.Sprintf("Concept '%s' completed successfully", req.ConceptName),
-	})
-}
-
-// GetSessionProgress returns progress information for a learning session
-func (h *LearningHandler) GetSessionProgress(w http.ResponseWriter, r *http.Request) {
-	userID := middleware.GetUserID(r.Context())
-	sessionID, err := uuid.Parse(chi.URLParam(r, "sessionID"))
-	if err != nil {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
-		return
-	}
-
-	// Verify session ownership
-	session, err := h.learningService.GetLearningSessionByID(sessionID)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-	if session.UserID != userID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Calculate progress metrics
-	progressPercent := float64(session.PassedAssessments) / float64(session.TotalAssessments) * 100
-	if session.TotalAssessments == 0 {
-		progressPercent = 0
-	}
-
-	// Return progress data
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":            true,
-		"session_id":         session.ID,
-		"current_step":       session.CurrentStep,
-		"concepts_completed": session.ConceptsCompleted,
-		"total_assessments":  session.TotalAssessments,
-		"passed_assessments": session.PassedAssessments,
-		"progress_percent":   progressPercent,
-		"status":             session.Status,
-		"session_summary":    session.SessionSummary,
 	})
 }

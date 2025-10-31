@@ -52,7 +52,7 @@ func main() {
 	topicService := services.NewTopicService(db)
 	methodService := services.NewLearningMethodService(db)
 	progressService := services.NewProgressService(db)
-	learningService := services.NewLearningService(db, topicService, methodService, progressService, openaiService)
+	learningService := services.NewLearningService(db, topicService, methodService, progressService)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -100,9 +100,9 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 		r.Get("/", folderHandler.OverviewPage)
 		r.Get("/overview", folderHandler.OverviewPage)
 
-		// Learning Platform (now AI-powered)
+		// Learning Platform
 		r.Get("/learning", learningHandler.LearningPlatformPage)
-		r.Post("/learning/start", learningHandler.StartLearningSession)
+		r.Post("/learning/start", learningHandler.StartLearning)
 		r.Get("/learning/session/{sessionID}", learningHandler.LearningSessionPage)
 
 		// New learning-focused routes matching architect template
@@ -159,16 +159,6 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, authHand
 					r.Post("/sessions", learningHandler.StartLearningSession)
 					r.Put("/sessions/{sessionID}", learningHandler.EndLearningSession)
 					r.Delete("/sessions/{sessionID}", learningHandler.DeleteLearningSession)
-					
-					// Enhanced AI-powered learning API routes
-					r.Route("/session/{sessionID}", func(r chi.Router) {
-						r.Post("/interact", learningHandler.ProcessSessionInteraction)
-						r.Post("/next-step", learningHandler.NextStep)
-						r.Put("/pause", learningHandler.PauseSession)
-						r.Put("/resume", learningHandler.ResumeSession)
-						r.Post("/complete-concept", learningHandler.CompleteConceptHandler)
-						r.Get("/progress", learningHandler.GetSessionProgress)
-					})
 				})
 		})
 	})

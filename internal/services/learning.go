@@ -15,16 +15,14 @@ type LearningService struct {
 	topicService        *TopicService
 	methodService       *LearningMethodService
 	progressService     *ProgressService
-	openaiService       *OpenAIService
 }
 
-func NewLearningService(db *sql.DB, topicService *TopicService, methodService *LearningMethodService, progressService *ProgressService, openaiService *OpenAIService) *LearningService {
+func NewLearningService(db *sql.DB, topicService *TopicService, methodService *LearningMethodService, progressService *ProgressService) *LearningService {
 	return &LearningService{
 		db:              db,
 		topicService:    topicService,
 		methodService:   methodService,
 		progressService: progressService,
-		openaiService:   openaiService,
 	}
 }
 
@@ -618,8 +616,11 @@ func (s *LearningService) GetPromptForSession(sessionID uuid.UUID) (*models.Lear
 		SELECT lp.id, lp.user_id, lp.topic_id, lp.learning_method_id, lp.learning_goal, lp.ai_prompt,
 		       lp.ai_response, lp.response_status, lp.error_message, lp.created_at, lp.updated_at
 		FROM learning_prompts lp
-		WHERE lp.session_id = $1
-		ORDER BY lp.created_at ASC
+		JOIN learning_sessions ls ON lp.topic_id = ls.topic_id
+			AND lp.learning_method_id = ls.learning_method_id
+			AND lp.user_id = ls.user_id
+		WHERE ls.id = $1
+		ORDER BY lp.created_at DESC
 		LIMIT 1
 	`
 
