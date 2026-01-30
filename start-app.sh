@@ -8,6 +8,11 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}Starting MH-Go Application...${NC}"
 
+# Function to check if command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
 # Start PostgreSQL with Docker Compose
 echo -e "${YELLOW}Starting PostgreSQL database...${NC}"
 docker-compose up -d postgres
@@ -28,9 +33,30 @@ echo -e "${GREEN}Database is ready!${NC}"
 echo -e "${YELLOW}Running database migrations...${NC}"
 # You can add migration commands here if needed
 
+# Generate templ templates (required for templates.* components)
+echo -e "${YELLOW}Generating Templ templates...${NC}"
+if command_exists templ; then
+  templ generate
+else
+  echo -e "${YELLOW}Templ not found. Installing...${NC}"
+  go install github.com/a-h/templ/cmd/templ@latest
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to install templ. Make sure Go is installed and GOPATH/bin is on your PATH.${NC}"
+    echo -e "${YELLOW}Tip: run ./setup-dev.sh to install required dev tools.${NC}"
+    exit 1
+  fi
+  templ generate
+fi
+
+if [ $? -ne 0 ]; then
+  echo -e "${RED}Failed to generate templ templates. Fix template errors and try again.${NC}"
+  exit 1
+fi
+
 # Build the application
 echo -e "${YELLOW}Building the application...${NC}"
-go build -o main .
+mkdir -p bin
+go build -o bin/server cmd/server/main.go
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}Build successful!${NC}"
@@ -45,7 +71,7 @@ if [ $? -eq 0 ]; then
     echo -e "${YELLOW}Press Ctrl+C to stop the server${NC}"
 
     # Start the application
-    ./main
+    ./bin/server
 else
     echo -e "${RED}Build failed!${NC}"
     exit 1
